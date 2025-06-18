@@ -11,11 +11,14 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:inteshar/app/core/init/init.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_api_availability/google_api_availability.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
   await init();
+
   try {
     await checkGooglePlayServices().timeout(const Duration(seconds: 10));
   } catch (e) {
@@ -23,21 +26,20 @@ void main() async {
   }
 
   runApp(const MyApp());
-
   FlutterNativeSplash.remove();
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({
-    super.key,
-  });
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    //connectivity controller
+    // Put connectivity controller in GetX dependency system
     Get.put(ConnectivityController());
+
     final bool darkMode =
         Constants.localStorage.read('settings')?['darkMode'] ?? false;
+
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       localizationsDelegates: const [
@@ -68,22 +70,26 @@ Future<void> checkGooglePlayServices() async {
   if (availability != GooglePlayServicesAvailability.success) {
     debugPrint('Google Play Services not available: $availability');
 
-    // در صورت عدم وجود Google Play ces به کاربر اطلاع دهید
-
+    // Notify user about lack of Google Play Services
     showGooglePlayServicesError(availability);
   } else {
     debugPrint('Google Play Services is available.');
 
     await Firebase.initializeApp();
 
-    FirebaseMessaging.onBackgroundMessage(handleFirebaseBackgroundMessage);
+    // Enable Firebase Crashlytics error reporting
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
 
+    FirebaseMessaging.onBackgroundMessage(handleFirebaseBackgroundMessage);
     await FirebaseNotificationService().initializeNotifications();
+
+    // Send a test crash to activate Crashlytics
+    // FirebaseCrashlytics.instance.crash(); // REMOVE THIS AFTER FIRST TEST
   }
 }
 
 void showGooglePlayServicesError(GooglePlayServicesAvailability availability) {
-  // اینجا می‌توانید با استفاده از دیالوگ یا صفحه جدید به کاربر اطلاع دهید.
+  // Show a warning if Google Play Services is not available
   debugPrint(
       'Google Play Services is not available: ${availability.toString()}');
 }

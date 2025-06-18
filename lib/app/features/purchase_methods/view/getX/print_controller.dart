@@ -12,6 +12,7 @@ class BluetoothController extends GetxController {
   RxBool isConnected = false.obs;
   RxBool isLoading = false.obs;
   RxBool printed = false.obs;
+  RxInt printCount = 1.obs;
   RxString deviceName = ''.obs;
   var rxRequestStatus = Status.initial.obs;
 
@@ -19,31 +20,25 @@ class BluetoothController extends GetxController {
   Future<void> checkAndRequestBluetooth() async {
     BluetoothAdapterState adapterState =
         await FlutterBluePlus.adapterState.first;
-    bool isBluetoothOn = (adapterState == BluetoothAdapterState.on);
 
-    if (!isBluetoothOn) {
-      // Request necessary permissions for Bluetooth usage
+    if (adapterState != BluetoothAdapterState.on) {
       await Permission.bluetoothConnect.request();
       await Permission.bluetoothScan.request();
 
-      // Attempt to turn on Bluetooth and wait for it to activate
       FlutterBluePlus.turnOn();
-      while (!isBluetoothOn) {
+
+      while (adapterState != BluetoothAdapterState.on) {
         await Future.delayed(const Duration(seconds: 1));
         adapterState = await FlutterBluePlus.adapterState.first;
       }
 
-      // Notify user about the Bluetooth status
-      if (!isBluetoothOn) {
-        Get.closeAllSnackbars();
-        Get.snackbar("خطأ", "تعذر تشغيل البلوتوث.");
-      } else {
-        Get.closeAllSnackbars();
-        Get.snackbar("نجاح", "تم تشغيل البلوتوث بنجاح.");
-        startScan();
-      }
+      Get.closeAllSnackbars();
+      Get.snackbar("نجاح", "تم تشغيل البلوتوث بنجاح.");
+
+      // بعد از روشن شدن بلوتوث دوباره تلاش کن برای اتصال
+      await tryAutoConnectPrinter();
     } else {
-      startScan(); // Begin scanning if Bluetooth was already on
+      startScan();
     }
   }
 
@@ -89,6 +84,40 @@ class BluetoothController extends GetxController {
     }
   }
 
+  Future<void> tryAutoConnectPrinter() async {
+    final savedPrinter = Constants.localStorage.read('printAddres');
+
+    if (savedPrinter != null &&
+        savedPrinter['macAddress'] != null &&
+        savedPrinter['name'] != null) {
+      final String macAddress = savedPrinter['macAddress'];
+      final String advName = savedPrinter['name'];
+
+      final adapterState = await FlutterBluePlus.adapterState.first;
+      if (adapterState != BluetoothAdapterState.on) {
+        print("🔴 بلوتوث روشن نیست.");
+        await checkAndRequestBluetooth();
+        return;
+      }
+
+      final bool isAlreadyConnected =
+          await PrintBluetoothThermal.connectionStatus;
+      if (isAlreadyConnected) {
+        print("✅ قبلاً متصل شده‌ایم.");
+        return;
+      }
+
+      try {
+        await connectToDevice(macAddress, advName);
+        print("✅ اتصال خودکار موفق بود.");
+      } catch (e) {
+        print("❌ خطا در اتصال خودکار: $e");
+      }
+    } else {
+      print("ℹ️ اطلاعات پرینتر ذخیره‌شده وجود ندارد.");
+    }
+  }
+
   // Connect to a specific Bluetooth device
   Future<void> connectToDevice(String remoteId, String advName) async {
     try {
@@ -96,6 +125,7 @@ class BluetoothController extends GetxController {
       if (!connectionStatus) {
         await PrintBluetoothThermal.connect(macPrinterAddress: remoteId);
       }
+
       Constants.localStorage.write('printAddres', {
         'macAddress': remoteId,
         'name': advName,

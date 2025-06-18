@@ -47,185 +47,194 @@ class Signin extends StatelessWidget {
               children: [
                 const Gap(120),
                 const Gap(40),
-                Form(
-                  key: formKey,
-                  child: Column(
-                    children: [
-                      TextFormField(
-                        focusNode: fildOne,
-                        textInputAction: TextInputAction.next,
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        controller: singinApiProvider.usernameController,
-                        validator: (value) {
-                          if (GetUtils.isEmail(value!)) {
-                            return null;
-                          }
-                          return 'أدخل بريد إلكتروني صالح';
-                        },
-                        onFieldSubmitted: (v) {
-                          FocusScope.of(context).requestFocus(fildTwo);
-                        },
-                        decoration: InputDecoration(
-                            border: const OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.grey,
-                                width: 1,
-                              ),
-                            ),
-                            enabledBorder: const OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: Color.fromARGB(255, 211, 211, 211),
-                                  width: 1),
-                            ),
-                            focusedBorder: const OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.grey, width: 1)),
-                            errorBorder: const OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Colors.red, width: 1),
-                            ),
-                            focusedErrorBorder: const OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Colors.grey, width: 1),
-                            ),
-                            filled: true,
-                            fillColor: Theme.of(context)
-                                .colorScheme
-                                .onPrimary
-                                .withAlpha(30),
-                            hintText: 'البريد الإلكتروني',
-                            hintStyle: const TextStyle(color: Colors.grey)),
-                      ),
-                      const Gap(20),
-                      Obx(
-                        () => TextFormField(
-                          focusNode: fildTwo,
+                Directionality(
+                  textDirection: TextDirection.ltr,
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          focusNode: fildOne,
+                          textInputAction: TextInputAction.next,
+                          textDirection: TextDirection.ltr,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
-                          obscureText: welcomeController.isPasswordHidden.value,
-                          controller: singinApiProvider.passwordController,
+                          controller: singinApiProvider.usernameController,
                           validator: (value) {
-                            if (value!.length > 5) {
+                            if (GetUtils.isEmail(value!)) {
                               return null;
                             }
-                            return 'أدخل كلمة المرور الخاصة بك بشكل صحيح';
+                            return 'أدخل بريد إلكتروني صالح';
+                          },
+                          onFieldSubmitted: (v) {
+                            FocusScope.of(context).requestFocus(fildTwo);
                           },
                           decoration: InputDecoration(
-                            border: const OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.grey,
-                                width: 1,
+                              border: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.grey,
+                                  width: 1,
+                                ),
                               ),
-                            ),
-                            enabledBorder: const OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: Color.fromARGB(255, 211, 211, 211),
-                                  width: 1),
-                            ),
-                            focusedBorder: const OutlineInputBorder(
+                              enabledBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Color.fromARGB(255, 211, 211, 211),
+                                    width: 1),
+                              ),
+                              focusedBorder: const OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: Colors.grey, width: 1)),
+                              errorBorder: const OutlineInputBorder(
                                 borderSide:
-                                    BorderSide(color: Colors.grey, width: 1)),
-                            errorBorder: const OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Colors.red, width: 1),
-                            ),
-                            focusedErrorBorder: const OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Colors.grey, width: 1),
-                            ),
-                            hintText: 'كلمة المرور',
-                            hintStyle: const TextStyle(color: Colors.grey),
-                            filled: true,
-                            fillColor: Theme.of(context)
-                                .colorScheme
-                                .onPrimary
-                                .withAlpha(30),
-                            suffix: ZoomTapAnimation(
-                              onTap: () {
-                                welcomeController.isPasswordHidden.value =
-                                    !welcomeController.isPasswordHidden.value;
-                              },
-                              child: SvgPicture.asset(
-                                welcomeController.isPasswordHidden.value
-                                    ? 'assets/svgs/eye.svg'
-                                    : 'assets/svgs/eye-crossed.svg',
-                                width: 20,
-                                height: 20,
-                                colorFilter: ColorFilter.mode(
-                                  Theme.of(context).colorScheme.onPrimary,
-                                  BlendMode.srcIn,
+                                    BorderSide(color: Colors.red, width: 1),
+                              ),
+                              focusedErrorBorder: const OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.grey, width: 1),
+                              ),
+                              filled: true,
+                              fillColor: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimary
+                                  .withAlpha(30),
+                              hintText: 'البريد الإلكتروني',
+                              hintStyle: const TextStyle(color: Colors.grey)),
+                        ),
+                        const Gap(20),
+                        Obx(
+                          () => TextFormField(
+                            focusNode: fildTwo,
+                            autovalidateMode: AutovalidateMode.onUserInteraction,
+                            obscureText: welcomeController.isPasswordHidden.value,
+                            controller: singinApiProvider.passwordController,
+                            textDirection: TextDirection.ltr,
+                            validator: (value) {
+                              if (value!.length > 5) {
+                                return null;
+                              }
+                              return 'أدخل كلمة المرور الخاصة بك بشكل صحيح';
+                            },
+                            decoration: InputDecoration(
+                              border: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.grey,
+                                  width: 1,
+                                ),
+                              ),
+                              enabledBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Color.fromARGB(255, 211, 211, 211),
+                                    width: 1),
+                              ),
+                              focusedBorder: const OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: Colors.grey, width: 1)),
+                              errorBorder: const OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.red, width: 1),
+                              ),
+                              focusedErrorBorder: const OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.grey, width: 1),
+                              ),
+                              hintText: 'كلمة المرور',
+                              hintStyle: const TextStyle(color: Colors.grey),
+                              filled: true,
+                              fillColor: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimary
+                                  .withAlpha(30),
+                              suffix: ZoomTapAnimation(
+                                onTap: () {
+                                  welcomeController.isPasswordHidden.value =
+                                      !welcomeController.isPasswordHidden.value;
+                                },
+                                child: SvgPicture.asset(
+                                  welcomeController.isPasswordHidden.value
+                                      ? 'assets/svgs/eye.svg'
+                                      : 'assets/svgs/eye-crossed.svg',
+                                  width: 20,
+                                  height: 20,
+                                  colorFilter: ColorFilter.mode(
+                                    Theme.of(context).colorScheme.onPrimary,
+                                    BlendMode.srcIn,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                      const Gap(20),
-                      SizedBox(
-                        width: double.infinity,
-                        child: Obx(
-                          () => ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor:
-                                  const Color.fromARGB(255, 55, 55, 55),
-                              backgroundColor: _getBackgroundColor(
-                                  singinApiProvider.rxRequestStatus.value,
-                                  context),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
+                        const Gap(20),
+                        SizedBox(
+                          width: double.infinity,
+                          child: Obx(
+                            () => ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor:
+                                    const Color.fromARGB(255, 55, 55, 55),
+                                backgroundColor: _getBackgroundColor(
+                                    singinApiProvider.rxRequestStatus.value,
+                                    context),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
                               ),
-                            ),
-                            onPressed:
-                                singinApiProvider.rxRequestButtonStatus.value ==
-                                        Status.loading
-                                    ? null
-                                    : () {
-                                        FocusScope.of(context).unfocus();
-                                        if (formKey.currentState!.validate()) {
-                                          singinApiProvider.login(
-                                            username: singinApiProvider
-                                                .usernameController.text,
-                                            password: singinApiProvider
-                                                .passwordController.text,
-                                          );
-                                        }
-                                      },
-                            child: Obx(
-                              () {
-                                switch (
-                                    singinApiProvider.rxRequestStatus.value) {
-                                  case Status.completed:
-                                    return Text(
-                                      'دخول',
-                                      style: TextStyle(
+                              onPressed:
+                                  singinApiProvider.rxRequestButtonStatus.value ==
+                                          Status.loading
+                                      ? null
+                                      : () {
+                                          FocusScope.of(context).unfocus();
+                                          if (formKey.currentState!.validate()) {
+                                            singinApiProvider.login(
+                                              username: singinApiProvider
+                                                  .usernameController.text,
+                                              password: singinApiProvider
+                                                  .passwordController.text,
+                                            );
+                                          }
+                                        },
+                              child: Obx(
+                                () {
+                                  switch (
+                                      singinApiProvider.rxRequestStatus.value) {
+                                    case Status.initial:
+                                      return Text(
+                                        'دخول',
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onPrimary,
+                                        ),
+                                      );
+                                    case Status.completed:
+                                      return CustomLoading(
                                         color: Theme.of(context)
                                             .colorScheme
                                             .onPrimary,
-                                      ),
-                                    );
-                                  case Status.error:
-                                    return Text(
-                                      singinApiProvider.errorMessage.value,
-                                      style: TextStyle(
+                                      );
+                                    case Status.error:
+                                      return Text(
+                                        singinApiProvider.errorMessage.value,
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onError,
+                                        ),
+                                      );
+                                    case Status.loading:
+                                      return CustomLoading(
                                         color: Theme.of(context)
                                             .colorScheme
-                                            .onError,
-                                      ),
-                                    );
-                                  case Status.loading:
-                                    return CustomLoading(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimary,
-                                    );
-                                  default:
-                                    return const Text('دخول');
-                                }
-                              },
+                                            .onPrimary,
+                                      );
+                                  }
+                                },
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 const Gap(20),

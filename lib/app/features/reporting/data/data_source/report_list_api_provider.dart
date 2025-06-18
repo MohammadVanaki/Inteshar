@@ -32,6 +32,11 @@ class ReportListApiProvider extends GetxController {
   }) async {
     rxRequestStatus.value = Status.loading;
     rxRequestButtonStatus.value = Status.loading;
+    print('response.statusCode :===> ${productId}');
+    print('response.statusCode :===> ${companyId}');
+    print('response.statusCode :===> ${startDate}');
+    print('response.statusCode :===> ${endDate}');
+
     try {
       final response = await dio.post(
         "${Constants.baseUrl}/sell_serials",

@@ -1,3 +1,4 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
@@ -135,7 +136,6 @@ class HomePage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  
                   Positioned(
                     top: 40,
                     child: SizedBox(
@@ -220,18 +220,45 @@ class HomePage extends StatelessWidget {
                                       children: [
                                         const Gap(5),
                                         Obx(
-                                          () => Text(
-                                            formatNumber(homeApiProvider
-                                                    .inventory.value) ??
-                                                '',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onPrimary,
-                                              fontSize: 25,
-                                              fontWeight: FontWeight.w700,
-                                            ),
+                                          () => Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                formatNumber(homeApiProvider
+                                                        .inventory.value) ??
+                                                    '',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onPrimary,
+                                                  fontSize: 25,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              ),
+                                              const Gap(10),
+                                              ZoomTapAnimation(
+                                                onTap: () {
+                                                  _refreshData(homeApiProvider);
+                                                  companySliderController
+                                                      .activeCompany.value = -1;
+                                                  companySliderController
+                                                      .selected.value = -1;
+                                                  companySliderController
+                                                      .isLoading.value = false;
+                                                },
+                                                child: SvgPicture.asset(
+                                                  'assets/svgs/rotate-square.svg', 
+                                                  colorFilter: ColorFilter.mode(
+                                                    Theme.of(context)
+                                                        .colorScheme
+                                                        .secondary,
+                                                    BlendMode.srcIn,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ],
@@ -239,7 +266,7 @@ class HomePage extends StatelessWidget {
                                   },
                                 )
                               : const SizedBox.shrink(),
-                        ],
+                        ], 
                       ),
                     ),
                   ),

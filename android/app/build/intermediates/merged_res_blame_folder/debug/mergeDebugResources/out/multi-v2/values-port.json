@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.dijlah.inteshar.app-mergeDebugResources-62:/values-port/values-port.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\mvana\\.gradle\\caches\\8.9\\transforms\\dcf3c1da679a9778b681f9390db08945\\transformed\\appcompat-1.2.0\\res\\values-port\\values-port.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "55",
+                        "endOffsets": "106"
+                    }
+                }
+            ]
+        }
+    ]
+}

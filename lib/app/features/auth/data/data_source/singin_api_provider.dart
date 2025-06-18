@@ -64,7 +64,7 @@ class SinginApiProvider extends GetxController {
           'firebase_token': Constants.fcmToken,
           'device_type': deviceType,
           'device_token': deviceId,
-        },
+        },   
       );
 
       if (response.statusCode == 200) {
@@ -79,6 +79,8 @@ class SinginApiProvider extends GetxController {
         await Future.delayed(const Duration(seconds: 2));
         rxRequestButtonStatus.value = Status.completed;
         Get.offNamed(Routes.home);
+        rxRequestStatus = Status.initial.obs;
+        rxRequestButtonStatus = Status.initial.obs;
       } else {
         print('===================>>>${response.data['errors'][0]}');
         errorMessage.value = response.data['errors'][0] ?? 'فشل تسجيل الدخول';

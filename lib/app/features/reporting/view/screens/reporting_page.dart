@@ -33,7 +33,8 @@ class ReportingPage extends StatelessWidget {
       canBack: false,
       child: Container(
         width: double.infinity,
-        margin: const EdgeInsets.symmetric(horizontal: 20).copyWith(bottom: 90),
+        height: 650,
+        margin: const EdgeInsets.symmetric(horizontal: 20),
         decoration: Constants.intesharBoxDecoration(context).copyWith(
           color: Theme.of(context).colorScheme.primary,
         ),
@@ -57,7 +58,7 @@ class ReportingPage extends StatelessWidget {
                             CategoryDropdown(
                               itemList: [
                                 const DropdownMenuEntry(
-                                    value: 'الکل', label: 'الکل'),
+                                    value: '0', label: 'الکل'),
                                 ...companyArchiveController.filteredCompanies
                                     .map((company) {
                                   return DropdownMenuEntry(
@@ -66,11 +67,21 @@ class ReportingPage extends StatelessWidget {
                                   );
                                 }),
                               ],
+                              selectedValue:
+                                  reportValueController.selectedCompany.value ??
+                                      '0',
                               onSelected: (id) {
-                                productsApiProvider
-                                    .fetchProducts(int.tryParse(id!) ?? 0);
+                                // وقتی شرکت انتخاب شد، محصولات مربوطه رو fetch کن
+                                productsApiProvider.fetchProducts(
+                                    int.tryParse(id ?? '0') ?? 0);
+
+                                // مقدار انتخاب شده شرکت رو ذخیره کن
                                 reportValueController.selectedCompany.value =
-                                    id;
+                                    id ?? '0';
+
+                                // مقدار محصول رو ریست کن به مقدار پیش‌فرض چون شرکت تغییر کرده
+                                reportValueController.selectedProduct.value =
+                                    '0';
                               },
                             ),
                             const Gap(10),
@@ -86,27 +97,33 @@ class ReportingPage extends StatelessWidget {
                                   return CategoryDropdown(
                                     itemList: const [
                                       DropdownMenuEntry(
-                                          value: 'الکل', label: 'الکل'),
+                                          value: '0', label: 'الکل'),
                                     ],
+                                    selectedValue: reportValueController
+                                            .selectedProduct.value ??
+                                        '0',
                                     onSelected: (id) {
                                       reportValueController
-                                          .selectedProduct.value = '0';
+                                          .selectedProduct.value = id ?? '0';
                                     },
                                   );
                                 case Status.completed:
                                   return CategoryDropdown(
                                     itemList: [
                                       const DropdownMenuEntry(
-                                          value: 'الکل', label: 'الکل'),
+                                          value: '0', label: 'الکل'),
                                       ...productsApiProvider.productsDataList
-                                          .map((company) {
+                                          .map((product) {
                                         return DropdownMenuEntry(
-                                          value: company.id.toString(),
-                                          label: company.title,
+                                          value: product.id.toString(),
+                                          label: product.title,
                                         );
                                       }),
                                     ],
-                                    onSelected: (String? id) {
+                                    selectedValue: reportValueController
+                                            .selectedProduct.value ??
+                                        '0',
+                                    onSelected: (id) {
                                       reportValueController
                                           .selectedProduct.value = id ?? '0';
                                     },

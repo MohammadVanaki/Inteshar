@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 // import 'package:flutter_sms/flutter_sms.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
@@ -10,6 +11,7 @@ import 'package:inteshar/app/core/common/constants/dashed_border.dart';
 import 'package:inteshar/app/core/routes/routes.dart';
 import 'package:inteshar/app/core/utils/custom_loading.dart';
 import 'package:inteshar/app/features/home/data/data_source/home_api_provider.dart';
+import 'package:inteshar/app/features/purchase_methods/view/getX/print_controller.dart';
 import 'package:inteshar/app/features/purchase_methods/view/screens/bluetooth_page.dart';
 import 'package:share_plus/share_plus.dart';
 // import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
@@ -60,7 +62,7 @@ Future<void> manageMethods({
     return buffer.toString();
   }
 
-    String generatePinCodesCopy() {
+  String generatePinCodesCopy() {
     final StringBuffer buffer = StringBuffer();
     if (serials?.first.code != null) {
       for (var serial in serials!) {
@@ -81,23 +83,18 @@ Future<void> manageMethods({
     return buffer.toString();
   }
 
-
-
   // print('ussdCodes----->${ussdCodes?.first.code}');
   switch (type) {
     case 0: // Print
-      Get.toNamed(
-        Routes.bluetoothPage,
-        arguments: BluetoothPage(
-          serialList: serials ?? [],
-          ussdCodes: ussdCodes ?? [],
-          photoUrl: photoUrl,
-          printDate: printDate,
-          cardTitle: cardTitle,
-          footer: footer,
-          isReported: isReported,
-          cardId: cardId,
-        ),
+      await checkBluetoothBeforeNavigate(
+        serials: serials,
+        ussdCodes: ussdCodes,
+        photoUrl: photoUrl,
+        printDate: printDate,
+        cardTitle: cardTitle,
+        footer: footer,
+        isReported: isReported,
+        cardId: cardId,
       );
       break;
 
@@ -282,5 +279,70 @@ void _sendSMS(String message, List<String> recipients) async {
     // debugPrint(result);
   } catch (error) {
     debugPrint("Error sending SMS: $error");
+  }
+}
+
+Future<void> navigateToBluetoothPage({
+  required List? serials,
+  required List? ussdCodes,
+  required String photoUrl,
+  required String printDate,
+  required String cardTitle,
+  required String footer,
+  required bool isReported,
+  required String cardId,
+}) async {
+  Get.toNamed(
+    Routes.bluetoothPage,
+    arguments: BluetoothPage(
+      serialList: serials ?? [],
+      ussdCodes: ussdCodes ?? [],
+      photoUrl: photoUrl,
+      printDate: printDate,
+      cardTitle: cardTitle,
+      footer: footer,
+      isReported: isReported,
+      cardId: cardId,
+    ),
+  );
+}
+
+Future<void> checkBluetoothBeforeNavigate({
+  required List? serials,
+  required List? ussdCodes,
+  required String photoUrl,
+  required String printDate,
+  required String cardTitle,
+  required String footer,
+  required bool isReported,
+  required String cardId,
+}) async {
+  final adapterState = await FlutterBluePlus.adapterState.first;
+
+        final BluetoothController bluetoothController =
+      Get.put(BluetoothController(), permanent: true);
+  if (adapterState == BluetoothAdapterState.on) {
+    await navigateToBluetoothPage(
+      serials: serials,
+      ussdCodes: ussdCodes,
+      photoUrl: photoUrl,
+      printDate: printDate,
+      cardTitle: cardTitle,
+      footer: footer,
+      isReported: isReported,
+      cardId: cardId,
+    );
+  } else {
+    await bluetoothController.checkAndRequestBluetooth();
+    await navigateToBluetoothPage(
+      serials: serials,
+      ussdCodes: ussdCodes,
+      photoUrl: photoUrl,
+      printDate: printDate,
+      cardTitle: cardTitle,
+      footer: footer,
+      isReported: isReported,
+      cardId: cardId,
+    );
   }
 }

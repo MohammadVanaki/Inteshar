@@ -32,7 +32,7 @@ class FirebaseNotificationService {
     });
 
     // Subscribe to a topic
-    await subscribeToTopic("general111");
+    await subscribeToTopic("general");
   }
 
   // Subscribe to a topic

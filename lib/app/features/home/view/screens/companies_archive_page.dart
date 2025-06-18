@@ -33,9 +33,10 @@ class CompaniesArchivePage extends StatelessWidget {
 
     final TextEditingController countController = TextEditingController();
     final FavorityController favorityController = Get.put(FavorityController());
+    String cardPricestr = '';
     return InternalPage(
       disconnect: false,
-      title: companyList.first.companyTitle,
+      title: companyList.isNotEmpty ? companyList.first.companyTitle : '',
       child: Container(
         width: double.infinity,
         margin: const EdgeInsets.symmetric(horizontal: 20).copyWith(bottom: 20),
@@ -86,7 +87,6 @@ class CompaniesArchivePage extends StatelessWidget {
                       Get.put(CardPriceApi(), tag: index.toString());
                   return ZoomTapAnimation(
                     onTap: () {
-                      String cardPricestr = '';
                       cardPriceApi
                           .fetchCardPrice(
                               cardId: companyList[index].id.toString())
@@ -368,7 +368,6 @@ class CompaniesArchivePage extends StatelessWidget {
                                                                                 cardId: companyList[index].id.toString())
                                                                             .then(
                                                                           (isSuccessful) {
-                                                                            print(purchaseApiProvider.purchaseDataList.first.printDate);
                                                                             if (isSuccessful) {
                                                                               Navigator.pop(context);
                                                                               purchaseApiProvider.isProcessing.value = false;

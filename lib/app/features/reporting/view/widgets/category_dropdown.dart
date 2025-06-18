@@ -1,21 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:get/get.dart';
 import 'package:inteshar/app/config/constants.dart';
-import 'package:inteshar/app/features/home/data/data_source/products_api_provider.dart';
 
 class CategoryDropdown extends StatelessWidget {
   const CategoryDropdown({
     super.key,
     required this.itemList,
+    required this.selectedValue,
     required this.onSelected,
   });
   final List<DropdownMenuEntry<String>> itemList;
   final void Function(String?) onSelected;
+  final String selectedValue;
   @override
   Widget build(BuildContext context) {
-    final ProductsApiProvider productsApiProvider =
-        Get.put(ProductsApiProvider(), tag: 'archive');
     return Directionality(
       textDirection: TextDirection.ltr,
       child: Expanded(
@@ -67,6 +65,7 @@ class CategoryDropdown extends StatelessWidget {
               return count > entries.length ? entries.length : count;
             },
             onSelected: onSelected,
+            initialSelection: selectedValue,
             // onSelected: (id) {
             //   print(id);
             //   productsApiProvider.fetchProducts(int.tryParse(id!) ?? 0);

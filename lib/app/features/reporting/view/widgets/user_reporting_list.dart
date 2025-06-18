@@ -194,17 +194,18 @@ class USerReportingList extends StatelessWidget {
                         ),
                       ),
                       const Gap(10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            serials.first.serials[index].serial ?? '',
-                          ),
-                          Text(
-                            serials.first.serials[index].printDate,
-                            textDirection: TextDirection.ltr,
-                          ),
-                        ],
+                      Text(
+                        serials.first.serials[index].serial ??
+                            serials.first.serials[index].code1 ??
+                            '',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: false,
+                      ),
+                      const Gap(5),
+                      Text(
+                        serials.first.serials[index].printDate,
+                        textDirection: TextDirection.ltr,
                       ),
                       const Gap(10),
                       SizedBox(
