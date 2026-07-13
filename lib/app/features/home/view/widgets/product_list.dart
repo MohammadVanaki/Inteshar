@@ -61,7 +61,7 @@ class ProductsList extends StatelessWidget {
                         fit: BoxFit.fill,
                         height: 120,
                         width: double.infinity,
-                        imageUrl: products[index].logoUrl,
+                        imageUrl: products[index].logoUrl ?? '',
                         placeholder: (context, url) => const CustomLoading(),
                         errorWidget: (context, url, error) => Image.asset(
                           'assets/images/not.jpg',
@@ -74,7 +74,7 @@ class ProductsList extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.all(10.0),
                       child: Text(
-                        products[index].title,
+                        products[index].title ?? '',
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onPrimary,
                         ),

@@ -4,19 +4,21 @@ import 'package:get/get.dart';
 import 'package:inteshar/app/config/constants.dart';
 import 'package:inteshar/app/config/handle_logout.dart';
 import 'package:inteshar/app/config/status.dart';
+import 'package:inteshar/app/core/common/constants/api_client.dart';
 import 'package:inteshar/app/core/common/widgets/exit_dialog.dart';
 import 'package:inteshar/app/features/home/data/data_source/home_api_provider.dart';
 import 'package:inteshar/app/features/services/view/widgets/result_page.dart';
+import 'package:inteshar/app/core/common/widgets/error_dialog.dart';
 
 class ServiceApiProvider extends GetxController {
   final RxString errorMessage = ''.obs;
-  final Dio dio = Dio(BaseOptions(
-    receiveTimeout: const Duration(milliseconds: 10000),
-    validateStatus: (status) {
-      return status! < 500;
-    },
-  ));
-
+  // final Dio dio = Dio(BaseOptions(
+  //   receiveTimeout: const Duration(milliseconds: 10000),
+  //   validateStatus: (status) {
+  //     return status! < 500;
+  //   },
+  // ));
+  final ApiClient _apiClient = ApiClient();
   final rxRequestStatus = Status.initial.obs;
   final HomeApiProvider updateController = Get.find<HomeApiProvider>();
 
@@ -35,7 +37,7 @@ class ServiceApiProvider extends GetxController {
     print(phone);
 
     try {
-      final response = await dio.post(
+      final response = await _apiClient.dio.post(
         "${Constants.baseUrl}/masal_transaction",
         queryParameters: {
           'mobile': phone,
@@ -46,6 +48,10 @@ class ServiceApiProvider extends GetxController {
           headers: {
             'Authorization': 'Bearer ${Constants.userToken}',
             'Content-Type': 'application/json',
+          },
+          extra: {
+            'safeToRetry': false,
+            'warningMessage': 'حدث خطأ في الاتصال أثناء تفعيل الخدمة. يرجى التأكد من وصول الخدمة للمستلم أو رصيدك أولاً تجنباً لتفعيل الخدمة مرتين. هل تريد المحاولة مرة أخرى؟',
           },
         ),
       );
@@ -76,16 +82,14 @@ class ServiceApiProvider extends GetxController {
           exitDialog(response.data['errors'][0]);
         } else {
           rxRequestStatus.value = Status.error;
-          errorMessage.value = response.data['message'];
-          Get.closeAllSnackbars();
-          Get.snackbar('خطأ', response.data['message']);
+          errorMessage.value = response.data['message'] ?? 'لم تتم العملية بشكل صحيح، يرجى اعادة المحاولة';
+          showErrorDialog(errorMessage.value);
         }
       }
     } catch (e) {
       rxRequestStatus.value = Status.error;
-      Get.closeAllSnackbars();
-      Get.snackbar('خطأ', 'فشل في جلب البيانات.');
       errorMessage.value = 'لم تتم العملية بشكل صحيح، يرجى اعادة المحاولة';
+      showErrorDialog(errorMessage.value);
       print(e);
     }
   }

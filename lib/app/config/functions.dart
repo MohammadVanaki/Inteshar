@@ -37,24 +37,101 @@ String removeHtmlTags(String htmlString) {
   return htmlString.replaceAll(tagRegExp, '');
 }
 
+List<TextSpan> parseHtmlToTextSpans(String htmlString, TextStyle baseStyle) {
+  String processed = htmlString
+      .replaceAll('&lt;', '<')
+      .replaceAll('&gt;', '>')
+      .replaceAll('&quot;', '"')
+      .replaceAll('&apos;', "'")
+      .replaceAll('&amp;', '&')
+      .replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), '\n')
+      .replaceAll('&nbsp;', ' ')
+      .replaceAll('&rlm;', '\u200F')
+      .replaceAll('&lrm;', '\u200E');
+
+  final regExp = RegExp(r'(<[^>]+>)');
+  final matches = regExp.allMatches(processed);
+  
+  List<TextSpan> spans = [];
+  int lastIndex = 0;
+  
+  bool isBold = false;
+  bool isItalic = false;
+  bool isUnderline = false;
+  
+  void addText(String text) {
+    if (text.isEmpty) return;
+    spans.add(TextSpan(
+      text: text,
+      style: baseStyle.copyWith(
+        fontWeight: isBold ? FontWeight.bold : baseStyle.fontWeight,
+        fontStyle: isItalic ? FontStyle.italic : baseStyle.fontStyle,
+        decoration: isUnderline ? TextDecoration.underline : baseStyle.decoration,
+      ),
+    ));
+  }
+
+  for (final match in matches) {
+    if (match.start > lastIndex) {
+      addText(processed.substring(lastIndex, match.start));
+    }
+    
+    String tag = match.group(0)!.toLowerCase();
+    if (tag == '<b>' || tag == '<strong>') {
+      isBold = true;
+    } else if (tag == '</b>' || tag == '</strong>') {
+      isBold = false;
+    } else if (tag == '<i>' || tag == '<em>') {
+      isItalic = true;
+    } else if (tag == '</i>' || tag == '<em>') {
+      isItalic = false;
+    } else if (tag == '<u>') {
+      isUnderline = true;
+    } else if (tag == '</u>') {
+      isUnderline = false;
+    } else if (tag == '</p>' || tag == '</div>') {
+      addText('\n');
+    }
+    
+    lastIndex = match.end;
+  }
+  
+  if (lastIndex < processed.length) {
+    addText(processed.substring(lastIndex));
+  }
+  
+  return spans;
+}
+
 Future<String?> getId() async {
   var deviceInfo = DeviceInfoPlugin();
   var storage = const FlutterSecureStorage();
 
-  if (Platform.isIOS) {
-    var iosDeviceInfo = await deviceInfo.iosInfo;
-    var deviceId = iosDeviceInfo.identifierForVendor ?? const Uuid().v4();
-    await storage.write(key: 'device_id', value: deviceId);
+  String? savedId = await storage.read(key: 'unique_device_id');
+  if (savedId != null) return savedId;
 
-    return deviceId;
-  } else if (Platform.isAndroid) {
-    var androidDeviceInfo = await deviceInfo.androidInfo;
-    var androidId = androidDeviceInfo.id;
+  String finalId = '';
 
-    await storage.write(key: 'device_id', value: androidId);
+  if (Platform.isAndroid) {
+    var androidInfo = await deviceInfo.androidInfo;
 
-    return androidId;
-  } else {
-    return null;
+    String hardwareSerial = androidInfo.serialNumber;
+
+    if (hardwareSerial != 'unknown' && hardwareSerial.isNotEmpty) {
+      finalId = hardwareSerial;
+    } else {
+      finalId =
+          "${androidInfo.brand}-${androidInfo.model}-${androidInfo.id}-${androidInfo.board}-${androidInfo.hardware}-${androidInfo.fingerprint}";
+    }
+  } else if (Platform.isIOS) {
+    var iosInfo = await deviceInfo.iosInfo;
+    finalId = iosInfo.identifierForVendor ?? const Uuid().v4();
   }
+
+  if (finalId.isEmpty) {
+    finalId = const Uuid().v4();
+  }
+
+  await storage.write(key: 'unique_device_id', value: finalId);
+  return finalId;
 }

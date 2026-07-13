@@ -7,9 +7,11 @@ import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:inteshar/app/features/home/data/data_source/home_api_provider.dart';
+import 'package:inteshar/app/features/purchase_methods/services/optimized_printer_service.dart';
 import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:inteshar/app/config/constants.dart';
+import 'package:inteshar/app/config/functions.dart';
 import 'package:image/image.dart' as img;
 import 'package:inteshar/app/config/status.dart';
 import 'package:inteshar/app/core/common/widgets/internal_page.dart';
@@ -47,8 +49,9 @@ class BluetoothPage extends StatelessWidget {
     print('printDate=======>$printDate');
     bluetoothController.printed.value = false;
     bluetoothController.printCount.value = 0;
-    SettingController settingController = Get.put(SettingController());
+    SettingController settingController = Get.find<SettingController>();
     final updateController = Get.find<HomeApiProvider>();
+    final String cleanFooter = removeHtmlTags(footer);
 
     List<ScreenshotController> cardPhotoScreenshotControllers =
         List.generate(serialList.length, (_) => ScreenshotController());
@@ -66,17 +69,6 @@ class BluetoothPage extends StatelessWidget {
     List<ScreenshotController> barCodeScreenshotControllers =
         List.generate(serialList.length, (_) => ScreenshotController());
 
-    // final savedPrinter = Constants.localStorage.read('printAddres');
-    // if (savedPrinter != null) {
-    //   print('macAddress ====> ${savedPrinter['macAddress']}');
-    //   print('advName macAddress ====> ${savedPrinter['name']}');
-    //   bluetoothController.connectToDevice(
-    //     savedPrinter['macAddress'],
-    //     savedPrinter['name'],
-    //   );
-
-    // }
-// تابع کمکی گرفتن عکس با چند بار تلاش
     Future<Uint8List> waitUntilCaptured(
       ScreenshotController controller, {
       int retries = 15,
@@ -87,8 +79,7 @@ class BluetoothPage extends StatelessWidget {
         await WidgetsBinding.instance.endOfFrame;
 
         try {
-          final bytes =
-              await controller.capture(pixelRatio: 2.0); // for better quality
+          final bytes = await controller.capture(pixelRatio: 2.0);
           if (bytes != null && bytes.isNotEmpty) {
             debugPrint("✅ عکس گرفته شد در تلاش $i");
             return bytes;
@@ -116,67 +107,43 @@ class BluetoothPage extends StatelessWidget {
         // گرفتن عکس Header (اجباری)
         final headerImageBytes =
             await waitUntilCaptured(headerScreenshotControllers[index]);
-        if (headerImageBytes == null) {
-          debugPrint("⚠️ header null شد. چاپ انجام نشد برای index $index");
-          continue;
-        }
         final headerBytes = await processImageForPrinter(headerImageBytes);
 
         // کارت
         List<int>? cardPhotoBytes;
-        if (settingController.settings["printCardImage"] ?? false) {
+        if (settingController.settings["preview_printCardImage"] ?? false) {
           final img =
               await waitUntilCaptured(cardPhotoScreenshotControllers[index]);
-          if (img != null) {
-            cardPhotoBytes = await processImageForPrinter(img);
-          } else {
-            debugPrint("❗ کارت image null بود برای index $index");
-          }
+          cardPhotoBytes = await processImageForPrinter(img);
         }
 
         // QR Code
         List<int>? qrCodeBytes;
-        if (settingController.settings["printQrcode"] ?? false) {
+        if (settingController.settings["preview_printQrcode"] ?? false) {
           final img =
               await waitUntilCaptured(qrcodeScreenshotControllers[index]);
-          if (img != null) {
-            qrCodeBytes = await processImageForPrinter(img);
-          } else {
-            debugPrint("❗ QR Code null بود برای index $index");
-          }
+          qrCodeBytes = await processImageForPrinter(img);
         }
 
         // Footer
         List<int>? footerBytes;
-        if (settingController.settings["printInformation"] ?? false) {
+        if (settingController.settings["preview_printInformation"] ?? false) {
           final img =
               await waitUntilCaptured(footerScreenshotControllers[index]);
-          if (img != null) {
-            footerBytes = await processImageForPrinter(img);
-          } else {
-            debugPrint("❗ Footer null بود برای index $index");
-          }
+          footerBytes = await processImageForPrinter(img);
         }
 
         // بارکد
         List<int>? barCodeBytes;
-        if (settingController.settings["printBarCode"] ?? false) {
+        if (settingController.settings["preview_printBarCode"] ?? false) {
           final img =
               await waitUntilCaptured(barCodeScreenshotControllers[index]);
-          if (img != null) {
-            barCodeBytes = await processImageForPrinter(img);
-          } else {
-            debugPrint("❗ Barcode null بود برای index $index");
-          }
+          barCodeBytes = await processImageForPrinter(img);
         }
 
         // پین‌کد (اجباری)
         final pinImg =
             await waitUntilCaptured(pinCodeScreenshotControllers[index]);
-        if (pinImg == null) {
-          debugPrint("⚠️ پین‌کد null شد. چاپ انجام نشد برای index $index");
-          continue;
-        }
         final pinCodeBytes = await processImageForPrinter(pinImg);
 
         // تابع چاپ متن
@@ -196,6 +163,8 @@ class BluetoothPage extends StatelessWidget {
           PrintBluetoothThermal.writeBytes(headerBytes);
         }
         printText(isReported ? '--------- 2 ---------\n' : '');
+        // Set alignment to Left (0)
+        PrintBluetoothThermal.writeBytes(const [0x1B, 0x61, 0x00]);
         printText('Terminal ID : ${user.user?.id ?? ''}\n');
         printText('Time : $printDate\n');
         printText('Order Number : ${serial.id}\n');
@@ -205,8 +174,12 @@ class BluetoothPage extends StatelessWidget {
           PrintBluetoothThermal.writeBytes(cardPhotoBytes);
         }
 
-        printText("\n$cardTitle");
+        // Set alignment to Center (1)
+        PrintBluetoothThermal.writeBytes(const [0x1B, 0x61, 0x01]);
+        printText("\n$cardTitle", bold: true);
 
+        // Reset alignment to Left (0)
+        PrintBluetoothThermal.writeBytes(const [0x1B, 0x61, 0x00]);
         if (serial.serial?.isNotEmpty ?? false) {
           printText("\nSerial : ${serial.serial}");
         }
@@ -237,6 +210,10 @@ class BluetoothPage extends StatelessWidget {
       }
     }
 
+    OptimizedPrinterService.preWarm(
+        photoUrl: photoUrl,
+        printCardImage:
+            settingController.settings["preview_printCardImage"] ?? false);
     bluetoothController.tryAutoConnectPrinter();
 
     return InternalPage(
@@ -268,85 +245,60 @@ class BluetoothPage extends StatelessWidget {
                                   constraints: const BoxConstraints(
                                     maxWidth: 360.0,
                                   ),
-                                  child: FutureBuilder(
-                                    future: Future.delayed(const Duration(
-                                        seconds: 1)), // ⏳ یک ثانیه صبر
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.done) {
-                                        // ✅ حالا ویجت‌ها رو بساز
-                                        return Column(
-                                          children: List.generate(
-                                            serialList.length,
-                                            (index) => Container(
-                                              alignment: Alignment.center,
-                                              margin: const EdgeInsets.only(
-                                                  bottom: 25),
-                                              child: PrintWidget(
-                                                printDate: printDate,
-                                                cardTitle: cardTitle,
-                                                photoUrl: photoUrl,
-                                                serialId: serialList[index]
-                                                        ?.id
-                                                        ?.toString() ??
-                                                    '',
-                                                serial:
-                                                    serialList[index]?.serial ??
-                                                        '',
-                                                pinCode:
-                                                    serialList[index]?.code ??
-                                                        '',
-                                                ussd: (index < ussdCodes.length)
-                                                    ? ussdCodes[index]?.code ??
-                                                        ''
-                                                    : '',
-                                                code1:
-                                                    serialList[index]?.code1 ??
-                                                        '',
-                                                code2:
-                                                    serialList[index]?.code2 ??
-                                                        '',
-                                                code3:
-                                                    serialList[index]?.code3 ??
-                                                        '',
-                                                code4:
-                                                    serialList[index]?.code4 ??
-                                                        '',
-                                                footerText: footer,
-                                                cardPhotoScreenshotControllers:
-                                                    cardPhotoScreenshotControllers[
-                                                        index],
-                                                headerScreenshotControllers:
-                                                    headerScreenshotControllers[
-                                                        index],
-                                                qrcodeScreenshotControllers:
-                                                    qrcodeScreenshotControllers[
-                                                        index],
-                                                footerScreenshotControllers:
-                                                    footerScreenshotControllers[
-                                                        index],
-                                                pinCodeScreenshotControllers:
-                                                    pinCodeScreenshotControllers[
-                                                        index],
-                                                isReported: isReported,
-                                                barCodeScreenshotControllers:
-                                                    barCodeScreenshotControllers[
-                                                        index],
-                                                cardId: cardId,
-                                                expiryTime: serialList[index]
-                                                        ?.expiredDate ??
-                                                    serialList[index]?.code3 ??
-                                                    '',
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      } else {
-                                        return const Center(
-                                          child: CustomLoading(),
-                                        );
-                                      }
-                                    },
+                                  child: Column(
+                                    children: List.generate(
+                                      serialList.length,
+                                      (index) => Container(
+                                        alignment: Alignment.center,
+                                        margin:
+                                            const EdgeInsets.only(bottom: 25),
+                                        child: PrintWidget(
+                                          printDate: printDate,
+                                          cardTitle: cardTitle,
+                                          photoUrl: photoUrl,
+                                          serialId: serialList[index]
+                                                  ?.id
+                                                  ?.toString() ??
+                                              '',
+                                          serial:
+                                              serialList[index]?.serial ?? '',
+                                          pinCode:
+                                              serialList[index]?.code ?? '',
+                                          ussd: (index < ussdCodes.length)
+                                              ? ussdCodes[index]?.code ?? ''
+                                              : '',
+                                          code1: serialList[index]?.code1 ?? '',
+                                          code2: serialList[index]?.code2 ?? '',
+                                          code3: serialList[index]?.code3 ?? '',
+                                          code4: serialList[index]?.code4 ?? '',
+                                          footerText: cleanFooter,
+                                          cardPhotoScreenshotControllers:
+                                              cardPhotoScreenshotControllers[
+                                                  index],
+                                          headerScreenshotControllers:
+                                              headerScreenshotControllers[
+                                                  index],
+                                          qrcodeScreenshotControllers:
+                                              qrcodeScreenshotControllers[
+                                                  index],
+                                          footerScreenshotControllers:
+                                              footerScreenshotControllers[
+                                                  index],
+                                          pinCodeScreenshotControllers:
+                                              pinCodeScreenshotControllers[
+                                                  index],
+                                          isReported: isReported,
+                                          barCodeScreenshotControllers:
+                                              barCodeScreenshotControllers[
+                                                  index],
+                                          cardId: cardId,
+                                          expiryTime:
+                                              serialList[index]?.expiredDate ??
+                                                  serialList[index]?.code3 ??
+                                                  '',
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -380,9 +332,6 @@ class BluetoothPage extends StatelessWidget {
                                                 .connectionStatus;
 
                                         if (!isConnected) {
-                                          Get.snackbar("جاري محاولة الاتصال",
-                                              "تم قطع الاتصال بالطابعة، جارٍ إعادة الاتصال...");
-
                                           final savedPrinter = Constants
                                               .localStorage
                                               .read('printAddres');
@@ -397,18 +346,12 @@ class BluetoothPage extends StatelessWidget {
                                                 savedPrinter['macAddress'],
                                                 savedPrinter['name'],
                                               );
-                                              Get.snackbar("تم الاتصال بنجاح",
-                                                  "تم الاتصال بالطابعة بنجاح، جاري الطباعة...");
                                             } catch (e) {
-                                              Get.snackbar("خطأ في الاتصال",
-                                                  "فشل الاتصال بالطابعة: $e");
                                               bluetoothController
                                                   .isLoading.value = false;
                                               return;
                                             }
                                           } else {
-                                            Get.snackbar("خطأ",
-                                                "لم يتم تخزين معلومات الطابعة.");
                                             bluetoothController
                                                 .isLoading.value = false;
                                             return;
@@ -419,13 +362,9 @@ class BluetoothPage extends StatelessWidget {
                                           await captureAndSavePng();
                                           bluetoothController.printed.value =
                                               true;
-                                          Get.snackbar(
-                                              "نجاح", "تمت الطباعة بنجاح");
                                         } catch (e) {
                                           bluetoothController.printed.value =
                                               false;
-                                          Get.snackbar("فشل الطباعة",
-                                              "الطباعة لم تنجح، حاول مرة أخرى");
                                         } finally {
                                           bluetoothController.isLoading.value =
                                               false;
@@ -474,8 +413,8 @@ class BluetoothPage extends StatelessWidget {
                                             .connectionStatus;
 
                                     if (!isConnected) {
-                                      Get.snackbar("جاري محاولة الاتصال",
-                                          "تم قطع الاتصال بالطابعة، جارٍ إعادة الاتصال...");
+                                      // Get.snackbar("جاري محاولة الاتصال",
+                                      //     "تم قطع الاتصال بالطابعة، جارٍ إعادة الاتصال...");
 
                                       final savedPrinter = Constants
                                           .localStorage
@@ -490,25 +429,25 @@ class BluetoothPage extends StatelessWidget {
                                             savedPrinter['macAddress'],
                                             savedPrinter['name'],
                                           );
-                                          Get.snackbar("تم الاتصال بنجاح",
-                                              "تم الاتصال بالطابعة بنجاح، جاري الطباعة...");
+                                          // Get.snackbar("تم الاتصال بنجاح",
+                                          //     "تم الاتصال بالطابعة بنجاح، جاري الطباعة...");
                                         } catch (e) {
-                                          Get.snackbar("خطأ في الاتصال",
-                                              "فشل الاتصال بالطابعة: $e");
+                                          // Get.snackbar("خطأ في الاتصال",
+                                          //     "فشل الاتصال بالطابعة: $e");
                                           return;
                                         }
                                       } else {
-                                        Get.snackbar("خطأ",
-                                            "لم يتم تخزين معلومات الطابعة.");
+                                        // Get.snackbar("خطأ",
+                                        //     "لم يتم تخزين معلومات الطابعة.");
                                         return;
                                       }
                                     }
 
                                     buildPrintString();
                                   } else {
-                                    Get.closeAllSnackbars();
-                                    Get.snackbar('تنبيه',
-                                        'تجاوزت الحد الاقصى لعدد مرات تكرار الخدمة!');
+                                    // Get.closeAllSnackbars();
+                                    // Get.snackbar('تنبيه',
+                                    //     'تجاوزت الحد الاقصى لعدد مرات تكرار الخدمة!');
                                   }
                                 },
                                 label: const Text('طباعة مختصرة'),
@@ -649,10 +588,8 @@ class BluetoothPage extends StatelessWidget {
 
   img.Image adjustContrastAndThreshold(
       img.Image originalImage, double contrast) {
-    // افزایش کنتراست با adjustColor
     final contrastAdjusted = img.adjustColor(originalImage, contrast: contrast);
 
-    // مقدار آستانه برای باینری کردن تصویر
     const int threshold = 228;
 
     for (int y = 0; y < contrastAdjusted.height; y++) {

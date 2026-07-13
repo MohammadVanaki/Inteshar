@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:inteshar/app/core/routes/routes.dart';
+import 'package:inteshar/app/features/register_web/view/getx/register_controller.dart';
+import 'package:inteshar/app/features/register_web/view/screens/register_view.dart';
 import 'package:inteshar/app/features/services/view/screens/invoice_page.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
@@ -20,16 +22,18 @@ class OtherServices extends StatelessWidget {
               arguments: const InvoicePage(type: 'topup', title: 'TOPUP'));
         },
       },
-      {
-        "title": 'فاتورة',
-        "icon": 'digital-payment',
-        "onTap": () {
-          // Get.toNamed(Routes.invoicePage,
-          //     arguments: const InvoicePage(type: 'bill', title: 'فاتورة'));
-
-          Get.snackbar('تنبيه', 'الخدمة المطلوبة غير مفعلة حاليا');
-        },
-      },
+      // {
+      //   "title": 'الوطني',
+      //   "icon": 'alwatani',
+      //   "onTap": () {
+      //     Get.defaultDialog(
+      //       title: 'تنبيه',
+      //       middleText: 'بوابة الوطني متوقفة مؤقتاً وستكون متاحة قريباً.',
+      //       textConfirm: 'حسناً',
+      //       onConfirm: Get.back,
+      //     );
+      //   },
+      // },
       {
         "title": 'باقات',
         "icon": 'box-open',
@@ -40,7 +44,7 @@ class OtherServices extends StatelessWidget {
     ];
     return AutoHeightGridView(
       itemCount: otherServicesList.length,
-      crossAxisCount: 3,
+      crossAxisCount: 2,
       mainAxisSpacing: 10,
       crossAxisSpacing: 10,
       physics: const BouncingScrollPhysics(),
@@ -64,10 +68,6 @@ class OtherServices extends StatelessWidget {
                 Expanded(
                   child: SvgPicture.asset(
                     'assets/svgs/${otherServicesList[index]['icon']}.svg',
-                    colorFilter: ColorFilter.mode(
-                      Theme.of(context).colorScheme.onPrimary,
-                      BlendMode.srcIn,
-                    ),
                     width: 37,
                     height: 37,
                   ),

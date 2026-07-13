@@ -1,4 +1,3 @@
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
@@ -12,6 +11,7 @@ import 'package:inteshar/app/core/routes/routes.dart';
 import 'package:inteshar/app/core/utils/custom_loading.dart';
 import 'package:inteshar/app/features/home/data/data_source/home_api_provider.dart';
 import 'package:inteshar/app/features/home/data/models/home_model.dart';
+
 import 'package:inteshar/app/features/home/view/getX/company_slider_controller.dart';
 import 'package:inteshar/app/features/home/view/widgets/ad_slider.dart';
 import 'package:inteshar/app/features/home/view/widgets/company_list_slider.dart';
@@ -41,8 +41,8 @@ class HomePage extends StatelessWidget {
     final CompanySliderController companySliderController =
         Get.put(CompanySliderController());
     final HomeApiProvider homeApiProvider = Get.put(HomeApiProvider());
-
     homeApiProvider.fetchHomeData();
+
     return SizedBox(
       width: Get.width,
       child: Obx(
@@ -94,6 +94,8 @@ class HomePage extends StatelessWidget {
                                     allCompanies.addAll(
                                         List<Company>.from(category.companies));
                                   }
+                                  allCompanies.sort((a, b) =>
+                                      (a.idShow ?? 0).compareTo(b.idShow ?? 0));
 
                                   return ProductsList(
                                     products: allCompanies,
@@ -137,7 +139,7 @@ class HomePage extends StatelessWidget {
                     ),
                   ),
                   Positioned(
-                    top: 40,
+                    top: 30,
                     child: SizedBox(
                       width: Get.width,
                       child: Column(
@@ -156,11 +158,15 @@ class HomePage extends StatelessWidget {
                                       scaffoldController.openDrawer();
                                     }
                                   },
-                                  child: SvgPicture.asset(
-                                    'assets/svgs/bars-staggered.svg',
-                                    colorFilter: ColorFilter.mode(
-                                      Theme.of(context).colorScheme.onPrimary,
-                                      BlendMode.srcIn,
+                                  child: Container(
+                                    // color: Colors.redAccent,
+                                    padding: EdgeInsets.all(7),
+                                    child: SvgPicture.asset(
+                                      'assets/svgs/bars-staggered.svg',
+                                      colorFilter: ColorFilter.mode(
+                                        Theme.of(context).colorScheme.onPrimary,
+                                        BlendMode.srcIn,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -196,11 +202,15 @@ class HomePage extends StatelessWidget {
                                       Routes.notifArchive,
                                     );
                                   },
-                                  child: SvgPicture.asset(
-                                    'assets/svgs/bell.svg',
-                                    colorFilter: ColorFilter.mode(
-                                      Theme.of(context).colorScheme.onPrimary,
-                                      BlendMode.srcIn,
+                                  child: Container(
+                                    // color: Colors.redAccent,
+                                    padding: EdgeInsets.all(7),
+                                    child: SvgPicture.asset(
+                                      'assets/svgs/bell.svg',
+                                      colorFilter: ColorFilter.mode(
+                                        Theme.of(context).colorScheme.onPrimary,
+                                        BlendMode.srcIn,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -249,7 +259,7 @@ class HomePage extends StatelessWidget {
                                                       .isLoading.value = false;
                                                 },
                                                 child: SvgPicture.asset(
-                                                  'assets/svgs/rotate-square.svg', 
+                                                  'assets/svgs/rotate-square.svg',
                                                   colorFilter: ColorFilter.mode(
                                                     Theme.of(context)
                                                         .colorScheme
@@ -266,7 +276,7 @@ class HomePage extends StatelessWidget {
                                   },
                                 )
                               : const SizedBox.shrink(),
-                        ], 
+                        ],
                       ),
                     ),
                   ),

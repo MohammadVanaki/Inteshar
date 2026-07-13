@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:inteshar/app/config/constants.dart';
 import 'package:inteshar/app/config/handle_logout.dart';
 import 'package:inteshar/app/config/status.dart';
+import 'package:inteshar/app/core/common/constants/api_client.dart';
 import 'package:inteshar/app/features/home/data/models/home_model.dart';
 import 'package:dio/dio.dart';
 import 'package:inteshar/app/features/home/data/models/product_model.dart';
@@ -10,18 +11,19 @@ class HomeApiProvider extends GetxController {
   var homeDataList = <HomeModel>[].obs;
   var productsDataList = <ProductModel>[].obs;
   RxInt inventory = 000.obs;
-  late Dio dio;
-  final rxRequestStatus = Status.loading.obs;
 
+  final rxRequestStatus = Status.loading.obs;
+  final ApiClient _apiClient = ApiClient();
   @override
   void onInit() {
     super.onInit();
-    dio = Dio(BaseOptions(
-      receiveTimeout: const Duration(milliseconds: 20000),
-      validateStatus: (status) {
-        return status! < 500;
-      },
-    ));
+
+    // dio = Dio(BaseOptions(
+    //   receiveTimeout: const Duration(milliseconds: 20000),
+    //   validateStatus: (status) {
+    //     return status! < 500;
+    //   },
+    // ));
     if (Constants.userToken.isNotEmpty) {
       Constants.isLoggedIn = true;
     }
@@ -32,7 +34,7 @@ class HomeApiProvider extends GetxController {
     print("userToken =======?>>: ${Constants.userToken.toString()}");
     rxRequestStatus.value = Status.loading;
     try {
-      final response = await dio.get(
+      final response = await _apiClient.dio.get(
         "${Constants.baseUrl}/home",
         options: Options(
           headers: {
@@ -41,7 +43,7 @@ class HomeApiProvider extends GetxController {
           },
         ),
       );
-
+      print("response.statusCode =======?>>: ${response.statusCode}");
       if (response.statusCode == 200) {
         rxRequestStatus.value = Status.completed;
         homeDataList.clear();
@@ -62,14 +64,10 @@ class HomeApiProvider extends GetxController {
         handleLogout('يرجى تسجيل الدخول مرة أخرى');
       } else {
         rxRequestStatus.value = Status.error;
-        Get.closeAllSnackbars();
-        Get.snackbar('خطأ', 'فشل في جلب البيانات.');
       }
     } catch (e) {
       print(e);
       rxRequestStatus.value = Status.error;
-      Get.closeAllSnackbars();
-      Get.snackbar('خطأ', 'فشل في جلب البيانات.');
     }
   }
 

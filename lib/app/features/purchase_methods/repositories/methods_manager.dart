@@ -4,7 +4,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-// import 'package:flutter_sms/flutter_sms.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:inteshar/app/core/common/constants/dashed_border.dart';
@@ -14,7 +13,6 @@ import 'package:inteshar/app/features/home/data/data_source/home_api_provider.da
 import 'package:inteshar/app/features/purchase_methods/view/getX/print_controller.dart';
 import 'package:inteshar/app/features/purchase_methods/view/screens/bluetooth_page.dart';
 import 'package:share_plus/share_plus.dart';
-// import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -39,26 +37,49 @@ Future<void> manageMethods({
   final updateController = Get.find<HomeApiProvider>();
   String generatePinCodes() {
     final StringBuffer buffer = StringBuffer();
-    if (serials?.first.code != null) {
-      for (var serial in serials!) {
+
+    final first = serials?.first;
+
+    final hasPinCode = first?.code?.toString().trim().isNotEmpty == true &&
+        first?.serial?.toString().trim().isNotEmpty == true;
+
+    if (hasPinCode) {
+      for (final serial in serials!) {
         buffer.writeln('الفئة: $cardTitle');
         buffer.writeln('Pin Code: ${serial.code}');
         buffer.writeln('Serial: ${serial.serial}');
         buffer.writeln('----------------------');
       }
     } else {
-      for (var serial in serials!) {
+      for (final serial in serials!) {
         buffer.writeln('الفئة: $cardTitle');
-        buffer.writeln('${serial.code1}');
-        buffer.writeln('${serial.code2}');
-        buffer.writeln('${serial.code3}');
-        buffer.writeln('${serial.code4}');
+
+        final codes = [
+          serial.code1,
+          serial.code2,
+          serial.code3,
+          serial.code4,
+        ].where((code) {
+          final value = code?.toString().trim();
+
+          return value != null &&
+              value.isNotEmpty &&
+              value.toLowerCase() != 'null' &&
+              !RegExp(r'^code\d+$', caseSensitive: false).hasMatch(value);
+        });
+
+        for (final code in codes) {
+          buffer.writeln(code);
+        }
+
         buffer.writeln('----------------------');
       }
     }
 
     buffer.writeln(
-        'أرسل بواسطة: ${updateController.homeDataList.first.user?.name ?? ''}');
+      'أرسل بواسطة: ${updateController.homeDataList.first.user?.name ?? ''}',
+    );
+
     return buffer.toString();
   }
 
@@ -319,7 +340,7 @@ Future<void> checkBluetoothBeforeNavigate({
 }) async {
   final adapterState = await FlutterBluePlus.adapterState.first;
 
-        final BluetoothController bluetoothController =
+  final BluetoothController bluetoothController =
       Get.put(BluetoothController(), permanent: true);
   if (adapterState == BluetoothAdapterState.on) {
     await navigateToBluetoothPage(

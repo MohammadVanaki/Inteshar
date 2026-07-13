@@ -63,7 +63,7 @@ class ReportingPage extends StatelessWidget {
                                     .map((company) {
                                   return DropdownMenuEntry(
                                     value: company.id.toString(),
-                                    label: company.title,
+                                    label: company.title ?? '',
                                   );
                                 }),
                               ],

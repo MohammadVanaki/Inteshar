@@ -33,7 +33,7 @@ class CompanyArchiveController extends GetxController {
       filteredCompanies.value = allCompanies;
     } else {
       filteredCompanies.value = allCompanies.where((item) {
-        return item.title.toLowerCase().contains(query);
+        return (item.title ?? '').toLowerCase().contains(query);
       }).toList();
     }
   }

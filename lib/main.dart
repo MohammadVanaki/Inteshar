@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +18,6 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-
   await init();
 
   try {
@@ -40,24 +41,35 @@ class MyApp extends StatelessWidget {
     final bool darkMode =
         Constants.localStorage.read('settings')?['darkMode'] ?? false;
 
-    return GetMaterialApp(
-      debugShowCheckedModeBanner: false,
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('en'),
-        Locale('ar'),
-      ],
-      locale: const Locale('ar'),
-      title: Constants.appTitle,
-      themeMode: darkMode ? ThemeMode.dark : ThemeMode.light,
-      darkTheme: MyThemes.darkTheme,
-      theme: MyThemes.lightTheme,
-      initialRoute: Routes.splash,
-      getPages: Routes.pages,
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom:
+            Platform.isAndroid && MediaQuery.of(context).viewInsets.bottom == 0
+                ? MediaQuery.of(context).viewPadding.bottom
+                : 0,
+      ),
+      child: MediaQuery(
+        data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(1)),
+        child: GetMaterialApp(
+          debugShowCheckedModeBanner: false,
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('en'),
+            Locale('ar'),
+          ],
+          locale: const Locale('ar'),
+          title: Constants.appTitle,
+          themeMode: darkMode ? ThemeMode.dark : ThemeMode.light,
+          darkTheme: MyThemes.darkTheme,
+          theme: MyThemes.lightTheme,
+          initialRoute: Routes.splash,
+          getPages: Routes.pages,
+        ),
+      ),
     );
   }
 }

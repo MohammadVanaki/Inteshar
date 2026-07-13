@@ -9,9 +9,11 @@ class ReportModel {
 
   factory ReportModel.fromJson(Map<String, dynamic> json) {
     return ReportModel(
-      status: json['status'],
-      serials: List<SerialModel>.from(
-          json['serials'].map((serial) => SerialModel.fromJson(serial))),
+      status: json['status'] ?? '',
+      serials: json['serials'] != null
+          ? List<SerialModel>.from(
+              json['serials'].map((serial) => SerialModel.fromJson(serial)))
+          : [],
     );
   }
 
@@ -28,7 +30,7 @@ class SerialModel {
   int rePrint;
   String? serial;
   String? code;
-  String? expiredDate; // New field
+  String? expiredDate;
   String? code1;
   String? code2;
   String? code3;
@@ -37,22 +39,22 @@ class SerialModel {
   String sellType;
   String title;
   int cardId;
-  String photo;
+  String? photo;
   String companyTitle;
-  String photoUrl;
+  String? photoUrl;
   String printDate;
   int? cardPrice;
-  int? userPrice; // New field
-  int? agentPrice; // New field
-  int? parentAgentPrice; // New field
-  int? categoryPrice; // New field
+  int? userPrice;
+  int? agentPrice;
+  int? parentAgentPrice;
+  int? categoryPrice;
 
   SerialModel({
     required this.id,
     required this.rePrint,
     this.serial,
     this.code,
-    this.expiredDate, // Added in constructor
+    this.expiredDate,
     this.code1,
     this.code2,
     this.code3,
@@ -62,40 +64,40 @@ class SerialModel {
     required this.sellType,
     required this.title,
     required this.cardId,
-    required this.photo,
+    this.photo,
     required this.companyTitle,
-    required this.photoUrl,
+    this.photoUrl,
     required this.printDate,
-    this.userPrice, // Added in constructor
-    this.agentPrice, // Added in constructor
-    this.parentAgentPrice, // Added in constructor
-    this.categoryPrice, // Added in constructor
+    this.userPrice,
+    this.agentPrice,
+    this.parentAgentPrice,
+    this.categoryPrice,
   });
 
   factory SerialModel.fromJson(Map<String, dynamic> json) {
     return SerialModel(
-      id: json['id'],
-      rePrint: json['re_print'],
-      serial: json['serial'],
-      code: json['code'],
-      expiredDate: json['expired_date'], // Mapping new field
-      code1: json['code1'],
-      code2: json['code2'],
-      code3: json['code3'],
-      code4: json['code4'],
-      dateTime: json['date_time'],
-      sellType: json['sell_type'],
-      title: json['title'],
-      cardId: json['card_id'],
-      photo: json['photo'],
-      companyTitle: json['company_title'],
-      photoUrl: json['photo_url'],
-      printDate: json['print_date'],
+      id: json['id'] ?? 0,
+      rePrint: json['re_print'] ?? 0,
+      serial: json['serial'] ?? '',
+      code: json['code'] ?? '',
+      expiredDate: json['expired_date'] ?? '',
+      code1: json['code1'] ?? '',
+      code2: json['code2'] ?? '',
+      code3: json['code3'] ?? '',
+      code4: json['code4'] ?? '',
+      dateTime: json['date_time'] ?? 0,
+      sellType: json['sell_type'] ?? '',
+      title: json['title'] ?? '',
+      cardId: json['card_id'] ?? 0,
+      photo: json['photo'] ?? '',
+      companyTitle: json['company_title'] ?? '',
+      photoUrl: json['photo_url'] ?? '',
+      printDate: json['print_date'] ?? '',
       cardPrice: json['card_price'],
-      userPrice: json['user_price'], // Mapping new field
-      agentPrice: json['agent_price'], // Mapping new field
-      parentAgentPrice: json['parent_agent_price'], // Mapping new field
-      categoryPrice: json['category_price'], // Mapping new field
+      userPrice: json['user_price'],
+      agentPrice: json['agent_price'],
+      parentAgentPrice: json['parent_agent_price'],
+      categoryPrice: json['category_price'],
     );
   }
 
@@ -105,7 +107,7 @@ class SerialModel {
       're_print': rePrint,
       'serial': serial,
       'code': code,
-      'expired_date': expiredDate, // Adding new field
+      'expired_date': expiredDate,
       'code1': code1,
       'code2': code2,
       'code3': code3,
@@ -119,10 +121,10 @@ class SerialModel {
       'photo_url': photoUrl,
       'print_date': printDate,
       'card_price': cardPrice,
-      'user_price': userPrice, // Adding new field
-      'agent_price': agentPrice, // Adding new field
-      'parent_agent_price': parentAgentPrice, // Adding new field
-      'category_price': categoryPrice, // Adding new field
+      'user_price': userPrice,
+      'agent_price': agentPrice,
+      'parent_agent_price': parentAgentPrice,
+      'category_price': categoryPrice,
     };
   }
 }

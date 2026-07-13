@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
+import 'package:inteshar/app/config/constants.dart';
 import 'package:inteshar/app/core/data/data_source/delete_account_api.dart';
 import 'package:inteshar/app/core/data/data_source/logout_api_provider.dart';
 import 'package:inteshar/app/features/home/data/data_source/home_api_provider.dart';
@@ -99,38 +100,42 @@ class USerInformationWidget extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                Get.dialog(
-                  AlertDialog(
-                    title: const Text('تنبيه'),
-                    content: const Text('هل تريد تسجيل الخروج من حسابك؟'),
-                    actions: [
-                      ElevatedButton(
-                        onPressed: () {
-                          Get.back();
-                        },
-                        child: const Text(
-                          'لا',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
+                if (!Get.isRegistered<LogoutApiProvider>()) {
+                  Get.put(LogoutApiProvider());
+                }
+                final LogoutApiProvider profileController =
+                    Get.find<LogoutApiProvider>();
+                if (Constants.isLoggedIn) {
+                  Get.dialog(
+                    AlertDialog(
+                      title: const Text('تنبيه'),
+                      content: const Text('هل تريد تسجيل الخروج من حسابك؟'),
+                      actions: [
+                        ElevatedButton(
+                          onPressed: () => Get.back(),
+                          child: const Text('لا'),
                         ),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          logout();
-                        },
-                        child: const Text(
-                          'نعم',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
+                        Obx(() => ElevatedButton(
+                              onPressed: profileController.isLogoutLoading.value
+                                  ? null
+                                  : () => profileController.logoutUser(),
+                              child: profileController.isLogoutLoading.value
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2, color: Colors.white))
+                                  : const Text(
+                                      'نعم',
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                            )),
+                      ],
+                    ),
+                  );
+                }
               },
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10),

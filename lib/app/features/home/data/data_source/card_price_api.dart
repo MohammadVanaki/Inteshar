@@ -3,28 +3,31 @@ import 'package:inteshar/app/config/constants.dart';
 import 'package:inteshar/app/config/handle_logout.dart';
 import 'package:inteshar/app/config/status.dart';
 import 'package:dio/dio.dart';
+import 'package:inteshar/app/core/common/constants/api_client.dart';
 import 'package:inteshar/app/core/common/widgets/exit_dialog.dart';
 import 'package:inteshar/app/features/home/data/models/card_price_model.dart';
 
 class CardPriceApi extends GetxController {
-  late Dio dio;
+  // late Dio dio;
   final rxRequestStatus = Status.initial.obs;
   var cardPriceData = <CardPriceModel>[].obs;
   CancelToken? cancelToken;
+  final ApiClient _apiClient = ApiClient();
+  // @override
+  // void onInit() {
+  //   super.onInit();
 
-  @override
-  void onInit() {
-    super.onInit();
-
-    dio = Dio(BaseOptions(
-      receiveTimeout: const Duration(milliseconds: 10000),
-      validateStatus: (status) {
-        return status! < 500;
-      },
-    ));
-  }
+  //   dio = Dio(BaseOptions(
+  //     receiveTimeout: const Duration(milliseconds: 10000),
+  //     validateStatus: (status) {
+  //       return status! < 500;
+  //     },
+  //   ));
+  // }
 
   Future fetchCardPrice({required String cardId}) async {
+    cardPriceData.clear();
+    rxRequestStatus.value = Status.loading;
     print(cardId);
 
     if (cancelToken != null) {
@@ -33,7 +36,7 @@ class CardPriceApi extends GetxController {
     cancelToken = CancelToken();
     rxRequestStatus.value = Status.loading;
     try {
-      final response = await dio.post(
+      final response = await _apiClient.dio.post(
         "${Constants.baseUrl}/card_price",
         queryParameters: {
           "card_id": cardId,
@@ -59,17 +62,11 @@ class CardPriceApi extends GetxController {
       } else {
         if ((response.data?['logged_in'] ?? 1) == 0) {
           exitDialog(response.data['errors'][0]);
-        } else {
-          rxRequestStatus.value = Status.error;
-          // Get.closeAllSnackbars();
-          // Get.snackbar('خطأ', 'فشل في جلب البيانات.');
         }
       }
     } catch (e) {
       print(e);
       rxRequestStatus.value = Status.error;
-      // Get.closeAllSnackbars();
-      // Get.snackbar('خطأ', 'فشل في جلب البيانات.');
     }
   }
 }

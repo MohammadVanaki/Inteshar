@@ -3,29 +3,31 @@ import 'package:inteshar/app/config/constants.dart';
 import 'package:inteshar/app/config/handle_logout.dart';
 import 'package:inteshar/app/config/status.dart';
 import 'package:dio/dio.dart';
+import 'package:inteshar/app/core/common/constants/api_client.dart';
 import 'package:inteshar/app/core/common/widgets/exit_dialog.dart';
 import 'package:inteshar/app/features/user_operations/data/models/operation_model.dart';
 
 class OperationApiProvider extends GetxController {
   var operationDataList = <OperationModel>[].obs;
-  late Dio dio;
   final rxRequestStatus = Status.loading.obs;
+  final ApiClient _apiClient = ApiClient();
+
   @override
   void onInit() {
     super.onInit();
-    dio = Dio(BaseOptions(
-      receiveTimeout: const Duration(milliseconds: 10000),
-      validateStatus: (status) {
-        return status! < 500;
-      },
-    ));
+    // dio = Dio(BaseOptions(
+    //   receiveTimeout: const Duration(milliseconds: 10000),
+    //   validateStatus: (status) {
+    //     return status! < 500;
+    //   },
+    // ));
     fetchOperationData();
   }
 
   Future<void> fetchOperationData() async {
     rxRequestStatus.value = Status.loading;
     try {
-      final response = await dio.get(
+      final response = await _apiClient.dio.get(
         "${Constants.baseUrl}/turnover",
         options: Options(
           headers: {
@@ -46,15 +48,11 @@ class OperationApiProvider extends GetxController {
           exitDialog(response.data['errors'][0]);
         } else {
           rxRequestStatus.value = Status.error;
-          Get.closeAllSnackbars();
-          Get.snackbar('خطأ', 'فشل في جلب البيانات.');
         }
       }
     } catch (e) {
       print(e);
       rxRequestStatus.value = Status.error;
-      Get.closeAllSnackbars();
-      Get.snackbar('خطأ', 'فشل في جلب البيانات.');
     }
   }
 }

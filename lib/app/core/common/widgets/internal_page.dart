@@ -61,25 +61,31 @@ class InternalPage extends StatelessWidget {
                                 Get.find<BluetoothController>();
                             bluetoothController.disconnectDevice();
                           },
-                          child: SvgPicture.asset(
-                            'assets/svgs/signal-stream-slash.svg',
-                            colorFilter: ColorFilter.mode(
-                              Theme.of(context).colorScheme.onPrimary,
-                              BlendMode.srcIn,
+                          child: Container(
+                            padding: const EdgeInsets.all(14),
+                            color: Colors.transparent,
+                            child: SvgPicture.asset(
+                              'assets/svgs/signal-stream-slash.svg',
+                              colorFilter: ColorFilter.mode(
+                                Theme.of(context).colorScheme.onPrimary,
+                                BlendMode.srcIn,
+                              ),
+                              width: 20,
+                              height: 20,
                             ),
-                            width: 20,
-                            height: 20,
                           ),
                         )
                       : const SizedBox.shrink(),
                   const Gap(20),
                   canBack ?? true
-                      ? Container(
-                          padding: EdgeInsets.all(10),
-                          child: ZoomTapAnimation(
-                            onTap: () {
-                              Get.back();
-                            },
+                      ? ZoomTapAnimation(
+                          onTap: () {
+                            Get.back();
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(
+                                14), // افزایش محدوده لمس به حداقل ۴۸ پیکسل
+                            color: Colors.transparent,
                             child: SvgPicture.asset(
                               'assets/svgs/angle-left.svg',
                               colorFilter: ColorFilter.mode(

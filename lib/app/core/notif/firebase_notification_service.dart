@@ -27,8 +27,10 @@ class FirebaseNotificationService {
 
     // Handle foreground messages
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print("Message received in foreground: ${message.notification?.title}");
-      _showLocalNotification(message);
+      final notification = message.notification;
+      if (notification != null) {
+        _showLocalNotification(message); // Show notification
+      }
     });
 
     // Subscribe to a topic
@@ -55,15 +57,28 @@ class FirebaseNotificationService {
     );
 
     await _localNotifications.initialize(settings);
+
+    // ⚡ این بخش رو اضافه کن
+    const AndroidNotificationChannel channel = AndroidNotificationChannel(
+      'default_channel_id', // id
+      'Default Notifications', // name
+      description: 'This channel is used for default notifications.',
+      importance: Importance.high,
+    );
+
+    await _localNotifications
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
   }
 
   // Display a local notification for a foreground message
   Future<void> _showLocalNotification(RemoteMessage message) async {
     final notification = message.notification;
     const androidDetails = AndroidNotificationDetails(
-      'default_channel_id', // Channel ID
-      'Default', // Channel name
-      channelDescription: 'Default notifications', // Channel description
+      'default_channel_id',
+      'Default Notifications',
+      channelDescription: 'This channel is used for default notifications.',
       importance: Importance.high,
       priority: Priority.high,
     );

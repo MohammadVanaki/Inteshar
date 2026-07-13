@@ -28,8 +28,8 @@ class LocationController extends GetxController {
       serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         rxRequestStatus.value = Status.error;
-        Get.snackbar('Error', 'Location services are disabled.',
-            snackPosition: SnackPosition.BOTTOM);
+        // Get.snackbar('Error', 'Location services are disabled.',
+        //     snackPosition: SnackPosition.BOTTOM);
         return;
       }
 
@@ -39,16 +39,16 @@ class LocationController extends GetxController {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
           rxRequestStatus.value = Status.error;
-          Get.snackbar('Error', 'Location permissions are denied.',
-              snackPosition: SnackPosition.BOTTOM);
+          // Get.snackbar('Error', 'Location permissions are denied.',
+          //     snackPosition: SnackPosition.BOTTOM);
           return;
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
         rxRequestStatus.value = Status.error;
-        Get.snackbar('Error', 'Location permissions are permanently denied.',
-            snackPosition: SnackPosition.BOTTOM);
+        // Get.snackbar('Error', 'Location permissions are permanently denied.',
+        //     snackPosition: SnackPosition.BOTTOM);
         return;
       }
 
@@ -68,8 +68,8 @@ class LocationController extends GetxController {
       rxRequestStatus.value = Status.completed;
     } catch (e) {
       rxRequestStatus.value = Status.error;
-      Get.snackbar('Error', 'An error occurred: $e',
-          snackPosition: SnackPosition.BOTTOM);
+      // Get.snackbar('Error', 'An error occurred: $e',
+      //     snackPosition: SnackPosition.BOTTOM);
     }
   }
 

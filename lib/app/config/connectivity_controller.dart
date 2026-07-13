@@ -12,6 +12,7 @@ class ConnectivityController extends GetxController {
   final isConnected = true.obs;
   //Check dialog
   bool _isDialogOpen = false;
+  bool _isVpnDialogOpen = false;
   //Prevent initial online snak message
   bool _isOnline = false;
 
@@ -30,21 +31,19 @@ class ConnectivityController extends GetxController {
     if (connections.contains(ConnectivityResult.none)) {
       isConnected.value = false;
       _isOnline = false;
+      _closeVpnDialog();
       //show no internet dialog/alert
       _showNoInternetDialog();
     } else if (connections.contains(ConnectivityResult.vpn)) {
-      Get.snackbar(
-        'VPN',
-        'اتصال VPN الخاص بك قد يتداخل مع أداء التطبيق.',
-        colorText: Colors.white,
-        backgroundColor: const Color.fromARGB(200, 212, 191, 0),
-        duration: const Duration(seconds: 3),
-        snackPosition: SnackPosition.TOP,
-      );
+      isConnected.value = false;
+      _isOnline = false;
+      _closeDialog();
+      _showVpnBlockDialog();
     } else {
       isConnected.value = true;
-      //close alert when back online
+      //close alerts when back online
       _closeDialog();
+      _closeVpnDialog();
       if (_isOnline) {
         Get.snackbar(
           'تم الاتصال بالانترنت',
@@ -123,11 +122,68 @@ class ConnectivityController extends GetxController {
     }
   }
 
+  void _showVpnBlockDialog() {
+    if (_isVpnDialogOpen) return;
+    _isVpnDialogOpen = true;
+    _isOnline = true;
+    Get.dialog(
+      AlertDialog(
+        title: const Text('تم اكتشاف اتصال VPN!'),
+        content: const Text('يرجى إيقاف تشغيل اتصال VPN للمتابعة واستخدام التطبيق بأمان.'),
+        actions: [
+          SizedBox(
+            height: 40,
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () async {
+                List<ConnectivityResult> connections = await _connectivity.checkConnectivity();
+                if (!connections.contains(ConnectivityResult.vpn) && !connections.contains(ConnectivityResult.none)) {
+                  isConnected.value = true;
+                  _closeVpnDialog();
+                } else if (connections.contains(ConnectivityResult.vpn)) {
+                  Get.snackbar(
+                    'VPN نشط!',
+                    'يرجى تعطيل الـ VPN أولاً ثم إعادة المحاولة.',
+                    colorText: Colors.red[300],
+                    backgroundColor: Colors.red[50],
+                    duration: const Duration(seconds: 3),
+                    snackPosition: SnackPosition.TOP,
+                  );
+                } else {
+                  _closeVpnDialog();
+                  _showNoInternetDialog();
+                }
+              },
+              child: const Text(
+                'إعادة المحاولة',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+      barrierDismissible: false,
+    ).then((_) {
+      _isVpnDialogOpen = false;
+    });
+  }
+
+  void _closeVpnDialog() {
+    if (_isVpnDialogOpen) {
+      Get.back();
+      _isVpnDialogOpen = false;
+    }
+  }
+
   @override
   void onClose() {
     // dispose stream
     _streamSubscription.cancel();
     _closeDialog();
+    _closeVpnDialog();
     super.onClose();
   }
 }

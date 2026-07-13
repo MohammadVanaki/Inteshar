@@ -196,73 +196,66 @@ class EditProfilePage extends StatelessWidget {
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () async {
-                            print(editProfilePageController
-                                .convertImageToBase64());
                             if (formKey.currentState!.validate()) {
-                              if (editProfilePageController
-                                      .passwordController.text.isNotEmpty &&
-                                  editProfilePageController
-                                      .passwordConfirmController
-                                      .text
-                                      .isNotEmpty) {
-            
-                                        final bool canAuthenticate =
+                              bool isPasswordValid = true;
+                              String pass = editProfilePageController
+                                  .passwordController.text;
+                              String confirmPass = editProfilePageController
+                                  .passwordConfirmController.text;
+
+                              if (pass.isNotEmpty || confirmPass.isNotEmpty) {
+                                if (pass != confirmPass ||
+                                    pass.isEmpty ||
+                                    confirmPass.isEmpty) {
+                                  Get.snackbar(
+                                      'خطأ', 'كلمات المرور غير متطابقة');
+                                  isPasswordValid = false;
+                                }
+                              }
+
+                              if (isPasswordValid) {
+                                bool canUpdate = true;
+                                final bool hasHardware =
                                     await LocalAuth.hasBiometrics();
-                                if (canAuthenticate) {
-                                  final bool authenticate =
-                                      await LocalAuth.authenticate();
-                                  if (authenticate) {
-                                    // If authenticated successfully, update profile
-                                    editeProfileApiProvider.updateProfile(
-                                      address: editProfilePageController
-                                          .addressController.text,
-                                      mobile: editProfilePageController
-                                          .mobileController.text,
-                                      password: editProfilePageController
-                                          .passwordController.text,
-                                      passwordConfirmation:
-                                          editProfilePageController
-                                              .passwordConfirmController.text,
-                                      photo: editProfilePageController
-                                              .convertImageToBase64() ??
-                                          '',
-                                      lat: locationController.lat.value,
-                                      lon: locationController.lon.value,
-                                    );
-                                  }
-                                } else {
-                                  // If no biometric support, update profile directly
-                                  editeProfileApiProvider.updateProfile(
+
+                                if (hasHardware) {
+                                  canUpdate = await LocalAuth.authenticate();
+                                }
+
+                                if (canUpdate) {
+                                  await editeProfileApiProvider.updateProfile(
                                     address: editProfilePageController
                                         .addressController.text,
                                     mobile: editProfilePageController
                                         .mobileController.text,
-                                    password: editProfilePageController
-                                        .passwordController.text,
-                                    passwordConfirmation:
-                                        editProfilePageController
-                                            .passwordConfirmController.text,
+                                    password: pass,
+                                    passwordConfirmation: confirmPass,
                                     photo: editProfilePageController
                                             .convertImageToBase64() ??
                                         '',
                                     lat: locationController.lat.value,
                                     lon: locationController.lon.value,
+                                    // printCode: editProfilePageController
+                                    //         .isCodeRequired.value
+                                    //     ? editProfilePageController
+                                    //         .customCodeController.text
+                                    //         .trim()
+                                    //     : '',
+                                    // activeCode: editProfilePageController
+                                    //         .isCodeRequired.value
+                                    //     ? '1'
+                                    //     : '0',
                                   );
+
+                                  if (editeProfileApiProvider
+                                          .rxRequestStatus.value ==
+                                      Status.completed) {
+                                    Get.back();
+                                    // Get.snackbar(
+                                    //     'نجاح', 'تم تحديث الملف الشخصي بنجاح');
+                                  }
                                 }
                               }
-                              editeProfileApiProvider.updateProfile(
-                                address: editProfilePageController
-                                    .addressController.text,
-                                mobile: editProfilePageController
-                                    .mobileController.text,
-                                password: '',
-                                passwordConfirmation: '',
-                                photo: editProfilePageController
-                                        .convertImageToBase64() ??
-                                    '',
-                                lat: locationController.lat.value,
-                                lon: locationController.lon.value,
-                              );
                             }
                           },
                           child: Obx(

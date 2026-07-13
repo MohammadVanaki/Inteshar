@@ -36,7 +36,7 @@ class CostumBottomNavigationBar extends StatelessWidget {
           _bottomAppBarItem(
               icon: 'info', page: 1, context: context, title: 'حول التطبيق'),
           _bottomAppBarItem(
-              icon: 'settings', page: 2, context: context, title: 'الاشعارات'),
+              icon: 'settings', page: 2, context: context, title: 'الإعدادات'),
           _bottomAppBarItem(
               icon: 'stats', page: 3, context: context, title: 'تقارير'),
         ],

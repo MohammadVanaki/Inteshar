@@ -29,8 +29,8 @@ class AdSlider extends StatelessWidget {
           builder: (BuildContext context) {
             return ZoomTapAnimation(
               onTap: () {
-                urlLauncher((slider.link.trim().isNotEmpty)
-                    ? slider.link
+                urlLauncher((slider.link?.trim().isNotEmpty == true)
+                    ? slider.link!
                     : 'https://inteshar.net/');
               },
               child: Container(
@@ -43,7 +43,7 @@ class AdSlider extends StatelessWidget {
                   fit: BoxFit.fill,
                   height: 90,
                   width: double.infinity,
-                  imageUrl: slider.photoUrl,
+                  imageUrl: slider.photoUrl ?? '',
                   placeholder: (context, url) => const CustomLoading(),
                   errorWidget: (context, url, error) => Image.asset(
                     'assets/images/not.jpg',

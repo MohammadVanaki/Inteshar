@@ -60,6 +60,7 @@ class PrintWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print('printDate=======>$printDate');
+    print('code2=======>$code2');
     final updateController = Get.find<HomeApiProvider>();
     final user = updateController.homeDataList.first;
     final settingController = Get.find<SettingController>();
@@ -101,7 +102,13 @@ class PrintWidget extends StatelessWidget {
                       width: 60,
                     ),
                   ),
-                  Text('INTESHAR COMPANY', style: boldTextStyle8),
+                  Center(
+                    child: Text(
+                      ' ${user.user?.agent?.name ?? ''}',
+                      style: boldTextStyle8,
+                    ),
+                  ),
+                  // Text('INTESHAR COMPANY', style: boldTextStyle8),
                   _buildLabeledContainer(user.user?.name ?? ''),
                 ],
               ),
@@ -117,7 +124,8 @@ class PrintWidget extends StatelessWidget {
           _buildAlignText('Expiry Time :  $expiryTime', boldTextStyle8),
           const Gap(5),
           Visibility(
-            visible: settingController.settings["printCardImage"] ?? false,
+            visible:
+                settingController.settings["preview_printCardImage"] ?? false,
             child: SizedBox(
               height: 140,
               width: double.infinity,
@@ -135,7 +143,12 @@ class PrintWidget extends StatelessWidget {
               ),
             ),
           ),
-          Text(cardTitle, style: boldTextStyle10),
+          Center(
+            child: Text(
+              cardTitle,
+              style: boldTextStyle10,
+            ),
+          ),
           const Gap(5),
           pinCode != ''
               ? Column(
@@ -174,54 +187,67 @@ class PrintWidget extends StatelessWidget {
                             style: TextStyle(fontSize: 18),
                             textAlign: TextAlign.center),
                         const Divider(),
-                        Text(code2,
-                            style: boldTextStyle10,
-                            textAlign: TextAlign.center),
+                        Text(
+                          code2,
+                          style: boldTextStyle10,
+                          textAlign: TextAlign.center,
+                          textDirection: TextDirection.ltr,
+                        ),
                         const Divider(),
-                        Text(code3,
-                            style: TextStyle(fontSize: 18),
-                            textAlign: TextAlign.center),
+                        Text(
+                          code3,
+                          style: TextStyle(fontSize: 18),
+                          textAlign: TextAlign.center,
+                          textDirection: TextDirection.ltr,
+                        ),
                         const Divider(),
-                        Text(code4,
-                            style: TextStyle(fontSize: 18),
-                            textAlign: TextAlign.center),
+                        Text(
+                          code4,
+                          style: TextStyle(fontSize: 18),
+                          textAlign: TextAlign.center,
+                          textDirection: TextDirection.ltr,
+                        ),
                         const Divider(),
                       ],
                     ),
                   ),
                 ),
           Visibility(
-            visible: settingController.settings["printQrcode"] ?? false,
-            child: Screenshot(
-              controller: qrcodeScreenshotControllers,
-              child: pinCode != ''
-                  ? Container(
-                      width: double.infinity,
-                      margin: const EdgeInsets.symmetric(vertical: 5),
-                      decoration:
-                          (settingController.settings["printInformation"] ??
-                                  false)
-                              ? const BoxDecoration(
-                                  color: Colors.white,
-                                  border: Border(bottom: BorderSide()))
-                              : const BoxDecoration(color: Colors.white),
-                      child: Center(
-                        child: QrImageView(
-                          data: "tel:$ussd",
-                          version: QrVersions.auto,
-                          size: 100.0,
+            visible: settingController.settings["preview_printQrcode"] ?? false,
+            child: Container(
+              margin: const EdgeInsets.symmetric(
+                  vertical:
+                      5), // مارجین را به بیرون از شات منتقل کردیم تا لبه‌های ترنسپرنت ثبت نشوند
+              child: Screenshot(
+                controller: qrcodeScreenshotControllers,
+                child: pinCode != ''
+                    ? Container(
+                        width: double.infinity,
+                        decoration: const BoxDecoration(
+                          color: Colors
+                              .white, // پس‌زمینه کاملاً سفید بدون حاشیه سیاه
                         ),
+                        child: Center(
+                          child: QrImageView(
+                            data: "tel:$ussd",
+                            version: QrVersions.auto,
+                            size: 100.0,
+                            backgroundColor:
+                                Colors.white, // هماهنگی کامل پس‌زمینه کیوآر
+                          ),
+                        ),
+                      )
+                    : Container(
+                        width: double.infinity,
+                        height: 1,
+                        color: Colors.white,
                       ),
-                    )
-                  : Container(
-                      width: double.infinity,
-                      height: 1,
-                      color: Colors.white,
-                    ),
+              ),
             ),
           ),
           Visibility(
-            visible: settingController.settings["printInformation"] ?? false,
+            visible:
+                settingController.settings["preview_printInformation"] ?? false,
             child: footerText.isNotEmpty
                 ? Screenshot(
                     controller: footerScreenshotControllers,
@@ -238,19 +264,6 @@ class PrintWidget extends StatelessWidget {
                             ),
                           },
                         ),
-                        // child:
-                        //  Text(
-                        //   removeHtmlTags(
-                        //     footerText,
-                        //   ),
-                        //   style: const TextStyle(
-                        //     color: Colors.black,
-                        //     fontWeight: FontWeight.w700,
-                        //     fontSize: 18,
-                        //   ),
-                        //   textAlign: TextAlign.left,
-                        //   textDirection: TextDirection.ltr,
-                        // ),
                       ),
                     ),
                   )
@@ -263,7 +276,8 @@ class PrintWidget extends StatelessWidget {
           ),
           const Gap(4),
           Visibility(
-            visible: settingController.settings["printBarCode"] ?? false,
+            visible:
+                settingController.settings["preview_printBarCode"] ?? false,
             child: Screenshot(
               controller: barCodeScreenshotControllers,
               child: Container(

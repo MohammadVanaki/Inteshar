@@ -3,28 +3,33 @@ import 'package:get/get.dart';
 import 'package:inteshar/app/config/constants.dart';
 import 'package:inteshar/app/config/handle_logout.dart';
 import 'package:inteshar/app/config/status.dart';
+import 'package:inteshar/app/core/common/constants/api_client.dart';
 import 'package:inteshar/app/core/common/widgets/exit_dialog.dart';
 import 'package:inteshar/app/features/home/data/data_source/home_api_provider.dart';
 import 'package:inteshar/app/features/purchase_methods/data/models/purchase_model.dart';
 
 class PurchaseApiProvider extends GetxController {
-  late Dio dio;
   final rxRequestStatus = Status.initial.obs;
   var purchaseDataList = <PurchaseModel>[].obs;
   final errorMessage = ''.obs;
   final RxBool isProcessing = false.obs;
+  final RxBool isSuccessful = true.obs;
+  final RxInt totalPrintCount = 0.obs;
+  final RxInt currentPrintCount = 0.obs;
   final HomeApiProvider updateController = Get.find<HomeApiProvider>();
 
-  @override
-  void onInit() {
-    super.onInit();
-    dio = Dio(BaseOptions(
-      receiveTimeout: const Duration(milliseconds: 20000),
-      validateStatus: (status) {
-        return status! < 500;
-      },
-    ));
-  }
+  final ApiClient _apiClient = ApiClient();
+
+  // @override
+  // void onInit() {
+  //   super.onInit();
+  //   dio = Dio(BaseOptions(
+  //     receiveTimeout: const Duration(milliseconds: 20000),
+  //     validateStatus: (status) {
+  //       return status! < 500;
+  //     },
+  //   ));
+  // }
 
   Future<bool> fetchPurchase({
     required String counter,
@@ -33,13 +38,14 @@ class PurchaseApiProvider extends GetxController {
   }) async {
     errorMessage.value = '';
     rxRequestStatus.value = Status.loading;
+    isSuccessful.value = true;
 
     print(counter);
     print(type);
     print(cardId);
     print(Constants.userToken);
     try {
-      final response = await dio.post(
+      final response = await _apiClient.dio.post(
         "${Constants.baseUrl}/print",
         queryParameters: {
           'serial_count': counter,
@@ -50,6 +56,10 @@ class PurchaseApiProvider extends GetxController {
           headers: {
             'Authorization': 'Bearer ${Constants.userToken}',
             'Content-Type': 'application/json',
+          },
+          extra: {
+            'safeToRetry': false,
+            'warningMessage': 'حدث خطأ في الاتصال أثناء شراء الكارت. يرجى التحقق من رصيدك وقائمة مشترياتك أولاً لتجنب الشراء المكرر وسحب الرصيد مرتين. هل تريد إعادة المحاولة على أي حال؟',
           },
         ),
       );
@@ -63,9 +73,11 @@ class PurchaseApiProvider extends GetxController {
         updateController.inventory.value = response.data['inventory'];
         updateController.update();
         print('1111printDate=======>${response.data['print_date']}');
+        isSuccessful.value = true;
         return true;
       } else if (response.statusCode == 401) {
         handleLogout(response.data['error']);
+        isSuccessful.value = false;
         return false;
       } else {
         print('===w==w=e=w=we=e=====');
@@ -80,14 +92,15 @@ class PurchaseApiProvider extends GetxController {
           rxRequestStatus.value = Status.error;
         }
 
+        isSuccessful.value = false;
         return false;
       }
     } catch (e) {
       print(e);
       errorMessage.value = 'حاول مرة أخرى';
       rxRequestStatus.value = Status.error;
-      Get.closeAllSnackbars();
-      Get.snackbar('خطأ', 'فشل في جلب البيانات.');
+
+      isSuccessful.value = false;
       return false;
     }
   }

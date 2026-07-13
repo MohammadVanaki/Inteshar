@@ -16,6 +16,12 @@ class BluetoothController extends GetxController {
   RxString deviceName = ''.obs;
   var rxRequestStatus = Status.initial.obs;
 
+  @override
+  void onInit() {
+    super.onInit();
+    tryAutoConnectPrinter();
+  }
+
   // Check and request Bluetooth permissions, then turn it on if needed
   Future<void> checkAndRequestBluetooth() async {
     BluetoothAdapterState adapterState =
@@ -62,16 +68,13 @@ class BluetoothController extends GetxController {
         }).toList();
       }
 
-      // Add a delay of 3 seconds to simulate scanning
-      await Future.delayed(const Duration(seconds: 3));
-
       isLoading.value = false; // Stop loading indicator
 
       // Show a notification based on the scan results
       if (devicesList.isEmpty) {
-        Get.closeAllSnackbars();
-        Get.snackbar(
-            "لم يتم العثور على أجهزة", "لم يتم العثور على أي جهاز بلوتوث.");
+        // Get.closeAllSnackbars();
+        // Get.snackbar(
+        //     "لم يتم العثور على أجهزة", "لم يتم العثور على أي جهاز بلوتوث.");
       } else {
         Get.closeAllSnackbars();
         Get.snackbar("تم العثور على أجهزة",
@@ -79,12 +82,16 @@ class BluetoothController extends GetxController {
       }
     } catch (e) {
       isLoading.value = false; // Stop loading indicator on error
-      Get.closeAllSnackbars();
-      Get.snackbar("خطا", "مشکلی در اسکن دستگاه‌های بلوتوث رخ داد: $e");
+      // Get.closeAllSnackbars();
+      // Get.snackbar("خطا", "مشکلی در اسکن دستگاه‌های بلوتوث رخ داد: $e");
     }
   }
 
   Future<void> tryAutoConnectPrinter() async {
+    if (isLoading.value || isConnected.value) {
+      return;
+    }
+
     final savedPrinter = Constants.localStorage.read('printAddres');
 
     if (savedPrinter != null &&
@@ -104,11 +111,13 @@ class BluetoothController extends GetxController {
           await PrintBluetoothThermal.connectionStatus;
       if (isAlreadyConnected) {
         print("✅ قبلاً متصل شده‌ایم.");
+        isConnected.value = true;
+        deviceName.value = advName;
         return;
       }
 
       try {
-        await connectToDevice(macAddress, advName);
+        await connectToDevice(macAddress, advName, isAutoConnect: true);
         print("✅ اتصال خودکار موفق بود.");
       } catch (e) {
         print("❌ خطا در اتصال خودکار: $e");
@@ -119,11 +128,19 @@ class BluetoothController extends GetxController {
   }
 
   // Connect to a specific Bluetooth device
-  Future<void> connectToDevice(String remoteId, String advName) async {
+  Future<void> connectToDevice(String remoteId, String advName,
+      {bool isAutoConnect = false}) async {
+    if (isLoading.value) return;
     try {
+      isLoading.value = true;
       bool connectionStatus = await PrintBluetoothThermal.connectionStatus;
       if (!connectionStatus) {
-        await PrintBluetoothThermal.connect(macPrinterAddress: remoteId);
+        bool connected =
+            await PrintBluetoothThermal.connect(macPrinterAddress: remoteId);
+        if (!connected) {
+          isConnected.value = false;
+          return;
+        }
       }
 
       Constants.localStorage.write('printAddres', {
@@ -131,21 +148,24 @@ class BluetoothController extends GetxController {
         'name': advName,
       });
       deviceName.value = advName;
-      // connectedDevice.value = device;
       isConnected.value = true;
-      Get.closeAllSnackbars();
-      Get.snackbar("تم الاتصال", "تم الاتصال بـ $advName بنجاح.");
+
+      // if (!isAutoConnect) {
+      //   Get.closeAllSnackbars();
+      //   Get.snackbar("تم الاتصال", "تم الاتصال بـ $advName بنجاح.");
+      // }
     } catch (e) {
-      Get.closeAllSnackbars();
-      Get.snackbar("خطأ", "فشل الاتصال بـ $advName: $e");
+      isConnected.value = false;
+    } finally {
+      isLoading.value = false;
     }
   }
 
   // Disconnect from the current Bluetooth device
   Future<void> disconnectDevice() async {
     Constants.localStorage.remove('printAddres');
-    Get.closeAllSnackbars();
-    Get.snackbar("تم قطع الاتصال", "تم قطع الاتصال مع الجهاز.");
+    // Get.closeAllSnackbars();
+    // Get.snackbar("تم قطع الاتصال", "تم قطع الاتصال مع الجهاز.");
     isConnected.value = false;
   }
 }

@@ -220,65 +220,70 @@ class USerReportingList extends StatelessWidget {
                           RePrintApiProvider rePrintApiProvider = Get.put(
                               RePrintApiProvider(),
                               tag: index.toString());
+                          final maxReprints = updateController.homeDataList
+                                  .first.user?.agent?.maxReprints ??
+                              1;
+                          final currentReprint =
+                              serials.first.serials[index].rePrint;
+                          final sessionReprint =
+                              purchaseMethodsController.isButtonDisabled.value;
+
                           return (purchaseMethodsController
                                       .purchaseMethodsSelected.value !=
                                   -1)
                               ? OutlinedButton(
                                   onPressed: () {
-                                    if (serials.first.serials[index].rePrint <=
-                                        (updateController.homeDataList.first
-                                                .user!.agent!.maxReprints ??
-                                            1)) {
-                                      if (purchaseMethodsController
-                                              .isButtonDisabled.value <=
-                                          (updateController.homeDataList.first
-                                                  .user!.agent!.maxReprints ??
-                                              1)) {
-                                        rePrintApiProvider
-                                            .fetchRePrintData(
-                                          cardId: serials
-                                              .first.serials[index].cardId
-                                              .toString(),
-                                          serialId: serials
-                                              .first.serials[index].id
-                                              .toString(),
-                                        )
-                                            .then(
-                                          (success) {
-                                            purchaseMethodsController
-                                                .isButtonDisabled.value++;
-                                            // Handle success
-                                            if (success) {
-                                              manageMethods(
-                                                type: purchaseMethodsController
-                                                    .purchaseMethodsSelected
-                                                    .value,
-                                                serials: [
-                                                  serials.first.serials[index]
-                                                ],
-                                                cardTitle: serials
-                                                    .first.serials[index].title,
-                                                photoUrl: serials.first
-                                                    .serials[index].photoUrl,
-                                                printDate: serials.first
-                                                    .serials[index].printDate,
-                                                title: serials
-                                                    .first.serials[index].title,
-                                                ussdCodes: [
-                                                  UssdCode(
-                                                      code: rePrintApiProvider
-                                                              .rePrintDataList
-                                                              .first
-                                                              .ussdCode ??
-                                                          '',
-                                                      id: -1)
-                                                ],
-                                                footer: rePrintApiProvider
+                                    if (currentReprint <= maxReprints ||
+                                        sessionReprint <= maxReprints) {
+                                      rePrintApiProvider
+                                          .fetchRePrintData(
+                                        cardId: serials
+                                            .first.serials[index].cardId
+                                            .toString(),
+                                        serialId: serials
+                                            .first.serials[index].id
+                                            .toString(),
+                                      )
+                                          .then(
+                                        (success) {
+                                          purchaseMethodsController
+                                              .isButtonDisabled.value++;
+                                          // Handle success
+                                          if (success) {
+                                            print(
+                                                '=>=>===============>${purchaseMethodsController.purchaseMethodsSelected.value}');
+                                            print(
+                                                '=>=>===============>${serials.first.serials[index]}');
+                                            manageMethods(
+                                              type: purchaseMethodsController
+                                                  .purchaseMethodsSelected
+                                                  .value,
+                                              serials: [
+                                                serials.first.serials[index]
+                                              ],
+                                              cardTitle: serials
+                                                  .first.serials[index].title,
+                                              photoUrl: serials
+                                                      .first
+                                                      .serials[index]
+                                                      .photoUrl ??
+                                                  '',
+                                              printDate: serials.first
+                                                  .serials[index].printDate,
+                                              title: serials
+                                                  .first.serials[index].title,
+                                              ussdCodes: [
+                                                UssdCode(
+                                                    code: rePrintApiProvider
                                                             .rePrintDataList
                                                             .first
-                                                            .cardDetails2
-                                                            ?.cardFooter
-                                                            ?.isEmpty ??
+                                                            .ussdCode ??
+                                                        '',
+                                                    id: -1)
+                                              ],
+                                              footer: removeHtmlTags(
+                                                rePrintApiProvider.rePrintDataList.first.cardDetails2
+                                                            ?.cardFooter?.isEmpty ??
                                                         true
                                                     ? (rePrintApiProvider
                                                                 .rePrintDataList
@@ -298,22 +303,17 @@ class USerReportingList extends StatelessWidget {
                                                         .first
                                                         .cardDetails2!
                                                         .cardFooter!,
-                                                isReported: true,
-                                                cardId: serials
-                                                    .first.serials[index].cardId
-                                                    .toString(),
-                                              );
-                                            }
-                                          },
-                                        );
-                                      } else {
-                                        Get.closeAllSnackbars();
-                                        Get.snackbar('تنبيه',
-                                            'تجاوزت الحد الاقصى لعدد مرات تكرار الخدمة!');
-                                      }
+                                              ),
+                                              isReported: true,
+                                              cardId: serials
+                                                  .first.serials[index].cardId
+                                                  .toString(),
+                                            );
+                                          }
+                                        },
+                                      );
                                     } else {
                                       Get.closeAllSnackbars();
-                                      // Show a snackbar if the reprint limit is exceeded
                                       Get.snackbar('تنبيه',
                                           'تجاوزت الحد الاقصى لعدد مرات تكرار الخدمة!');
                                     }
@@ -324,10 +324,18 @@ class USerReportingList extends StatelessWidget {
                                       case Status.loading:
                                         return const CustomLoading();
                                       case Status.error:
-                                        return const SizedBox(
+                                        return SizedBox(
                                           width: double.infinity,
                                           child: Center(
-                                              child: Text('حاول مرة أخرى')),
+                                            child: Text(
+                                              'حاول مرة أخرى',
+                                              style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onPrimary,
+                                              ),
+                                            ),
+                                          ),
                                         );
                                       case Status.completed:
                                       case Status.initial:
@@ -361,8 +369,6 @@ class USerReportingList extends StatelessWidget {
                                             ],
                                           ),
                                         );
-                                      default:
-                                        return const SizedBox.shrink();
                                     }
                                   }),
                                 )
@@ -461,10 +467,8 @@ class USerReportingList extends StatelessWidget {
 
   img.Image adjustContrastAndThreshold(
       img.Image originalImage, double contrast) {
-    // افزایش کنتراست با adjustColor
     final contrastAdjusted = img.adjustColor(originalImage, contrast: contrast);
 
-    // مقدار آستانه برای باینری کردن تصویر
     const int threshold = 228;
 
     for (int y = 0; y < contrastAdjusted.height; y++) {

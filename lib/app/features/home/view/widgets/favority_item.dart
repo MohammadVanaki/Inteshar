@@ -98,8 +98,9 @@ class FavorityItem extends StatelessWidget {
                                                 height: 160,
                                                 width: double.infinity,
                                                 imageUrl: favorityController
-                                                    .favoriteItems[index]
-                                                    .photoUrl,
+                                                        .favoriteItems[index]
+                                                        .photoUrl ??
+                                                    '',
                                                 placeholder: (context, url) =>
                                                     const CustomLoading(),
                                                 errorWidget:
@@ -160,7 +161,7 @@ class FavorityItem extends StatelessWidget {
                                                             favorityController
                                                                 .favoriteItems[
                                                                     index]
-                                                                .id);
+                                                                .id!);
                                                     return ZoomTapAnimation(
                                                       onTap: () =>
                                                           favorityController
@@ -317,12 +318,12 @@ class FavorityItem extends StatelessWidget {
                                                                       ?.successColor),
                                                             ),
                                                             onPressed: () {
-                                                              if (countController
-                                                                      .text ==
-                                                                  '') {
-                                                                Get.snackbar(
-                                                                    'تنبيه',
-                                                                    'يرجى تحديد العدد المطلوب');
+                                                              if (countController.text == '' || countController.text == '0') {
+                                                                if (!Get.isSnackbarOpen) {
+                                                                  Get.snackbar(
+                                                                      'تنبيه',
+                                                                      'يرجى تحديد العدد المطلوب');
+                                                                }
                                                               } else {
                                                                 purchaseApiProvider
                                                                     .fetchPurchase(
@@ -370,7 +371,7 @@ class FavorityItem extends StatelessWidget {
                                                                         title: purchaseApiProvider.purchaseDataList.first.companyTitle ??
                                                                             '',
                                                                         footer:
-                                                                            purchaseApiProvider.purchaseDataList.first.cardDetails?.cardFooter ??
+                                                                            purchaseApiProvider.purchaseDataList.first.cardDetails2?.cardFooter ??
                                                                                 '',
                                                                         isReported:
                                                                             false,
@@ -451,6 +452,7 @@ class FavorityItem extends StatelessWidget {
                                   );
                                 },
                               ).whenComplete(() {
+                                countController.clear();
                                 Get.delete<PurchaseApiProvider>();
                                 Get.delete<PurchaseMethodsController>(
                                     tag: 'single');
@@ -488,7 +490,8 @@ class FavorityItem extends StatelessWidget {
                                       fit: BoxFit.fill,
                                       height: 140,
                                       imageUrl: favorityController
-                                          .favoriteItems[index].photoUrl,
+                                              .favoriteItems[index].photoUrl ??
+                                          '',
                                       placeholder: (context, url) =>
                                           const CustomLoading(),
                                       errorWidget: (context, url, error) =>
@@ -503,7 +506,8 @@ class FavorityItem extends StatelessWidget {
                                   const Gap(10),
                                   Text(
                                     favorityController
-                                        .favoriteItems[index].title,
+                                            .favoriteItems[index].title ??
+                                        '',
                                     style: TextStyle(
                                       color: Theme.of(context)
                                           .colorScheme

@@ -126,6 +126,11 @@ class CustomDrawer extends StatelessWidget {
         "title": 'خروج',
         "icon": 'sign-out-alt',
         "onTap": () {
+          if (!Get.isRegistered<LogoutApiProvider>()) {
+            Get.put(LogoutApiProvider());
+          }
+          final LogoutApiProvider profileController =
+              Get.find<LogoutApiProvider>();
           if (Constants.isLoggedIn) {
             Get.dialog(
               AlertDialog(
@@ -133,34 +138,28 @@ class CustomDrawer extends StatelessWidget {
                 content: const Text('هل تريد تسجيل الخروج من حسابك؟'),
                 actions: [
                   ElevatedButton(
-                    onPressed: () {
-                      Get.back();
-                    },
-                    child: const Text(
-                      'لا',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    onPressed: () => Get.back(),
+                    child: const Text('لا'),
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      logout();
-                    },
-                    child: const Text(
-                      'نعم',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+                  Obx(() => ElevatedButton(
+                        onPressed: profileController.isLogoutLoading.value
+                            ? null
+                            : () => profileController.logoutUser(),
+                        child: profileController.isLogoutLoading.value
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2, color: Colors.white))
+                            : const Text(
+                                'نعم',
+                                style: TextStyle(
+                                    fontSize: 15, fontWeight: FontWeight.bold),
+                              ),
+                      )),
                 ],
               ),
             );
-          } else {
-            Get.offAndToNamed(Routes.welcomePage);
           }
         },
       },

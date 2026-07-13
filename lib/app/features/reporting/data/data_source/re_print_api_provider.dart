@@ -3,25 +3,27 @@ import 'package:inteshar/app/config/constants.dart';
 import 'package:inteshar/app/config/handle_logout.dart';
 import 'package:inteshar/app/config/status.dart';
 import 'package:dio/dio.dart';
+import 'package:inteshar/app/core/common/constants/api_client.dart';
 import 'package:inteshar/app/core/common/widgets/exit_dialog.dart';
 import 'package:inteshar/app/features/reporting/data/models/re_print_model.dart';
 
 class RePrintApiProvider extends GetxController {
   var rePrintDataList = <RePrintModel>[].obs;
-  late Dio dio;
+  // late Dio dio;
   final rxRequestStatus = Status.initial.obs;
-  
 
-  @override
-  void onInit() {
-    super.onInit();
-    dio = Dio(BaseOptions(
-      receiveTimeout: const Duration(milliseconds: 10000),
-      validateStatus: (status) {
-        return status! < 500;
-      },
-    ));
-  }
+  final ApiClient _apiClient = ApiClient();
+
+  // @override
+  // void onInit() {
+  //   super.onInit();
+  //   dio = Dio(BaseOptions(
+  //     receiveTimeout: const Duration(milliseconds: 10000),
+  //     validateStatus: (status) {
+  //       return status! < 500;
+  //     },
+  //   ));
+  // }
 
   Future<bool> fetchRePrintData({
     required String cardId,
@@ -31,7 +33,7 @@ class RePrintApiProvider extends GetxController {
     try {
       print(cardId);
       print(serialId);
-      final response = await dio.post(
+      final response = await _apiClient.dio.post(
         "${Constants.baseUrl}/re_print",
         queryParameters: {
           'card_id': cardId,
@@ -41,6 +43,10 @@ class RePrintApiProvider extends GetxController {
           headers: {
             'Authorization': 'Bearer ${Constants.userToken}',
             'Content-Type': 'application/json',
+          },
+          extra: {
+            'safeToRetry': false,
+            'warningMessage': 'حدث خطأ في الاتصال أثناء طلب إعادة الطباعة. قد يؤدي التكرار إلى استهلاك الحد الأقصى المسموح به لإعادة الطباعة. هل تريد إعادة المحاولة؟',
           },
         ),
       );

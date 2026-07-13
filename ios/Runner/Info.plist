@@ -2,6 +2,18 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 	<dict>
+		<!-- توضیح استفاده از بلوتوث -->
+		<key>NSBluetoothPeripheralUsageDescription</key>
+		<string>This app uses Bluetooth to connect to nearby devices.</string>
+
+		<!-- توضیح استفاده از بلوتوث در همه حال -->
+		<key>NSBluetoothAlwaysUsageDescription</key>
+		<string>This app needs access to Bluetooth at all times for better functionality.</string>
+
+		<!-- توضیح استفاده از مکان‌یابی در حالت always و whenInUse -->
+		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+		<string>This app needs location access to provide location-based services.</string>
+
 		<!-- keychain -->
 		<key>keychain-access-groups</key>
 		<array>

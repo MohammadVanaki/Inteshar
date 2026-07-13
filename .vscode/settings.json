@@ -2,7 +2,15 @@
     "workbench.colorCustomizations": {
         "activityBar.background": "#56180D",
         "titleBar.activeBackground": "#792112",
-        "titleBar.activeForeground": "#FEF8F7"
+        "titleBar.activeForeground": "#FEF8F7",
+        "titleBar.inactiveBackground": "#56180D",
+        "titleBar.inactiveForeground": "#FEF8F7",
+        "statusBar.background": "#56180D",
+        "statusBar.foreground": "#FEF8F7",
+        "statusBar.debuggingBackground": "#56180D",
+        "statusBar.debuggingForeground": "#FEF8F7",
+        "statusBar.noFolderBackground": "#56180D",
+        "statusBar.noFolderForeground": "#FEF8F7"
     },
     "CodeGPT.apiKey": "CodeGPT Plus Beta",
     "java.configuration.updateBuildConfiguration": "automatic",

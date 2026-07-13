@@ -3,26 +3,27 @@ import 'package:get/get.dart';
 import 'package:inteshar/app/config/constants.dart';
 import 'package:inteshar/app/config/handle_logout.dart';
 import 'package:inteshar/app/config/status.dart';
+import 'package:inteshar/app/core/common/constants/api_client.dart';
 import 'package:inteshar/app/core/common/widgets/exit_dialog.dart';
 import 'package:inteshar/app/features/reporting/data/models/topup_report_model.dart';
 
 class TopupReportApiProvider extends GetxController {
   var reportDataList = <TopupReportModel>[].obs;
-  late Dio dio;
 
   late Rx<Status> rxRequestStatus;
   late Rx<Status> rxRequestButtonStatus;
+  final ApiClient _apiClient = ApiClient();
   @override
   void onInit() {
     super.onInit();
     rxRequestStatus = Status.initial.obs;
     rxRequestButtonStatus = Status.initial.obs;
-    dio = Dio(BaseOptions(
-      receiveTimeout: const Duration(milliseconds: 10000),
-      validateStatus: (status) {
-        return status! < 500;
-      },
-    ));
+    // dio = Dio(BaseOptions(
+    //   receiveTimeout: const Duration(milliseconds: 10000),
+    //   validateStatus: (status) {
+    //     return status! < 500;
+    //   },
+    // ));
   }
 
   Future<void> fetchReportData({
@@ -34,7 +35,7 @@ class TopupReportApiProvider extends GetxController {
     print(startDate);
     print(endDate);
     try {
-      final response = await dio.post(
+      final response = await _apiClient.dio.post(
         "${Constants.baseUrl}/masal_transaction_list",
         queryParameters: {
           'start_date': startDate,

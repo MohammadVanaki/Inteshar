@@ -14,8 +14,6 @@ import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 final formKey = GlobalKey<FormState>();
 FocusNode fildOne = FocusNode();
 FocusNode fildTwo = FocusNode();
-final WelcomeController welcomeController = Get.put(WelcomeController());
-final SinginApiProvider singinApiProvider = Get.put(SinginApiProvider());
 
 class Signin extends StatelessWidget {
   const Signin({
@@ -24,6 +22,9 @@ class Signin extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final WelcomeController welcomeController = Get.put(WelcomeController());
+    final SinginApiProvider singinApiProvider = Get.put(SinginApiProvider());
+
     final userInfo = Constants.localStorage.read('userInfo');
     return Container(
       padding: const EdgeInsets.all(40),
@@ -103,8 +104,10 @@ class Signin extends StatelessWidget {
                         Obx(
                           () => TextFormField(
                             focusNode: fildTwo,
-                            autovalidateMode: AutovalidateMode.onUserInteraction,
-                            obscureText: welcomeController.isPasswordHidden.value,
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            obscureText:
+                                welcomeController.isPasswordHidden.value,
                             controller: singinApiProvider.passwordController,
                             textDirection: TextDirection.ltr,
                             validator: (value) {
@@ -163,7 +166,43 @@ class Signin extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const Gap(20),
+                        const Gap(10),
+                        Directionality(
+                          textDirection: TextDirection.rtl,
+                          child: InkWell(
+                            onTap: () {
+                              singinApiProvider.rememberMe.toggle();
+                            },
+                            borderRadius: BorderRadius.circular(8),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Obx(
+                                  () => Checkbox(
+                                    value: singinApiProvider.rememberMe.value,
+                                    onChanged: (value) {
+                                      singinApiProvider.rememberMe.value =
+                                          value ?? false;
+                                    },
+                                    activeColor:
+                                        Theme.of(context).colorScheme.secondary,
+                                    checkColor:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
+                                ),
+                                Text(
+                                  'تذكرني',
+                                  style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.onPrimary,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const Gap(10),
                         SizedBox(
                           width: double.infinity,
                           child: Obx(
@@ -175,29 +214,29 @@ class Signin extends StatelessWidget {
                                     singinApiProvider.rxRequestStatus.value,
                                     context),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
+                                    borderRadius: BorderRadius.circular(10)),
                               ),
-                              onPressed:
-                                  singinApiProvider.rxRequestButtonStatus.value ==
-                                          Status.loading
-                                      ? null
-                                      : () {
-                                          FocusScope.of(context).unfocus();
-                                          if (formKey.currentState!.validate()) {
-                                            singinApiProvider.login(
-                                              username: singinApiProvider
-                                                  .usernameController.text,
-                                              password: singinApiProvider
-                                                  .passwordController.text,
-                                            );
-                                          }
-                                        },
+                              onPressed: singinApiProvider
+                                          .rxRequestButtonStatus.value ==
+                                      Status.loading
+                                  ? null
+                                  : () {
+                                      FocusScope.of(context).unfocus();
+                                      if (formKey.currentState!.validate()) {
+                                        singinApiProvider.login(
+                                          username: singinApiProvider
+                                              .usernameController.text,
+                                          password: singinApiProvider
+                                              .passwordController.text,
+                                        );
+                                      }
+                                    },
                               child: Obx(
                                 () {
                                   switch (
                                       singinApiProvider.rxRequestStatus.value) {
                                     case Status.initial:
+                                    case Status.completed:
                                       return Text(
                                         'دخول',
                                         style: TextStyle(
@@ -205,12 +244,6 @@ class Signin extends StatelessWidget {
                                               .colorScheme
                                               .onPrimary,
                                         ),
-                                      );
-                                    case Status.completed:
-                                      return CustomLoading(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onPrimary,
                                       );
                                     case Status.error:
                                       return Text(

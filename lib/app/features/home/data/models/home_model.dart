@@ -1,5 +1,5 @@
 class HomeModel {
-  String status;
+  String? status;
   List<CompanyCategory> companyCategories;
   List<Slider> sliders;
   List<AsiacellCategory>? asiacellCategories;
@@ -8,7 +8,7 @@ class HomeModel {
   int? loggedIn;
 
   HomeModel({
-    required this.status,
+    this.status,
     required this.companyCategories,
     required this.sliders,
     this.asiacellCategories,
@@ -19,7 +19,7 @@ class HomeModel {
 
   // Convert JSON to HomeModel object
   factory HomeModel.fromJson(Map<String, dynamic> json) => HomeModel(
-        status: json["status"],
+        status: json["status"]?.toString() ?? "",
         companyCategories: List<CompanyCategory>.from(
             json["company_categories"].map((x) => CompanyCategory.fromJson(x))),
         sliders:
@@ -54,36 +54,36 @@ class HomeModel {
 }
 
 class CardCategory {
-  int id;
-  String title;
-  String photo;
-  String companyTitle;
-  int companyId;
-  int price;
-  int serialCount;
-  String photoUrl;
+  int? id;
+  String? title;
+  String? photo;
+  String? companyTitle;
+  int? companyId;
+  int? price;
+  int? serialCount;
+  String? photoUrl;
 
   CardCategory({
-    required this.id,
-    required this.title,
-    required this.photo,
-    required this.companyTitle,
-    required this.companyId,
-    required this.price,
-    required this.serialCount,
-    required this.photoUrl,
+    this.id,
+    this.title,
+    this.photo,
+    this.companyTitle,
+    this.companyId,
+    this.price,
+    this.serialCount,
+    this.photoUrl,
   });
 
   // Convert JSON to CardCategory object
   factory CardCategory.fromJson(Map<String, dynamic> json) => CardCategory(
         id: json["id"],
-        title: json["title"],
-        photo: json["photo"],
-        companyTitle: json["company_title"],
+        title: json["title"]?.toString() ?? "",
+        photo: json["photo"]?.toString() ?? "",
+        companyTitle: json["company_title"]?.toString() ?? "",
         companyId: json["company_id"],
         price: json["price"],
         serialCount: json["serial_count"],
-        photoUrl: json["photo_url"],
+        photoUrl: json["photo_url"]?.toString() ?? "",
       );
 
   // Convert CardCategory object to JSON
@@ -154,28 +154,28 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) => User(
         id: json["id"],
-        lang: json["lang"],
-        name: json["name"],
-        officeOwner: json["office_owner"],
-        delegate: json["delegate"],
+        lang: json["lang"]?.toString(),
+        name: json["name"]?.toString() ?? "",
+        officeOwner: json["office_owner"]?.toString(),
+        delegate: json["delegate"]?.toString(),
         totalBalance: json["total_balance"],
-        username: json["username"],
-        password: json["password"],
-        codeNumber: json["code_number"],
+        username: json["username"]?.toString(),
+        password: json["password"]?.toString(),
+        codeNumber: json["code_number"]?.toString(),
         cityId: json["city_id"],
         companyId: json["company_id"],
         agentId: json["agent_id"],
-        posUsername: json["pos_username"],
-        mobile: json["mobile"],
-        description: json["description"],
-        address: json["address"],
+        posUsername: json["pos_username"]?.toString(),
+        mobile: json["mobile"]?.toString(),
+        description: json["description"]?.toString(),
+        address: json["address"]?.toString(),
         deviceId: json["device_id"],
         active: json["active"],
         loggedIn: json["logged_in"],
-        firebaseToken: json["firebase_token"],
-        firebaseDevice: json["firebase_device"],
+        firebaseToken: json["firebase_token"]?.toString(),
+        firebaseDevice: json["firebase_device"]?.toString(),
         deletedAt: json["deleted_at"],
-        photoUrl: json["photo_url"],
+        photoUrl: json["photo_url"]?.toString(),
         agent: json["agent"] == null ? null : Agent.fromJson(json["agent"]),
       );
 
@@ -265,17 +265,17 @@ class Agent {
   factory Agent.fromJson(Map<String, dynamic> json) => Agent(
         id: json["id"],
         parentId: json["parent_id"],
-        lang: json["lang"],
-        name: json["name"],
-        photo: json["photo"],
-        appPhoto: json["app_photo"],
-        email: json["email"],
+        lang: json["lang"]?.toString(),
+        name: json["name"]?.toString() ?? "",
+        photo: json["photo"]?.toString(),
+        appPhoto: json["app_photo"]?.toString(),
+        email: json["email"]?.toString(),
         feature: json["feature"],
         cityId: json["city_id"],
-        access: json["access"],
-        description: json["description"],
-        primaryColor: json["primary_color"],
-        onPrimaryColor: json["on_primary_color"],
+        access: json["access"]?.toString(),
+        description: json["description"]?.toString(),
+        primaryColor: json["primary_color"]?.toString(),
+        onPrimaryColor: json["on_primary_color"]?.toString(),
         alrabeaToken: json["alrabea_token"],
         masalBalance: json["masal_balance"],
         numberPrint: json["number_print"],
@@ -285,9 +285,9 @@ class Agent {
         limitAgentPrint: json["limit_agent_print"],
         active: json["active"],
         deletedAt: json["deleted_at"],
-        appPhotoUrl: json["app_photo_url"],
+        appPhotoUrl: json["app_photo_url"]?.toString(),
         maxReprints: json["max_reprints"],
-        supportText: json["support_txt"],
+        supportText: json["support_txt"]?.toString(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -315,32 +315,35 @@ class Agent {
         "deleted_at": deletedAt,
         "app_photo_url": appPhotoUrl,
         "max_reprints": maxReprints,
-        "supportText": supportText,
+        "support_txt": supportText,
       };
 }
 
 class Company {
-  int id;
-  int categoryId;
-  String title;
-  int numberPrint;
-  String logoUrl;
+  int? id;
+  int? idShow;
+  int? categoryId;
+  String? title;
+  int? numberPrint;
+  String? logoUrl;
 
   Company({
-    required this.id,
-    required this.categoryId,
-    required this.title,
-    required this.numberPrint,
-    required this.logoUrl,
+    this.id,
+    this.categoryId,
+    this.title,
+    this.idShow,
+    this.numberPrint,
+    this.logoUrl,
   });
 
   // Convert JSON to Company object
   factory Company.fromJson(Map<String, dynamic> json) => Company(
         id: json["id"],
         categoryId: json["category_id"],
-        title: json["title"],
+        title: json["title"]?.toString() ?? "",
+        idShow: json["id_show"] ?? 0,
         numberPrint: json["number_print"],
-        logoUrl: json["logo_url"],
+        logoUrl: json["logo_url"]?.toString() ?? "",
       );
 
   // Convert Company object to JSON
@@ -348,34 +351,39 @@ class Company {
         "id": id,
         "category_id": categoryId,
         "title": title,
+        "id_show": idShow,
         "number_print": numberPrint,
         "logo_url": logoUrl,
       };
 }
 
 class CompanyCategory {
-  int id;
-  String title;
-  int parentId;
+  int? id;
+  String? title;
+  int? parentId;
   List<Company> companies;
 
   CompanyCategory({
-    required this.id,
-    required this.title,
-    required this.parentId,
+    this.id,
+    this.title,
+    this.parentId,
     required this.companies,
   });
 
   // Convert JSON to CompanyCategory object
-  factory CompanyCategory.fromJson(Map<String, dynamic> json) =>
-      CompanyCategory(
-        id: json["id"],
-        title: json["title"],
-        parentId: json["parent_id"],
-        companies: (json["companies"] as List)
-            .map((companyJson) => Company.fromJson(companyJson))
-            .toList(),
-      );
+  factory CompanyCategory.fromJson(Map<String, dynamic> json) {
+    final list = (json["companies"] as List)
+        .map((companyJson) => Company.fromJson(companyJson))
+        .toList();
+    // Sort by idShow (ascending)
+    list.sort((a, b) => (a.idShow ?? 0).compareTo(b.idShow ?? 0));
+    return CompanyCategory(
+      id: json["id"],
+      title: json["title"]?.toString() ?? "",
+      parentId: json["parent_id"],
+      companies: list,
+    );
+  }
 
   // Convert CompanyCategory object to JSON
   Map<String, dynamic> toJson() => {
@@ -392,11 +400,11 @@ class AsiacellCategory {
   Type? type;
   String? title;
   int? price;
-  String? img; // New field for img
+  String? img;
   String? description;
   int? show2Site;
   int? idShow;
-  String? photoUrl; // New field for photo_url
+  String? photoUrl;
   AgentPrice? agentPrice;
 
   AsiacellCategory({
@@ -405,11 +413,11 @@ class AsiacellCategory {
     this.type,
     this.title,
     this.price,
-    this.img, // Initialize img field
+    this.img,
     this.description,
     this.show2Site,
     this.idShow,
-    this.photoUrl, // Initialize photoUrl field
+    this.photoUrl,
     this.agentPrice,
   });
 
@@ -418,13 +426,13 @@ class AsiacellCategory {
         id: json["id"],
         parentId: json["parent_id"],
         type: json["type"] == null ? null : typeValues.map[json["type"]],
-        title: json["title"],
+        title: json["title"]?.toString() ?? "",
         price: json["price"],
-        img: json["img"], // Parse img from JSON
-        description: json["description"],
+        img: json["img"]?.toString() ?? "",
+        description: json["description"]?.toString() ?? "",
         show2Site: json["show2site"],
         idShow: json["id_show"],
-        photoUrl: json["photo_url"], // Parse photo_url from JSON
+        photoUrl: json["photo_url"]?.toString() ?? "",
         agentPrice: json["agent_price"] == null
             ? null
             : AgentPrice.fromJson(json["agent_price"]),
@@ -436,11 +444,11 @@ class AsiacellCategory {
         "type": type == null ? null : typeValues.reverse[type],
         "title": title,
         "price": price,
-        "img": img, // Include img in toJson
+        "img": img,
         "description": description,
         "show2site": show2Site,
         "id_show": idShow,
-        "photo_url": photoUrl, // Include photo_url in toJson
+        "photo_url": photoUrl,
         "agent_price": agentPrice?.toJson(),
       };
 }
@@ -466,26 +474,26 @@ class AgentPrice {
 }
 
 class Slider {
-  int id;
-  String title;
+  int? id;
+  String? title;
   String? cityId;
-  String link;
-  String photoUrl;
+  String? link;
+  String? photoUrl;
 
   Slider({
-    required this.id,
-    required this.title,
+    this.id,
+    this.title,
     this.cityId,
-    required this.link,
-    required this.photoUrl,
+    this.link,
+    this.photoUrl,
   });
 
   factory Slider.fromJson(Map<String, dynamic> json) => Slider(
         id: json["id"],
-        title: json["title"],
-        cityId: json["city_id"],
-        link: json["link"],
-        photoUrl: json["photo_url"],
+        title: json["title"]?.toString() ?? "",
+        cityId: json["city_id"]?.toString(),
+        link: json["link"]?.toString() ?? "",
+        photoUrl: json["photo_url"]?.toString() ?? "",
       );
 
   Map<String, dynamic> toJson() => {

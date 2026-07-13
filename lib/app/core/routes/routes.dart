@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:inteshar/app/features/auth/view/screens/otp_page.dart';
 import 'package:inteshar/app/features/home/bindings/home_binding.dart';
 import 'package:inteshar/app/features/home/view/screens/companies_archive_page.dart';
 import 'package:inteshar/app/features/home/view/screens/product_archive_page.dart';
@@ -10,6 +11,7 @@ import 'package:inteshar/app/features/notif/view/screens/notification_archive.da
 import 'package:inteshar/app/features/profile/view/screens/edit_profile_page.dart';
 import 'package:inteshar/app/features/profile/view/screens/profile_page.dart';
 import 'package:inteshar/app/features/purchase_methods/view/screens/bluetooth_page.dart';
+import 'package:inteshar/app/features/register_web/view/screens/register_view.dart';
 import 'package:inteshar/app/features/reporting/view/screens/reporting_topup.dart';
 import 'package:inteshar/app/features/services/view/screens/internet_packages_page.dart';
 import 'package:inteshar/app/features/services/view/screens/invoice_page.dart';
@@ -32,6 +34,8 @@ class Routes {
   static const String bluetoothPage = '/bluetoothPage';
   static const String reportingTopup = '/reportingTopup';
   static const String userOperation = '/userOperation';
+  static const String registerView = '/registerView';
+  static const String otp = '/otp';
 
   static final List<GetPage> pages = [
     GetPage(name: reportingTopup, page: () => const ReportingTopup()),
@@ -44,9 +48,14 @@ class Routes {
     GetPage(name: welcomePage, page: () => const WelcomePage()),
     GetPage(name: profilePage, page: () => const ProfilePage()),
     GetPage(name: editProfilePage, page: () => const EditProfilePage()),
-
+    GetPage(name: otp, page: () => const OtpPage()),
     GetPage(
         name: internetPackagesPage, page: () => const InternetPackagesPage()),
+    GetPage(
+        name: registerView,
+        page: () => const RegisterView(
+              token: '',
+            )),
     GetPage(name: userOperation, page: () => const UserOperation()),
     // GetPage(name: invoicePage, page: () => const InvoicePage()),
     GetPage(

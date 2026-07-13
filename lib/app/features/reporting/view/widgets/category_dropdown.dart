@@ -57,12 +57,10 @@ class CategoryDropdown extends StatelessWidget {
               border: const UnderlineInputBorder(borderSide: BorderSide.none),
             ),
             searchCallback: (entries, query) {
-              final filteredEntries = entries.where((entry) {
-                return entry.label.toLowerCase().contains(query.toLowerCase());
-              }).toList();
-
-              final count = filteredEntries.length;
-              return count > entries.length ? entries.length : count;
+              if (query.isEmpty) return null;
+              final index = entries.indexWhere((entry) =>
+                  entry.label.toLowerCase().contains(query.toLowerCase()));
+              return index != -1 ? index : null;
             },
             onSelected: onSelected,
             initialSelection: selectedValue,
