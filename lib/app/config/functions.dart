@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 
 String? formatNumber(int? number) {
@@ -105,9 +105,9 @@ List<TextSpan> parseHtmlToTextSpans(String htmlString, TextStyle baseStyle) {
 
 Future<String?> getId() async {
   var deviceInfo = DeviceInfoPlugin();
-  var storage = const FlutterSecureStorage();
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-  String? savedId = await storage.read(key: 'unique_device_id');
+  String? savedId = prefs.getString('unique_device_id');
   if (savedId != null) return savedId;
 
   String finalId = '';
@@ -132,6 +132,6 @@ Future<String?> getId() async {
     finalId = const Uuid().v4();
   }
 
-  await storage.write(key: 'unique_device_id', value: finalId);
+  await prefs.setString('unique_device_id', finalId);
   return finalId;
 }

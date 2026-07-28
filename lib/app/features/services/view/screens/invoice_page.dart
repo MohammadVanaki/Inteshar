@@ -25,12 +25,13 @@ class InvoicePage extends StatelessWidget {
   Widget build(BuildContext context) {
     InvoiceController invoiceController = Get.put(InvoiceController());
     final homeApiProvider = Get.find<HomeApiProvider>();
-    final List<AsiacellCategory> shortcutList = homeApiProvider
-        .homeDataList.first.asiacellCategories!
+    final List<AsiacellCategory> shortcutList = (homeApiProvider
+                .homeDataList.firstOrNull?.asiacellCategories ??
+            [])
         .where((category) => category.type == Type.TOPUP)
         .toList();
 
-    shortcutList.sort((a, b) => a.idShow!.compareTo(b.idShow ?? 0));
+    shortcutList.sort((a, b) => (a.idShow ?? 0).compareTo(b.idShow ?? 0));
 
     final formKey = GlobalKey<FormState>();
     return InternalPage(
@@ -44,8 +45,18 @@ class InvoicePage extends StatelessWidget {
           decoration: Constants.intesharBoxDecoration(context)
               .copyWith(color: Theme.of(context).colorScheme.primary),
           child: Constants.isLoggedIn
-              ? Column(
-                  children: [
+              ? (shortcutList.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'لا توجد فئات متاحة حالياً',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                        ),
+                      ),
+                    )
+                  : Column(
+                      children: [
                     const Gap(20),
                     const Text(
                       'للشراء من الفئة المطلوبة',
@@ -65,6 +76,9 @@ class InvoicePage extends StatelessWidget {
                       key: formKey,
                       child: TextFormField(
                         textDirection: TextDirection.ltr,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onPrimary,
+                        ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return null;
@@ -88,12 +102,22 @@ class InvoicePage extends StatelessWidget {
                           label: const Text(
                             'رقم الهاتف',
                           ),
+                          labelStyle: TextStyle(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onPrimary
+                                .withOpacity(0.7),
+                          ),
+                          floatingLabelStyle: TextStyle(
+                            color: Theme.of(context).colorScheme.onPrimary,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
                     const Gap(30),
                     AutoHeightGridView(
-                      itemCount: 3,
+                      itemCount: shortcutList.length < 3 ? shortcutList.length : 3,
                       crossAxisCount: 3,
                       mainAxisSpacing: 10,
                       crossAxisSpacing: 10,
@@ -383,7 +407,7 @@ class InvoicePage extends StatelessWidget {
                       ),
                     )
                   ],
-                )
+                ))
               : const OfflineWidget(),
         ),
       ),

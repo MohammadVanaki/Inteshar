@@ -15,6 +15,7 @@ class PrintWidget extends StatelessWidget {
   const PrintWidget({
     super.key,
     required this.printDate,
+    required this.originalAgent,
     required this.serialId,
     required this.cardTitle,
     required this.serial,
@@ -37,6 +38,7 @@ class PrintWidget extends StatelessWidget {
     required this.cardId,
   });
   final String printDate;
+  final String originalAgent;
   final String serialId;
   final String cardTitle;
   final String serial;
@@ -59,8 +61,24 @@ class PrintWidget extends StatelessWidget {
   final ScreenshotController barCodeScreenshotControllers;
   @override
   Widget build(BuildContext context) {
-    print('printDate=======>$printDate');
-    print('code2=======>$code2');
+    print('=== PRINT WIDGET DATA LOG ===');
+    print('printDate=======>>>$printDate');
+    print('originalAgent=======>>>$originalAgent');
+    print('serialId=======>>>$serialId');
+    print('cardTitle=======>>>$cardTitle');
+    print('serial=======>>>$serial');
+    print('pinCode=======>>>$pinCode');
+    print('photoUrl=======>>>$photoUrl');
+    print('footerText=======>>>$footerText');
+    print('expiryTime=======>>>$expiryTime');
+    print('ussd=======>>>$ussd');
+    print('code1=======>>>$code1');
+    print('code2=======>>>$code2');
+    print('code3=======>>>$code3');
+    print('code4=======>>>$code4');
+    print('isReported=======>>>$isReported');
+    print('cardId=======>>>$cardId');
+    print('==============================>>>');
     final updateController = Get.find<HomeApiProvider>();
     final user = updateController.homeDataList.first;
     final settingController = Get.find<SettingController>();
@@ -71,12 +89,18 @@ class PrintWidget extends StatelessWidget {
     const TextStyle boldTextStyle10 = TextStyle(
         fontWeight: FontWeight.w700, fontSize: 20, color: Colors.black);
 
-    final Barcode barcode = Barcode.code93();
+    final Barcode barcode = Barcode.code128();
 
-    // Generate the barcode as SVG
-    final String svgBarcode = barcode.toSvg(
-      '00964$cardId',
-    );
+    // Generate the barcode as SVG with safety check
+    String svgBarcode = '';
+    try {
+      if (cardId.isNotEmpty) {
+        svgBarcode = barcode.toSvg('00964$cardId');
+      }
+    } catch (e) {
+      debugPrint("Error generating barcode SVG: $e");
+    }
+
     return Container(
       padding: const EdgeInsets.all(mainPadding),
       decoration: BoxDecoration(
@@ -89,6 +113,7 @@ class PrintWidget extends StatelessWidget {
           Screenshot(
             controller: headerScreenshotControllers,
             child: Container(
+              width: double.infinity,
               color: Colors.white,
               child: Column(
                 children: [
@@ -104,7 +129,7 @@ class PrintWidget extends StatelessWidget {
                   ),
                   Center(
                     child: Text(
-                      ' ${user.user?.agent?.name ?? ''}',
+                      ' ${originalAgent.isEmpty ? user.parentAgent : originalAgent}',
                       style: boldTextStyle8,
                     ),
                   ),
@@ -131,13 +156,18 @@ class PrintWidget extends StatelessWidget {
               width: double.infinity,
               child: Screenshot(
                 controller: cardPhotoScreenshotControllers,
-                child: CachedNetworkImage(
-                  fit: BoxFit.fill,
-                  imageUrl: photoUrl,
-                  placeholder: (context, url) => const CustomLoading(),
-                  errorWidget: (context, url, error) => Image.asset(
-                    'assets/images/not.jpg',
+                child: Container(
+                  width: double.infinity,
+                  height: 140,
+                  color: Colors.white,
+                  child: CachedNetworkImage(
                     fit: BoxFit.fill,
+                    imageUrl: photoUrl,
+                    placeholder: (context, url) => const CustomLoading(),
+                    errorWidget: (context, url, error) => Image.asset(
+                      'assets/images/not.jpg',
+                      fit: BoxFit.fill,
+                    ),
                   ),
                 ),
               ),
@@ -158,18 +188,21 @@ class PrintWidget extends StatelessWidget {
                     Screenshot(
                       controller: pinCodeScreenshotControllers,
                       child: Container(
+                        width: double.infinity,
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
                           border: Border.all(),
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(5),
                         ),
-                        child: Text(
-                          pinCode,
-                          style: const TextStyle(
-                            fontSize: 27,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                        child: Center(
+                          child: Text(
+                            pinCode,
+                            style: const TextStyle(
+                              fontSize: 27,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
                           ),
                         ),
                       ),
@@ -179,12 +212,15 @@ class PrintWidget extends StatelessWidget {
               : Screenshot(
                   controller: pinCodeScreenshotControllers,
                   child: Container(
+                    width: double.infinity,
                     color: Colors.white,
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         const Divider(),
                         Text("serial : $code1",
-                            style: TextStyle(fontSize: 18),
+                            style: const TextStyle(
+                                fontSize: 18, color: Colors.black),
                             textAlign: TextAlign.center),
                         const Divider(),
                         Text(
@@ -196,14 +232,16 @@ class PrintWidget extends StatelessWidget {
                         const Divider(),
                         Text(
                           code3,
-                          style: TextStyle(fontSize: 18),
+                          style: const TextStyle(
+                              fontSize: 18, color: Colors.black),
                           textAlign: TextAlign.center,
                           textDirection: TextDirection.ltr,
                         ),
                         const Divider(),
                         Text(
                           code4,
-                          style: TextStyle(fontSize: 18),
+                          style: const TextStyle(
+                              fontSize: 18, color: Colors.black),
                           textAlign: TextAlign.center,
                           textDirection: TextDirection.ltr,
                         ),
@@ -215,78 +253,90 @@ class PrintWidget extends StatelessWidget {
           Visibility(
             visible: settingController.settings["preview_printQrcode"] ?? false,
             child: Container(
-              margin: const EdgeInsets.symmetric(
-                  vertical:
-                      5), // مارجین را به بیرون از شات منتقل کردیم تا لبه‌های ترنسپرنت ثبت نشوند
+              margin: const EdgeInsets.symmetric(vertical: 2),
               child: Screenshot(
                 controller: qrcodeScreenshotControllers,
-                child: pinCode != ''
+                child: (pinCode != '' || ussd.isNotEmpty)
                     ? Container(
                         width: double.infinity,
-                        decoration: const BoxDecoration(
-                          color: Colors
-                              .white, // پس‌زمینه کاملاً سفید بدون حاشیه سیاه
-                        ),
+                        height: 90,
+                        color: Colors.white,
                         child: Center(
                           child: QrImageView(
-                            data: "tel:$ussd",
+                            data: "tel:${ussd.isNotEmpty ? ussd : pinCode}",
                             version: QrVersions.auto,
-                            size: 100.0,
-                            backgroundColor:
-                                Colors.white, // هماهنگی کامل پس‌زمینه کیوآر
+                            size: 90.0,
+                            padding: EdgeInsets.zero,
+                            backgroundColor: Colors.white,
                           ),
                         ),
                       )
                     : Container(
                         width: double.infinity,
-                        height: 1,
+                        height: 5,
                         color: Colors.white,
                       ),
               ),
             ),
           ),
-          Visibility(
-            visible:
-                settingController.settings["preview_printInformation"] ?? false,
-            child: footerText.isNotEmpty
-                ? Screenshot(
-                    controller: footerScreenshotControllers,
-                    child: Container(
-                      color: Colors.white,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 5),
-                        child: Html(
-                          data: footerText,
-                          style: {
-                            "p": Style(
-                              fontSize: FontSize(16),
-                              color: Colors.black,
-                            ),
-                          },
-                        ),
-                      ),
-                    ),
-                  )
-                : Screenshot(
-                    controller: footerScreenshotControllers,
-                    child: const Divider(
-                      color: Colors.white,
-                    ),
-                  ),
-          ),
-          const Gap(4),
+          const Gap(2),
+          // 1. Barcode
           Visibility(
             visible:
                 settingController.settings["preview_printBarCode"] ?? false,
             child: Screenshot(
               controller: barCodeScreenshotControllers,
               child: Container(
+                width: double.infinity,
+                height: 60,
                 color: Colors.white,
-                child: SvgPicture.string(
-                  svgBarcode,
-                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                child: svgBarcode.isNotEmpty
+                    ? SvgPicture.string(
+                        svgBarcode,
+                        width: double.infinity,
+                        height: 56,
+                        fit: BoxFit.fill,
+                      )
+                    : const SizedBox.shrink(),
               ),
             ),
+          ),
+          // 2. Footer (below Barcode)
+          Visibility(
+            visible: (settingController.settings["preview_printInformation"] ??
+                    false) &&
+                footerText.isNotEmpty,
+            child: footerText.isNotEmpty
+                ? Screenshot(
+                    controller: footerScreenshotControllers,
+                    child: Container(
+                      width: double.infinity,
+                      constraints: const BoxConstraints(minHeight: 20),
+                      color: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 2, horizontal: 4),
+                      child: Html(
+                        data: footerText,
+                        style: {
+                          "body": Style(
+                            margin: Margins.zero,
+                            padding: HtmlPaddings.zero,
+                            fontSize: FontSize(15),
+                            color: Colors.black,
+                          ),
+                          "p": Style(
+                            margin: Margins.zero,
+                            padding: HtmlPaddings.zero,
+                            fontSize: FontSize(15),
+                            color: Colors.black,
+                          ),
+                        },
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink(),
           ),
         ],
       ),

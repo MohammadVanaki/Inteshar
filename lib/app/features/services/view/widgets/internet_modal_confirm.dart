@@ -38,6 +38,9 @@ Future<dynamic> internetModalConfirm({
                 key: formKey,
                 child: TextFormField(
                   textDirection: TextDirection.ltr,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
                   validator: (value) {
                     if (value!.length < 10 || value.length > 10) {
                       return 'رقم الجوال غير صالح';
@@ -55,10 +58,16 @@ Future<dynamic> internetModalConfirm({
                             .onPrimary
                             .withAlpha(200)),
                     border: const OutlineInputBorder(),
-                    label: Text(
-                      'رقم الهاتف',
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.onPrimary),
+                    label: const Text('رقم الهاتف'),
+                    labelStyle: TextStyle(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onPrimary
+                          .withOpacity(0.7),
+                    ),
+                    floatingLabelStyle: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),

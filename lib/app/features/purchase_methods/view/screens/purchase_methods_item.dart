@@ -117,7 +117,7 @@ class PurchaseMethodsItem extends StatelessWidget {
             ),
           ),
         ),
-        const Gap(20),
+        // const Gap(10),
       ],
     );
   }

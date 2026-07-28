@@ -2,25 +2,20 @@ import 'package:get/get.dart';
 import 'package:inteshar/app/config/constants.dart';
 import 'package:inteshar/app/config/status.dart';
 import 'package:dio/dio.dart';
+import 'package:inteshar/app/core/common/constants/api_client.dart';
 import 'package:inteshar/app/features/home/data/models/product_model.dart';
 
 class ProductsApiProvider extends GetxController {
   var productsDataList = <ProductModel>[].obs;
-  late Dio dio;
+  final ApiClient _apiClient = ApiClient();
   final rxRequestStatus = Status.initial.obs;
-
-  @override
-  void onInit() {
-    super.onInit();
-    dio = Dio();
-  }
 
   Future<void> fetchProducts(int companyId) async {
     print(companyId);
     print(Constants.userToken);
     rxRequestStatus.value = Status.loading;
     try {
-      final response = await dio.post(
+      final response = await _apiClient.dio.post(
         "${Constants.baseUrl}/company_categories",
         queryParameters: {
           "company_id": companyId,

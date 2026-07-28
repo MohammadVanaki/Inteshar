@@ -13,7 +13,7 @@ class InternetPackagesController extends GetxController {
   void onInit() {
     super.onInit();
     companyList.assignAll(
-      homeApiProvider.homeDataList.first.asiacellCategories!
+      (homeApiProvider.homeDataList.firstOrNull?.asiacellCategories ?? [])
           .where((category) =>
               category.type == Type.BUNDLE && category.parentId == null)
           .map((category) => category.toJson())
@@ -28,7 +28,7 @@ class InternetPackagesController extends GetxController {
 
   buildPackageList(int index) {
     packageList.assignAll(
-      homeApiProvider.homeDataList.first.asiacellCategories!
+      (homeApiProvider.homeDataList.firstOrNull?.asiacellCategories ?? [])
           .where((category) =>
               category.type == Type.BUNDLE && category.parentId == index)
           .map((category) => category.toJson())

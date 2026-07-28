@@ -32,6 +32,7 @@ class BluetoothPage extends StatelessWidget {
     required this.footer,
     required this.isReported,
     required this.cardId,
+    required this.originalAgent,
   });
   final List serialList;
   final List ussdCodes;
@@ -41,6 +42,7 @@ class BluetoothPage extends StatelessWidget {
   final String footer;
   final bool isReported;
   final String cardId;
+  final String originalAgent;
   // final GlobalKey _globalKey = GlobalKey();
   final BluetoothController bluetoothController =
       Get.find<BluetoothController>();
@@ -51,7 +53,7 @@ class BluetoothPage extends StatelessWidget {
     bluetoothController.printCount.value = 0;
     SettingController settingController = Get.find<SettingController>();
     final updateController = Get.find<HomeApiProvider>();
-    final String cleanFooter = removeHtmlTags(footer);
+    // final String cleanFooter = removeHtmlTags(footer);
 
     List<ScreenshotController> cardPhotoScreenshotControllers =
         List.generate(serialList.length, (_) => ScreenshotController());
@@ -69,30 +71,37 @@ class BluetoothPage extends StatelessWidget {
     List<ScreenshotController> barCodeScreenshotControllers =
         List.generate(serialList.length, (_) => ScreenshotController());
 
-    Future<Uint8List> waitUntilCaptured(
+    Future<Uint8List?> waitUntilCaptured(
       ScreenshotController controller, {
-      int retries = 15,
-      Duration delay = const Duration(milliseconds: 300),
+      required String tag,
+      int retries = 10,
+      Duration delay = const Duration(milliseconds: 50),
+      bool allowFailure = false,
     }) async {
       for (int i = 0; i < retries; i++) {
-        await Future.delayed(delay);
+        if (i > 0) {
+          await Future.delayed(delay);
+        }
         await WidgetsBinding.instance.endOfFrame;
 
         try {
           final bytes = await controller.capture(pixelRatio: 2.0);
           if (bytes != null && bytes.isNotEmpty) {
-            debugPrint("✅ عکس گرفته شد در تلاش $i");
+            debugPrint("✅ [$tag] عکس گرفته شد در تلاش $i");
             return bytes;
           } else {
-            debugPrint("⏳ تلاش $i: عکس null یا خالی بود");
+            debugPrint("⏳ [$tag] تلاش $i: عکس null یا خالی بود");
           }
         } catch (e) {
-          debugPrint("❌ خطا در تلاش $i برای capture: $e");
+          debugPrint("❌ [$tag] خطا در تلاش $i برای capture: $e");
         }
       }
 
-      debugPrint("⚠️ بعد از $retries تلاش، capture موفق نبود");
-      throw Exception("عکس‌برداری ناموفق بود بعد از $retries تلاش");
+      debugPrint("⚠️ [$tag] بعد از $retries تلاش، capture موفق نبود");
+      if (allowFailure) {
+        return null;
+      }
+      throw Exception("[$tag] عکس‌برداری ناموفق بود بعد از $retries تلاش");
     }
 
     Future<void> captureAndSavePng() async {
@@ -102,110 +111,141 @@ class BluetoothPage extends StatelessWidget {
       for (final serial in serialList) {
         final int index = serialList.indexOf(serial);
 
-        debugPrint("🔍 شروع چاپ برای index: $index");
+        debugPrint("🔍 شروع چاپ موازی برای index: $index");
 
-        // گرفتن عکس Header (اجباری)
-        final headerImageBytes =
-            await waitUntilCaptured(headerScreenshotControllers[index]);
-        final headerBytes = await processImageForPrinter(headerImageBytes);
+        final bool showCardPhoto =
+            settingController.settings["preview_printCardImage"] ?? false;
+        final bool showQrCode =
+            settingController.settings["preview_printQrcode"] ?? false;
+        final bool showFooter =
+            (settingController.settings["preview_printInformation"] ?? false) &&
+                footer.isNotEmpty;
+        final bool showBarCode =
+            settingController.settings["preview_printBarCode"] ?? false;
 
-        // کارت
-        List<int>? cardPhotoBytes;
-        if (settingController.settings["preview_printCardImage"] ?? false) {
-          final img =
-              await waitUntilCaptured(cardPhotoScreenshotControllers[index]);
-          cardPhotoBytes = await processImageForPrinter(img);
+        // گرفتن همزمان عکس‌ها به صورت موازی (Parallel) برای حداکثر سرعت
+        final results = await Future.wait([
+          waitUntilCaptured(headerScreenshotControllers[index],
+              tag: "Header", allowFailure: true),
+          showCardPhoto
+              ? waitUntilCaptured(cardPhotoScreenshotControllers[index],
+                  tag: "CardPhoto", allowFailure: true)
+              : Future.value(null),
+          showQrCode
+              ? waitUntilCaptured(qrcodeScreenshotControllers[index],
+                  tag: "QRCode", allowFailure: true)
+              : Future.value(null),
+          showFooter
+              ? waitUntilCaptured(footerScreenshotControllers[index],
+                  tag: "Footer", allowFailure: true)
+              : Future.value(null),
+          showBarCode
+              ? waitUntilCaptured(barCodeScreenshotControllers[index],
+                  tag: "BarCode", allowFailure: true)
+              : Future.value(null),
+          waitUntilCaptured(pinCodeScreenshotControllers[index],
+              tag: "PinCode", allowFailure: true),
+        ]);
+
+        final headerImageBytes = results[0];
+        final cardPhotoImageBytes = results[1];
+        final qrCodeImageBytes = results[2];
+        final footerImageBytes = results[3];
+        final barCodeImageBytes = results[4];
+        final pinCodeImageBytes = results[5];
+
+        final headerBytes = headerImageBytes != null
+            ? await processImageForPrinter(headerImageBytes)
+            : null;
+        final cardPhotoBytes = cardPhotoImageBytes != null
+            ? await processImageForPrinter(cardPhotoImageBytes)
+            : null;
+        final qrCodeBytes = qrCodeImageBytes != null
+            ? await processImageForPrinter(qrCodeImageBytes)
+            : null;
+        final footerBytes = footerImageBytes != null
+            ? await processImageForPrinter(footerImageBytes)
+            : null;
+        final barCodeBytes = barCodeImageBytes != null
+            ? await processImageForPrinter(barCodeImageBytes)
+            : null;
+        final pinCodeBytes = pinCodeImageBytes != null
+            ? await processImageForPrinter(pinCodeImageBytes)
+            : null;
+
+        // تابع چاپ متن با مدیریت خطا و await
+        Future<void> printText(String text,
+            {bool bold = false, int? size}) async {
+          try {
+            await PrintBluetoothThermal.writeString(
+              printText: PrintTextSize(
+                size: size ?? 8,
+                text: bold ? "\x1B\x45\x01$text\x1B\x45\x00" : text,
+              ),
+            );
+          } catch (e) {
+            debugPrint("⚠️ خطا در ارسال متن به پرینتر: $e");
+          }
         }
 
-        // QR Code
-        List<int>? qrCodeBytes;
-        if (settingController.settings["preview_printQrcode"] ?? false) {
-          final img =
-              await waitUntilCaptured(qrcodeScreenshotControllers[index]);
-          qrCodeBytes = await processImageForPrinter(img);
-        }
-
-        // Footer
-        List<int>? footerBytes;
-        if (settingController.settings["preview_printInformation"] ?? false) {
-          final img =
-              await waitUntilCaptured(footerScreenshotControllers[index]);
-          footerBytes = await processImageForPrinter(img);
-        }
-
-        // بارکد
-        List<int>? barCodeBytes;
-        if (settingController.settings["preview_printBarCode"] ?? false) {
-          final img =
-              await waitUntilCaptured(barCodeScreenshotControllers[index]);
-          barCodeBytes = await processImageForPrinter(img);
-        }
-
-        // پین‌کد (اجباری)
-        final pinImg =
-            await waitUntilCaptured(pinCodeScreenshotControllers[index]);
-        final pinCodeBytes = await processImageForPrinter(pinImg);
-
-        // تابع چاپ متن
-        void printText(String text, {bool bold = false, int? size}) {
-          PrintBluetoothThermal.writeString(
-            printText: PrintTextSize(
-              size: size ?? 8,
-              text: bold ? "\x1B\x45\x01$text\x1B\x45\x00" : text,
-            ),
-          );
+        Future<void> safeWriteBytes(List<int> bytes) async {
+          try {
+            await PrintBluetoothThermal.writeBytes(bytes);
+          } catch (e) {
+            debugPrint("⚠️ خطا در ارسال بایت‌ها به پرینتر: $e");
+          }
         }
 
         // شروع چاپ
         debugPrint("🖨️ شروع ارسال به پرینتر برای index $index");
         bluetoothController.printed.value = true;
         if (headerBytes != null) {
-          PrintBluetoothThermal.writeBytes(headerBytes);
+          await safeWriteBytes(headerBytes);
         }
-        printText(isReported ? '--------- 2 ---------\n' : '');
+        await printText(isReported ? '--------- 2 ---------\n' : '');
         // Set alignment to Left (0)
-        PrintBluetoothThermal.writeBytes(const [0x1B, 0x61, 0x00]);
-        printText('Terminal ID : ${user.user?.id ?? ''}\n');
-        printText('Time : $printDate\n');
-        printText('Order Number : ${serial.id}\n');
-        printText('Expiry Time : ${serial.expiredDate ?? serial.code3}');
+        await safeWriteBytes(const [0x1B, 0x61, 0x00]);
+        await printText('Terminal ID : ${user.user?.id ?? ''}\n');
+        await printText('Time : $printDate\n');
+        await printText('Order Number : ${serial.id}\n');
+        await printText('Expiry Time : ${serial.expiredDate ?? serial.code3}');
 
         if (cardPhotoBytes != null) {
-          PrintBluetoothThermal.writeBytes(cardPhotoBytes);
+          await safeWriteBytes(cardPhotoBytes);
         }
 
         // Set alignment to Center (1)
-        PrintBluetoothThermal.writeBytes(const [0x1B, 0x61, 0x01]);
-        printText("\n$cardTitle", bold: true);
+        await safeWriteBytes(const [0x1B, 0x61, 0x01]);
+        await printText("\n$cardTitle", bold: true);
 
         // Reset alignment to Left (0)
-        PrintBluetoothThermal.writeBytes(const [0x1B, 0x61, 0x00]);
+        await safeWriteBytes(const [0x1B, 0x61, 0x00]);
         if (serial.serial?.isNotEmpty ?? false) {
-          printText("\nSerial : ${serial.serial}");
+          await printText("\nSerial : ${serial.serial}");
         }
 
         if (serial.code1 != null &&
             serial.code1 is String &&
             (serial.code1 as String).isNotEmpty) {
-          printText('\nPin Code :');
+          await printText('\nPin Code :');
         }
         if (pinCodeBytes != null) {
-          PrintBluetoothThermal.writeBytes(pinCodeBytes);
+          await safeWriteBytes(pinCodeBytes);
         }
 
         if (qrCodeBytes != null) {
-          PrintBluetoothThermal.writeBytes(qrCodeBytes);
+          await safeWriteBytes(qrCodeBytes);
         }
 
         if (barCodeBytes != null) {
-          PrintBluetoothThermal.writeBytes(barCodeBytes);
+          await safeWriteBytes(barCodeBytes);
         }
 
         if (footerBytes != null) {
-          PrintBluetoothThermal.writeBytes(footerBytes);
+          await safeWriteBytes(footerBytes);
         }
 
-        printText('\n --------------- \n\n');
+        await printText('\n --------------- \n\n');
         debugPrint("✅ چاپ کامل شد برای index $index");
       }
     }
@@ -271,7 +311,8 @@ class BluetoothPage extends StatelessWidget {
                                           code2: serialList[index]?.code2 ?? '',
                                           code3: serialList[index]?.code3 ?? '',
                                           code4: serialList[index]?.code4 ?? '',
-                                          footerText: cleanFooter,
+                                          originalAgent: originalAgent,
+                                          footerText: footer,
                                           cardPhotoScreenshotControllers:
                                               cardPhotoScreenshotControllers[
                                                   index],
@@ -436,10 +477,6 @@ class BluetoothPage extends StatelessWidget {
                                           //     "فشل الاتصال بالطابعة: $e");
                                           return;
                                         }
-                                      } else {
-                                        // Get.snackbar("خطأ",
-                                        //     "لم يتم تخزين معلومات الطابعة.");
-                                        return;
                                       }
                                     }
 
@@ -475,22 +512,7 @@ class BluetoothPage extends StatelessWidget {
                         ),
                         // const Gap(5),
                         // ZoomTapAnimation(
-                        //   child: ElevatedButton.icon(
-                        //     onPressed: () {
-                        //       bluetoothController.disconnectDevice();
-                        //     },
-                        //     label: const Text('قطع الاتصال'),
-                        //     icon: SvgPicture.asset(
-                        //       'assets/svgs/signal-stream-slash.svg',
-                        //       colorFilter: ColorFilter.mode(
-                        //         Theme.of(context).colorScheme.onPrimary,
-                        //         BlendMode.srcIn,
-                        //       ),
-                        //       width: 20,
-                        //       height: 20,
-                        //     ),
-                        //   ),
-                        // ),
+
                         const Gap(5),
                         Text(
                             "تم الاتصال بـ : ${bluetoothController.deviceName.value}"),
@@ -516,13 +538,37 @@ class BluetoothPage extends StatelessWidget {
                                   ),
                                   margin: const EdgeInsets.only(bottom: 10),
                                   child: ListTile(
+                                    leading: Icon(
+                                      device.isPrinter
+                                          ? Icons.print_rounded
+                                          : Icons.bluetooth_rounded,
+                                      color: device.isPrinter
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .primary
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withAlpha(120),
+                                    ),
                                     title: Text(device.name),
                                     subtitle:
                                         Text(device.macAddress.toString()),
-                                    onTap: () {
-                                      bluetoothController.deviceName.value =
-                                          device.name;
-                                      bluetoothController.connectToDevice(
+                                    trailing: Obx(() {
+                                      final isThisConnected =
+                                          bluetoothController
+                                                  .isConnected.value &&
+                                              bluetoothController
+                                                      .deviceName.value ==
+                                                  device.name;
+                                      return isThisConnected
+                                          ? const Icon(
+                                              Icons.check_circle_rounded,
+                                              color: Colors.green)
+                                          : const SizedBox.shrink();
+                                    }),
+                                    onTap: () async {
+                                      await bluetoothController.connectToDevice(
                                         device.macAddress,
                                         device.name,
                                       );
@@ -568,12 +614,13 @@ class BluetoothPage extends StatelessWidget {
       // تغییر اندازه تصویر
       final resizedImage = img.copyResize(image, width: 384);
       final processedImage = adjustContrastAndThreshold(resizedImage, 1.5);
+      final trimmedImage = trimWhiteMargins(processedImage);
 
       // تبدیل تصویر به داده‌های باینری مناسب چاپگر
       final profile = await CapabilityProfile.load();
       final generator = Generator(PaperSize.mm58, profile);
       final bytes = generator.imageRaster(
-        processedImage,
+        trimmedImage,
         align: PosAlign.center,
         highDensityHorizontal: true,
         highDensityVertical: true,
@@ -584,6 +631,65 @@ class BluetoothPage extends StatelessWidget {
       print("Error processing image: $e");
       return null;
     }
+  }
+
+  img.Image trimWhiteMargins(img.Image image) {
+    int top = 0;
+    int bottom = image.height - 1;
+
+    // پیدا کردن اولین ردیف غیر سفید از بالا
+    for (int y = 0; y < image.height; y++) {
+      bool rowHasContent = false;
+      for (int x = 0; x < image.width; x++) {
+        final pixel = image.getPixel(x, y);
+        final r = pixel.r;
+        final g = pixel.g;
+        final b = pixel.b;
+        if (r < 240 || g < 240 || b < 240) {
+          rowHasContent = true;
+          break;
+        }
+      }
+      if (rowHasContent) {
+        top = y;
+        break;
+      }
+    }
+
+    // پیدا کردن اولین ردیف غیر سفید از پایین
+    for (int y = image.height - 1; y >= top; y--) {
+      bool rowHasContent = false;
+      for (int x = 0; x < image.width; x++) {
+        final pixel = image.getPixel(x, y);
+        final r = pixel.r;
+        final g = pixel.g;
+        final b = pixel.b;
+        if (r < 240 || g < 240 || b < 240) {
+          rowHasContent = true;
+          break;
+        }
+      }
+      if (rowHasContent) {
+        bottom = y;
+        break;
+      }
+    }
+
+    final safeTop = (top - 1).clamp(0, image.height - 1);
+    final safeBottom = (bottom + 1).clamp(0, image.height - 1);
+    final cropHeight = safeBottom - safeTop + 1;
+
+    if (cropHeight <= 0 || cropHeight >= image.height) {
+      return image;
+    }
+
+    return img.copyCrop(
+      image,
+      x: 0,
+      y: safeTop,
+      width: image.width,
+      height: cropHeight,
+    );
   }
 
   img.Image adjustContrastAndThreshold(

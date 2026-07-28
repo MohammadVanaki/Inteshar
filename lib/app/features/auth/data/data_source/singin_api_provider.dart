@@ -57,6 +57,8 @@ class SinginApiProvider extends GetxController {
           'password': password,
           'device_token': deviceId,
           'app_version': 27,
+          'firebase_token': Constants.fcmToken,
+          'device_type': deviceType,
         },
       );
 
@@ -80,17 +82,26 @@ class SinginApiProvider extends GetxController {
         rxRequestButtonStatus.value = Status.completed;
         int expireTime = response.data['expire_time'] ?? 120;
 
-        Get.offNamed(Routes.otp, arguments: {
-          'username': username,
-          'password': password,
-          'status': response.data?['status'],
-          'deviceToken': deviceId,
-          'userId': response.data?['user_id'].toString(),
-          'qr': response.data?['qr'] ?? '',
-          'secret': response.data?['secret'] ?? '',
-          'expire_time': expireTime,
-        });
-        // }
+        // --- OTP bypassed: skip verify-2fa and go directly to home ---
+        // Get.offNamed(Routes.otp, arguments: {
+        //   'username': username,
+        //   'password': password,
+        //   'status': response.data?['status'],
+        //   'deviceToken': deviceId,
+        //   'userId': response.data?['user_id'].toString(),
+        //   'qr': response.data?['qr'] ?? '',
+        //   'secret': response.data?['secret'] ?? '',
+        //   'expire_time': expireTime,
+        // });
+
+        // Save token from login response directly
+        Constants.userToken = response.data['token'] ?? '';
+        Constants.localStorage.write('userToken', Constants.userToken);
+        Constants.localStorage
+            .write('userInfo', {'userName': username, 'password': password});
+        Constants.isLoggedIn = true;
+
+        Get.offAllNamed(Routes.home);
       } else {
         errorMessage.value = response.data['errors']?[0] ?? 'فشل تسجيل الدخول';
         rxRequestStatus.value = Status.error;

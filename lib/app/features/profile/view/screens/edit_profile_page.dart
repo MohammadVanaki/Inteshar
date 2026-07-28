@@ -66,7 +66,15 @@ class EditProfilePage extends StatelessWidget {
                             suffixIcon: locationController
                                         .rxRequestStatus.value ==
                                     Status.loading
-                                ? const CustomLoading()
+                                ? Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Theme.of(context).colorScheme.onPrimary,
+                                      ),
+                                    ),
+                                  )
                                 : ZoomTapAnimation(
                                     onTap: () async {
                                       await locationController
@@ -79,7 +87,9 @@ class EditProfilePage extends StatelessWidget {
                                       child: SvgPicture.asset(
                                         'assets/svgs/land-layer-location.svg',
                                         colorFilter: ColorFilter.mode(
-                                          Theme.of(context).colorScheme.primary,
+                                          Theme.of(context)
+                                              .colorScheme
+                                              .onPrimary,
                                           BlendMode.srcIn,
                                         ),
                                       ),
@@ -325,19 +335,32 @@ class EditProfilePage extends StatelessWidget {
                               height: 160,
                               fit: BoxFit.cover,
                             )
-                          : CachedNetworkImage(
-                              fit: BoxFit.cover,
-                              imageUrl: editProfilePageController
-                                  .networkImageUrl.value,
-                              placeholder: (context, url) =>
-                                  const CustomLoading(),
-                              errorWidget: (context, url, error) => Image.asset(
-                                'assets/images/profile.png',
-                                fit: BoxFit.fill,
-                                height: 160,
-                                width: 160,
-                              ),
-                            ),
+                          : (() {
+                              final photoUrl = editProfilePageController
+                                  .networkImageUrl.value;
+                              if (photoUrl.isEmpty ||
+                                  !photoUrl.startsWith('http')) {
+                                return Image.asset(
+                                  'assets/images/profile.png',
+                                  fit: BoxFit.fill,
+                                  height: 160,
+                                  width: 160,
+                                );
+                              }
+                              return CachedNetworkImage(
+                                fit: BoxFit.cover,
+                                imageUrl: photoUrl,
+                                placeholder: (context, url) =>
+                                    const CustomLoading(),
+                                errorWidget: (context, url, error) =>
+                                    Image.asset(
+                                  'assets/images/profile.png',
+                                  fit: BoxFit.fill,
+                                  height: 160,
+                                  width: 160,
+                                ),
+                              );
+                            })(),
                     ),
                   ),
                 ),
@@ -361,7 +384,7 @@ class EditProfilePage extends StatelessWidget {
                 child: SvgPicture.asset(
                   'assets/svgs/folder-camera.svg',
                   colorFilter: ColorFilter.mode(
-                    Theme.of(context).colorScheme.onPrimary,
+                    Colors.black,
                     BlendMode.srcIn,
                   ),
                 ),

@@ -20,7 +20,7 @@ class CategoryDropdown extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.only(left: 8),
           decoration: Constants.intesharBoxDecoration(context).copyWith(
-            color: Theme.of(context).colorScheme.primary,
+            color: Theme.of(context).colorScheme.onPrimary.withAlpha(20),
             border: Border(
               right: BorderSide(
                 color: Theme.of(context).colorScheme.secondary,
@@ -50,11 +50,18 @@ class CategoryDropdown extends StatelessWidget {
                 BlendMode.srcIn,
               ),
             ),
+
             inputDecorationTheme: InputDecorationTheme(
               filled: true,
               contentPadding: const EdgeInsets.symmetric(vertical: 5.0),
-              fillColor: Theme.of(context).colorScheme.primary,
+              fillColor: Theme.of(context).colorScheme.onPrimary.withAlpha(0),
               border: const UnderlineInputBorder(borderSide: BorderSide.none),
+              disabledBorder:
+                  const UnderlineInputBorder(borderSide: BorderSide.none),
+              enabledBorder:
+                  const UnderlineInputBorder(borderSide: BorderSide.none),
+              focusedBorder:
+                  const UnderlineInputBorder(borderSide: BorderSide.none),
             ),
             searchCallback: (entries, query) {
               if (query.isEmpty) return null;

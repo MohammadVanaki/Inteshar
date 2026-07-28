@@ -10,6 +10,7 @@ class PurchaseModel {
   CardDetails? cardDetails;
   CardDetails? cardDetails2;
   String? printDate;
+  String? originalAgent;
 
   PurchaseModel({
     this.status,
@@ -23,6 +24,7 @@ class PurchaseModel {
     this.cardDetails,
     this.cardDetails2,
     this.printDate,
+    this.originalAgent,
   });
 
   factory PurchaseModel.fromJson(Map<String, dynamic> json) => PurchaseModel(
@@ -48,6 +50,7 @@ class PurchaseModel {
             ? null
             : CardDetails.fromJson(json["card_details2"]),
         printDate: json["print_date"],
+        originalAgent: json["original_agent"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -66,6 +69,7 @@ class PurchaseModel {
         "card_details": cardDetails?.toJson(),
         "card_details2": cardDetails2?.toJson(),
         "print_date": printDate,
+        "original_agent": originalAgent,
       };
 }
 

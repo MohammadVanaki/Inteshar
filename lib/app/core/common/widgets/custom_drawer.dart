@@ -192,19 +192,33 @@ class CustomDrawer extends StatelessWidget {
                             color: Theme.of(context).colorScheme.onPrimary),
                       ),
                       currentAccountPicture: ClipOval(
-                        child: CachedNetworkImage(
-                          fit: BoxFit.cover,
-                          height: 70,
-                          width: 60,
-                          imageUrl: user.user?.photoUrl ?? '',
-                          placeholder: (context, url) => const CustomLoading(),
-                          errorWidget: (context, url, error) => Image.asset(
-                            'assets/images/profile.png',
-                            fit: BoxFit.fill,
+                        child: (() {
+                          final photoUrl = user.user?.photoUrl;
+                          if (photoUrl == null ||
+                              photoUrl.isEmpty ||
+                              !photoUrl.startsWith('http')) {
+                            return Image.asset(
+                              'assets/images/profile.png',
+                              fit: BoxFit.fill,
+                              height: 70,
+                              width: 60,
+                            );
+                          }
+                          return CachedNetworkImage(
+                            fit: BoxFit.cover,
                             height: 70,
                             width: 60,
-                          ),
-                        ),
+                            imageUrl: photoUrl,
+                            placeholder: (context, url) =>
+                                const CustomLoading(),
+                            errorWidget: (context, url, error) => Image.asset(
+                              'assets/images/profile.png',
+                              fit: BoxFit.fill,
+                              height: 70,
+                              width: 60,
+                            ),
+                          );
+                        })(),
                       ),
                       decoration: BoxDecoration(
                         color: Theme.of(context).colorScheme.surface,

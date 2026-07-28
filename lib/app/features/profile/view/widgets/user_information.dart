@@ -32,6 +32,16 @@ class USerInformationWidget extends StatelessWidget {
           {
             "icon": 'branding',
             "title": 'الاسم التجاري :',
+            "data": user.user?.name ?? '',
+          },
+          {
+            "icon": 'branding',
+            "title": 'الوكيل الاصلي :',
+            "data": user.parentAgent ?? '',
+          },
+          {
+            "icon": 'branding',
+            "title": 'الوكيل الفرعي :',
             "data": user.user?.agent?.name ?? '',
           },
           {

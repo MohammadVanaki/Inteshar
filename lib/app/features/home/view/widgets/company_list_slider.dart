@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -17,8 +18,6 @@ class CompanyListSlider extends StatelessWidget {
   Widget build(BuildContext context) {
     final CompanySliderController companySliderController =
         Get.put(CompanySliderController());
-    final ProductsApiProvider productsApiProvider =
-        Get.find<ProductsApiProvider>(tag: 'random');
 
 // Define a modifiable list of maps
     final List<Map<String, dynamic>> parsCompanyList = [
@@ -39,11 +38,12 @@ class CompanyListSlider extends StatelessWidget {
     }
 
     return SizedBox(
-      height: 50.0,
+      height: 43.0,
       child: ListView.builder(
         physics: const BouncingScrollPhysics(),
         shrinkWrap: true,
         scrollDirection: Axis.horizontal,
+        clipBehavior: Clip.none,
         itemCount: min(parsCompanyList.length, 10),
         itemBuilder: (BuildContext context, int index) => ZoomTapAnimation(
           onTap: () {
@@ -57,56 +57,117 @@ class CompanyListSlider extends StatelessWidget {
             // productsApiProvider.fetchProducts(parsCompanyList[index]['id']);
           },
           child: Obx(
-            () => AnimatedContainer(
-              duration: const Duration(milliseconds: 100),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              margin:
-                  const EdgeInsets.only(left: 10, top: 2, bottom: 2, right: 2),
-              clipBehavior: Clip.antiAlias,
-              decoration: BoxDecoration(
-                color: (index - 1) == companySliderController.selected.value
-                    ? Theme.of(context).colorScheme.secondary
-                    : Theme.of(context).colorScheme.primary.withAlpha(40),
-                border: Border.all(
-                  color: (index - 1) == companySliderController.selected.value
-                      ? Theme.of(context).colorScheme.secondary
-                      : Theme.of(context).colorScheme.surface,
+            () {
+              final isSelected =
+                  (index - 1) == companySliderController.selected.value;
+              final isDark = Theme.of(context).brightness == Brightness.dark;
+              return Container(
+                margin:
+                    const EdgeInsets.only(left: 4, top: 4, bottom: 4, right: 4),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    // Outer soft bottom shadow for depth/elevation
+                    BoxShadow(
+                      color: isDark
+                          ? Colors.black.withValues(alpha: 0.4)
+                          : Colors.black.withValues(alpha: 0.08),
+                      blurRadius: isSelected ? 8 : 4,
+                      offset: isSelected
+                          ? const Offset(0, 3)
+                          : const Offset(0, 1.5),
+                    ),
+                    // Inner/outer top white light-reflection to make it look raised
+                    BoxShadow(
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.08)
+                          : Colors.white.withValues(alpha: 0.7),
+                      blurRadius: 4,
+                      offset: const Offset(0, -1.5),
+                    ),
+                  ],
                 ),
-                borderRadius: BorderRadius.circular(120),
-                // border: Border.all(
-                //   color: index == companySliderController.selected.value
-                //       ? Colors.black
-                //       : Theme.of(context).colorScheme.onPrimary,
-                // ),
-              ),
-              child: Center(
-                child: Text(
-                  parsCompanyList[index]['title'],
-                  style: TextStyle(
-                    color: (index - 1) == companySliderController.selected.value
-                        ? Colors.black
-                        : Theme.of(context).colorScheme.onPrimary,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 16.0, sigmaY: 16.0),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 150),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 22, vertical: 8),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: const Alignment(-0.6, -1.0),
+                          end: const Alignment(0.6, 1.0),
+                          colors: isSelected
+                              ? [
+                                  Colors.white
+                                      .withValues(alpha: isDark ? 0.95 : 0.95),
+                                  Colors.white
+                                      .withValues(alpha: isDark ? 0.90 : 0.90),
+                                  Colors.white.withValues(alpha: 1.0),
+                                  Colors.white
+                                      .withValues(alpha: isDark ? 0.70 : 0.75),
+                                  Colors.white
+                                      .withValues(alpha: isDark ? 0.80 : 0.85),
+                                ]
+                              : [
+                                  Colors.white
+                                      .withValues(alpha: isDark ? 0.25 : 0.55),
+                                  Colors.white
+                                      .withValues(alpha: isDark ? 0.20 : 0.45),
+                                  Colors.white
+                                      .withValues(alpha: isDark ? 0.45 : 0.80),
+                                  Colors.white
+                                      .withValues(alpha: isDark ? 0.05 : 0.15),
+                                  Colors.white
+                                      .withValues(alpha: isDark ? 0.10 : 0.25),
+                                ],
+                          stops: const [0.0, 0.46, 0.50, 0.54, 1.0],
+                        ),
+                        border: Border.all(
+                          color: isSelected
+                              ? Colors.white.withValues(alpha: 0.9)
+                              : Colors.white.withValues(alpha: 0.45),
+                          width: 1.2,
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Center(
+                        child: Text(
+                          parsCompanyList[index]['title'],
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                            color: isSelected
+                                ? Colors.black87
+                                : (isDark
+                                    ? Colors.white70
+                                    : Colors.black87.withValues(alpha: 0.75)),
+                          ),
+                        ),
+                      ), // child: CachedNetworkImage(
+                      //   fit: BoxFit.cover,
+                      //   width: index == companySliderController.selected.value
+                      //       ? 120
+                      //       : 80,
+                      //   height: 80,
+                      //   imageUrl: companyList.first.companies[index].logoUrl,
+                      //   placeholder: (context, url) => const CustomLoading(),
+                      //   errorWidget: (context, url, error) => Image.asset(
+                      //     'assets/images/not.jpg',
+                      //     fit: BoxFit.fill,
+                      //     width: index == companySliderController.selected.value
+                      //         ? 120
+                      //         : 80,
+                      //     height: 80,
+                      //   ),
+                      // ),
+                    ),
                   ),
                 ),
-                // child: CachedNetworkImage(
-                //   fit: BoxFit.cover,
-                //   width: index == companySliderController.selected.value
-                //       ? 120
-                //       : 80,
-                //   height: 80,
-                //   imageUrl: companyList.first.companies[index].logoUrl,
-                //   placeholder: (context, url) => const CustomLoading(),
-                //   errorWidget: (context, url, error) => Image.asset(
-                //     'assets/images/not.jpg',
-                //     fit: BoxFit.fill,
-                //     width: index == companySliderController.selected.value
-                //         ? 120
-                //         : 80,
-                //     height: 80,
-                //   ),
-                // ),
-              ),
-            ),
+              );
+            },
           ),
         ),
       ),

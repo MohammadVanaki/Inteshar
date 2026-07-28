@@ -131,10 +131,15 @@ class USerReportingList extends StatelessWidget {
 
                           print('All serials printed successfully!');
                         },
-                  label: const Text('طباعة'),
+                  label: Text(
+                    'طباعة',
+                    style: TextStyle(
+                      color: Colors.black,
+                    ),
+                  ),
                   icon: SvgPicture.asset(
                     'assets/svgs/print.svg',
-                    colorFilter: const ColorFilter.mode(
+                    colorFilter: ColorFilter.mode(
                       Colors.black,
                       BlendMode.srcIn,
                     ),
@@ -153,7 +158,7 @@ class USerReportingList extends StatelessWidget {
           child: ListView.builder(
             physics: const BouncingScrollPhysics(),
             padding:
-                const EdgeInsets.only(bottom: 0, top: 0, left: 20, right: 20),
+                const EdgeInsets.only(bottom: 40, top: 0, left: 20, right: 20),
             itemCount: serials.first.serials.length,
             itemBuilder: (context, index) {
               PurchaseMethodsController purchaseMethodsController =
@@ -261,6 +266,11 @@ class USerReportingList extends StatelessWidget {
                                               serials: [
                                                 serials.first.serials[index]
                                               ],
+                                              originalAgent: rePrintApiProvider
+                                                      .rePrintDataList
+                                                      .first
+                                                      .originalAgent ??
+                                                  '',
                                               cardTitle: serials
                                                   .first.serials[index].title,
                                               photoUrl: serials

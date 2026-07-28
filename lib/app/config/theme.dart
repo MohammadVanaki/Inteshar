@@ -16,13 +16,29 @@ class MyThemes {
         ),
       ),
     ),
+    checkboxTheme: CheckboxThemeData(
+      side: WidgetStateBorderSide.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return const BorderSide(color: Colors.white, width: 2.0);
+        }
+        return const BorderSide(color: Colors.white12, width: 1.5);
+      }),
+    ),
+    switchTheme: SwitchThemeData(
+      trackOutlineColor: WidgetStateProperty.resolveWith<Color?>((states) {
+        if (states.contains(WidgetState.selected)) {
+          return Colors.white;
+        }
+        return Colors.white38;
+      }),
+    ),
     colorScheme: const ColorScheme(
       brightness: Brightness.dark,
       primary: Color.fromARGB(255, 44, 44, 44),
       onPrimary: Color.fromARGB(255, 245, 245, 245),
       surface: Color.fromARGB(255, 55, 55, 55),
       onSurface: Color.fromARGB(255, 245, 245, 245),
-      secondary: Color.fromARGB(255, 254, 194, 0),
+      secondary: Color(0xFFFEC200),
       onSecondary: Color.fromARGB(255, 63, 34, 34),
       error: Color.fromARGB(255, 249, 52, 62),
       onError: Color(0xffffb4ab),
@@ -49,6 +65,22 @@ class MyThemes {
         ),
       ),
     ),
+    checkboxTheme: CheckboxThemeData(
+      side: WidgetStateBorderSide.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return const BorderSide(color: Colors.black45, width: 2.0);
+        }
+        return const BorderSide(color: Colors.black26, width: 1.5);
+      }),
+    ),
+    switchTheme: SwitchThemeData(
+      trackOutlineColor: WidgetStateProperty.resolveWith<Color?>((states) {
+        if (states.contains(WidgetState.selected)) {
+          return Colors.black45;
+        }
+        return Colors.black26;
+      }),
+    ),
     colorScheme: const ColorScheme(
       brightness: Brightness.light,
       primary: Color.fromARGB(255, 255, 255, 255),
@@ -66,6 +98,10 @@ class MyThemes {
       focusColor: Colors.transparent,
       hoverColor: Colors.transparent,
       iconColor: Colors.transparent,
+      labelStyle: TextStyle(color: Colors.black54),
+      floatingLabelStyle:
+          TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
+      hintStyle: TextStyle(color: Colors.black38),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.all(Radius.circular(10)),
         borderSide: BorderSide(
@@ -76,8 +112,8 @@ class MyThemes {
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.all(Radius.circular(8)),
         borderSide: BorderSide(
-          color: Colors.white,
-          width: 1.0,
+          color: Color.fromARGB(255, 254, 194, 0),
+          width: 1.5,
         ),
       ),
       enabledBorder: OutlineInputBorder(

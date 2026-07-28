@@ -9,6 +9,8 @@ import 'package:inteshar/app/features/page_view/view/getX/scaffold_controller.da
 
 import 'package:inteshar/app/features/setting/view/getX/setting_controller.dart';
 
+import 'package:inteshar/app/core/security/security_service.dart';
+
 Future<void> init() async {
 
   Get.put(ScaffoldController());
@@ -16,6 +18,12 @@ Future<void> init() async {
   // Initialize the custom error widget
   CustomErrorWidget.initialize();
   await GetStorage.init();
+
+  // Run initial security audit (Root, Emulator, Frida, APK Signature)
+  await SecurityService().performSecurityCheck(
+    expectedSignatureSha256: Constants.expectedApkSignatureSha256,
+  );
+
   Get.put(SettingController());
   Constants.userToken = Constants.localStorage.read('userToken') ?? '';
   Get.put(HomeApiProvider());

@@ -97,7 +97,10 @@ class MainPageView extends GetView<ScaffoldController> {
                   ),
                   Positioned(
                     bottom: 0,
-                    child: CostumBottomNavigationBar(),
+                    child: GestureDetector(
+                      onHorizontalDragUpdate: (_) {},
+                      child: CostumBottomNavigationBar(),
+                    ),
                   ),
                 ],
               ),

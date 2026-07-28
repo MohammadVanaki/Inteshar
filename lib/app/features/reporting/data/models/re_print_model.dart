@@ -6,6 +6,7 @@ class RePrintModel {
   final CardDetails? cardDetails;
   final CardDetails? cardDetails2;
   final String? printDate;
+  final String? originalAgent;
 
   RePrintModel({
     this.status,
@@ -15,6 +16,7 @@ class RePrintModel {
     this.cardDetails,
     this.cardDetails2,
     this.printDate,
+    this.originalAgent,
   });
 
   factory RePrintModel.fromJson(Map<String, dynamic> json) {
@@ -30,6 +32,7 @@ class RePrintModel {
           ? CardDetails.fromJson(json['card_details2'])
           : null,
       printDate: json['print_date'] as String?,
+      originalAgent: json['original_agent'] as String?,
     );
   }
 
@@ -42,6 +45,7 @@ class RePrintModel {
       'card_details': cardDetails?.toJson(),
       'card_details2': cardDetails2?.toJson(),
       'print_date': printDate,
+      'original_agent': originalAgent,
     };
   }
 }

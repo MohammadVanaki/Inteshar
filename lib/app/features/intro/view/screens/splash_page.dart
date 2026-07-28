@@ -3,6 +3,7 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:inteshar/app/config/constants.dart';
 import 'package:inteshar/app/core/routes/routes.dart';
+import 'package:inteshar/app/core/security/security_service.dart';
 import 'package:inteshar/app/core/utils/custom_loading.dart';
 import 'package:inteshar/app/features/home/view/getX/check_update.dart';
 
@@ -17,6 +18,12 @@ class SplashPage extends StatelessWidget {
     Future.delayed(
       const Duration(seconds: 3),
       () {
+        final isAllowed = SecurityService().validatePolicyEnforcement();
+        if (!isAllowed) {
+          // Security policy violation detected (e.g. Emulator/Root/Frida). Navigation blocked.
+          return;
+        }
+
         final UpdateController updateController = Get.put(UpdateController());
         updateController.checkUpdate(Get.context!);
         hasSeenOnboarding

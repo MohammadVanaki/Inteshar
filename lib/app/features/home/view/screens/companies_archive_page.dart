@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:ui' as img;
+import 'dart:ui' as ui;
 
 import 'package:auto_height_grid_view/auto_height_grid_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -11,7 +11,6 @@ import 'package:flutter_svg/svg.dart';
 
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
-import 'package:image/image.dart' hide Image;
 import 'package:image/image.dart' as img;
 import 'package:inteshar/app/config/constants.dart';
 import 'package:inteshar/app/config/functions.dart';
@@ -35,7 +34,6 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 import 'package:http/http.dart' as http;
 import 'package:barcode/barcode.dart' as bc;
-import 'dart:ui' as ui;
 import 'package:screenshot/screenshot.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 
@@ -137,7 +135,7 @@ class CompaniesArchivePage extends StatelessWidget {
     final navigationController = Get.find<BottmNavigationController>();
 
     final TextEditingController countController =
-        TextEditingController(text: '0');
+        TextEditingController(text: '1');
     final FavorityController favorityController = Get.put(FavorityController());
     final SettingController settingController = Get.put(SettingController());
     final BluetoothController bluetoothController =
@@ -204,8 +202,11 @@ class CompaniesArchivePage extends StatelessWidget {
                   showChildOpacityTransition: false,
                   backgroundColor: Theme.of(context).colorScheme.secondary,
                   springAnimationDurationInMilliseconds: 350,
-                  color: Colors.white,
+                  color: Colors.transparent,
                   child: Obx(() {
+                    // Always read the observable so GetX can track it,
+                    // even when companyId is null and we fall back to companyList.
+                    final _ = homeApiProvider.homeDataList.length;
                     final currentList = dynamicCategories();
                     return AutoHeightGridView(
                       itemCount: currentList.length,
@@ -348,6 +349,14 @@ class CompaniesArchivePage extends StatelessWidget {
                                                               : 'assets/svgs/star.svg',
                                                           width: 25,
                                                           height: 25,
+                                                          colorFilter:
+                                                              ColorFilter.mode(
+                                                                  Theme.of(
+                                                                          context)
+                                                                      .colorScheme
+                                                                      .onPrimary,
+                                                                  BlendMode
+                                                                      .srcIn),
                                                         ),
                                                       );
                                                     }),
@@ -417,7 +426,7 @@ class CompaniesArchivePage extends StatelessWidget {
                                                         int.tryParse(
                                                                 countController
                                                                     .text) ??
-                                                            0;
+                                                            1;
                                                     return Row(
                                                       children: [
                                                         Text(
@@ -433,7 +442,7 @@ class CompaniesArchivePage extends StatelessWidget {
                                                         const Gap(15),
                                                         // دکمه منفی حجم‌دار
                                                         ZoomTapAnimation(
-                                                          onTap: currentVal > 0
+                                                          onTap: currentVal > 1
                                                               ? () {
                                                                   setState(() {
                                                                     countController
@@ -454,26 +463,13 @@ class CompaniesArchivePage extends StatelessWidget {
                                                                   .onPrimary
                                                                   .withAlpha(
                                                                       currentVal >
-                                                                              0
+                                                                              1
                                                                           ? 40
                                                                           : 15),
                                                               borderRadius:
                                                                   BorderRadius
                                                                       .circular(
                                                                           12),
-                                                              boxShadow:
-                                                                  currentVal > 0
-                                                                      ? [
-                                                                          BoxShadow(
-                                                                            color:
-                                                                                Colors.black.withOpacity(0.15),
-                                                                            blurRadius:
-                                                                                6,
-                                                                            offset:
-                                                                                const Offset(0, 3),
-                                                                          )
-                                                                        ]
-                                                                      : null,
                                                             ),
                                                             child: Icon(
                                                               Icons.remove,
@@ -483,7 +479,7 @@ class CompaniesArchivePage extends StatelessWidget {
                                                                   .onPrimary
                                                                   .withOpacity(
                                                                       currentVal >
-                                                                              0
+                                                                              1
                                                                           ? 1.0
                                                                           : 0.4),
                                                               size: 22,
@@ -498,13 +494,10 @@ class CompaniesArchivePage extends StatelessWidget {
                                                               currentVal
                                                                   .toString(),
                                                               style: TextStyle(
-                                                                color: currentVal ==
-                                                                        0
-                                                                    ? Colors.red
-                                                                    : Theme.of(
-                                                                            context)
-                                                                        .colorScheme
-                                                                        .onPrimary,
+                                                                color: Theme.of(
+                                                                        context)
+                                                                    .colorScheme
+                                                                    .onPrimary,
                                                                 fontSize: 22,
                                                                 fontWeight:
                                                                     FontWeight
@@ -539,18 +532,18 @@ class CompaniesArchivePage extends StatelessWidget {
                                                                   BorderRadius
                                                                       .circular(
                                                                           12),
-                                                              boxShadow: [
-                                                                BoxShadow(
-                                                                  color: Colors
-                                                                      .black
-                                                                      .withOpacity(
-                                                                          0.15),
-                                                                  blurRadius: 6,
-                                                                  offset:
-                                                                      const Offset(
-                                                                          0, 3),
-                                                                )
-                                                              ],
+                                                              // boxShadow: [
+                                                              //   BoxShadow(
+                                                              //     color: Colors
+                                                              //         .black
+                                                              //         .withOpacity(
+                                                              //             0.15),
+                                                              //     blurRadius: 6,
+                                                              //     offset:
+                                                              //         const Offset(
+                                                              //             0, 3),
+                                                              //   )
+                                                              // ],
                                                             ),
                                                             child: Icon(
                                                               Icons.add,
@@ -696,6 +689,7 @@ class CompaniesArchivePage extends StatelessWidget {
                                                                                           footer: purchaseApiProvider.purchaseDataList.first.cardDetails2?.cardFooter ?? '',
                                                                                           isReported: false,
                                                                                           cardId: purchaseApiProvider.purchaseDataList.first.cardCategory?.id?.toString() ?? '',
+                                                                                          originalAgent: purchaseApiProvider.purchaseDataList.first.originalAgent ?? '',
                                                                                         );
                                                                                       } else if (settingController.isPreviewEnabled.value && purchaseMethodsController.purchaseMethodsSelected.value == 0) {
                                                                                         manageMethods(
@@ -709,6 +703,7 @@ class CompaniesArchivePage extends StatelessWidget {
                                                                                           footer: purchaseApiProvider.purchaseDataList.first.cardDetails2?.cardFooter ?? '',
                                                                                           isReported: false,
                                                                                           cardId: purchaseApiProvider.purchaseDataList.first.cardCategory?.id?.toString() ?? '',
+                                                                                          originalAgent: purchaseApiProvider.purchaseDataList.first.originalAgent ?? '',
                                                                                         );
                                                                                       } else {
                                                                                         bool isConnected = await PrintBluetoothThermal.connectionStatus;
@@ -782,17 +777,12 @@ class CompaniesArchivePage extends StatelessWidget {
                                                                                             }
 
                                                                                             // تبدیل نام نماینده (فروشگاه) به عکس در صورت عربی/فارسی بودن
-                                                                                            final agentName = user.user?.agent?.name ?? '';
+                                                                                            final agentName = user.parentAgent ?? '';
                                                                                             final List<int> agentNameBytes;
                                                                                             if (agentName.isNotEmpty) {
                                                                                               final bool hasNonAsciiAgent = agentName.codeUnits.any((unit) => unit > 127);
                                                                                               if (hasNonAsciiAgent) {
-                                                                                                if (_cachedUserNames.containsKey(agentName)) {
-                                                                                                  agentNameBytes = _cachedUserNames[agentName]!;
-                                                                                                } else {
-                                                                                                  agentNameBytes = await _buildCodeImageWithBorder(agentName, width: 220, drawBorder: false, isBold: true);
-                                                                                                  _cachedUserNames[agentName] = agentNameBytes;
-                                                                                                }
+                                                                                                agentNameBytes = await _buildCodeImageWithBorder(agentName, width: 220, drawBorder: false, isBold: true);
                                                                                               } else {
                                                                                                 agentNameBytes = _buildRawTextBytes(agentName, bold: true);
                                                                                               }
@@ -957,7 +947,7 @@ class CompaniesArchivePage extends StatelessWidget {
                                   );
                                 },
                               ).whenComplete(() {
-                                countController.text = '0';
+                                countController.text = '1';
                                 Get.delete<PurchaseApiProvider>();
                                 Get.delete<PurchaseMethodsController>(
                                     tag: 'single');
@@ -984,22 +974,23 @@ class CompaniesArchivePage extends StatelessWidget {
                                         .copyWith(
                                             color: Theme.of(context)
                                                 .colorScheme
-                                                .primary),
+                                                .onPrimary
+                                                .withAlpha(10)),
                                 child: Column(
                                   children: [
                                     Container(
                                       clipBehavior: Clip.antiAlias,
                                       decoration: BoxDecoration(
-                                        boxShadow: <BoxShadow>[
-                                          BoxShadow(
-                                            color: Colors.black.withOpacity(.2),
-                                            blurRadius: 5,
-                                            offset: const Offset(0, 2),
-                                          )
-                                        ],
+                                        // boxShadow: <BoxShadow>[
+                                        //   BoxShadow(
+                                        //     color: Colors.black.withOpacity(.2),
+                                        //     blurRadius: 5,
+                                        //     offset: const Offset(0, 2),
+                                        //   )
+                                        // ],
                                         borderRadius: const BorderRadius.only(
-                                            bottomLeft: Radius.circular(30),
-                                            bottomRight: Radius.circular(30)),
+                                            bottomLeft: Radius.circular(10),
+                                            bottomRight: Radius.circular(10)),
                                       ),
                                       child: CachedNetworkImage(
                                         fit: BoxFit.fill,

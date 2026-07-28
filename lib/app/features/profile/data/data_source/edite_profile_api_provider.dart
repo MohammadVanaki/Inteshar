@@ -82,7 +82,12 @@ class EditeProfileApiProvider extends GetxController {
         await updateController.fetchHomeData();
         return true;
       } else if (response.statusCode == 401) {
-        handleLogout(response.data['error']['message']);
+        final error = response.data?['error'];
+        handleLogout(error is Map
+            ? (error['message']?.toString() ??
+                'لقد انتهت صلاحية الرمز المميز الخاص بك. الرجاء تسجيل الدخول مرة أخرى.')
+            : error?.toString() ??
+                'لقد انتهت صلاحية الرمز المميز الخاص بك. الرجاء تسجيل الدخول مرة أخرى.');
         return false;
       } else if (response.statusCode == 422) {
         rxRequestStatus.value = Status.error;

@@ -1,5 +1,6 @@
 class HomeModel {
   String? status;
+  String? parentAgent;
   List<CompanyCategory> companyCategories;
   List<Slider> sliders;
   List<AsiacellCategory>? asiacellCategories;
@@ -9,6 +10,7 @@ class HomeModel {
 
   HomeModel({
     this.status,
+    this.parentAgent,
     required this.companyCategories,
     required this.sliders,
     this.asiacellCategories,
@@ -20,6 +22,7 @@ class HomeModel {
   // Convert JSON to HomeModel object
   factory HomeModel.fromJson(Map<String, dynamic> json) => HomeModel(
         status: json["status"]?.toString() ?? "",
+        parentAgent: json["original_agent"]?.toString() ?? "",
         companyCategories: List<CompanyCategory>.from(
             json["company_categories"].map((x) => CompanyCategory.fromJson(x))),
         sliders:
@@ -39,6 +42,7 @@ class HomeModel {
   // Convert HomeModel object to JSON
   Map<String, dynamic> toJson() => {
         "status": status,
+        "original_agent": parentAgent,
         "company_categories":
             List<dynamic>.from(companyCategories.map((x) => x.toJson())),
         "sliders": List<dynamic>.from(sliders.map((x) => x.toJson())),

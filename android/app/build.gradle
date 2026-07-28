@@ -24,8 +24,12 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace "com.dijlah.inteshar"
-    compileSdk flutter.compileSdkVersion
-    ndkVersion flutter.ndkVersion
+    
+    // ✅ طبق بخش ۳ راهنما: تنظیم روی اندروید ۱۵ (SDK 35)
+    compileSdk 36
+
+    // ✅ طبق بخش ۲ راهنما: تنظیم NDK به نسخه r28 یا بالاتر
+    ndkVersion "28.0.12433566"
 
     compileOptions {
         coreLibraryDesugaringEnabled true
@@ -45,7 +49,10 @@ android {
         applicationId "com.dijlah.inteshar"
         multiDexEnabled true
         minSdkVersion 23
-        targetSdkVersion flutter.targetSdkVersion
+        
+        // ✅ طبق بخش ۳ راهنما: targetSdk روی 35
+        targetSdkVersion 35
+        
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
@@ -63,16 +70,23 @@ android {
     buildTypes {
         release {
             minifyEnabled true
-            signingConfig signingConfigs.release // ✅ Use the correct release signing config
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             firebaseCrashlytics {
-                mappingFileUploadEnabled true
+                mappingFileUploadEnabled false
             }
         }
         debug {
             firebaseCrashlytics {
                 mappingFileUploadEnabled false
             }
+        }
+    }
+
+    // ✅ طبق بخش ۶ راهنما (Quick Fix): استفاده از useLegacyPackaging true برای فشرده‌سازی .soها
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
         }
     }
 }
@@ -82,9 +96,10 @@ flutter {
 }
 
 dependencies {
-    implementation platform('com.google.firebase:firebase-bom:32.2.2')
+    implementation platform('com.google.firebase:firebase-bom:33.1.2')
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.android.play:integrity:1.4.0'
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
     implementation 'androidx.multidex:multidex:2.0.1'
 }

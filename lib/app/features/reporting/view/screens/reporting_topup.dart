@@ -52,7 +52,8 @@ class ReportingTopup extends StatelessWidget {
                 alignment: Alignment.center,
                 width: Get.width - 40,
                 padding: const EdgeInsets.all(20),
-                decoration: Constants.intesharBoxDecoration(context),
+                decoration: Constants.intesharBoxDecoration(context)
+                    .copyWith(color: Theme.of(context).colorScheme.primary),
                 child: Constants.isLoggedIn
                     ? Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -84,13 +85,16 @@ class ReportingTopup extends StatelessWidget {
                                     width: 20,
                                     height: 20,
                                     colorFilter: ColorFilter.mode(
-                                      Theme.of(context).colorScheme.onPrimary,
+                                      Colors.black,
                                       BlendMode.srcIn,
                                     ),
                                   ),
                                   const Gap(10),
-                                  const Text(
+                                  Text(
                                     'ارسال',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -159,8 +163,20 @@ class ReportingTopup extends StatelessWidget {
                                                   Obx(
                                                     () {
                                                       return ZoomTapAnimation(
-                                                        child:
-                                                            ElevatedButton.icon(
+                                                        child: ElevatedButton(
+                                                          style: ElevatedButton
+                                                              .styleFrom(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                                    horizontal:
+                                                                        14,
+                                                                    vertical:
+                                                                        8),
+                                                            minimumSize:
+                                                                const Size(
+                                                                    50, 36),
+                                                          ),
                                                           onPressed:
                                                               !reportValueController
                                                                       .reportPrint
@@ -266,22 +282,8 @@ class ReportingTopup extends StatelessWidget {
                                                                       print(
                                                                           'All serials printed successfully!');
                                                                     },
-                                                          label: const Text(
+                                                          child: const Text(
                                                               'طباعة'),
-                                                          icon:
-                                                              SvgPicture.asset(
-                                                            'assets/svgs/print.svg',
-                                                            colorFilter:
-                                                                ColorFilter
-                                                                    .mode(
-                                                              Theme.of(context)
-                                                                  .colorScheme
-                                                                  .onPrimary,
-                                                              BlendMode.srcIn,
-                                                            ),
-                                                            width: 20,
-                                                            height: 20,
-                                                          ),
                                                         ),
                                                       );
                                                     },

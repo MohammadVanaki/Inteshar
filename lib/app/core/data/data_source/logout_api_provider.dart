@@ -35,7 +35,12 @@ class LogoutApiProvider extends GetxController {
         Get.snackbar('تنبيه', 'تم تسجيل الخروج بنجاح');
         Get.offAllNamed(Routes.welcomePage);
       } else if (response.statusCode == 401) {
-        handleLogout(response.data['error']['message']);
+        final error = response.data?['error'];
+        handleLogout(error is Map
+            ? (error['message']?.toString() ??
+                'لقد انتهت صلاحية الرمز المميز الخاص بك. الرجاء تسجيل الدخول مرة أخرى.')
+            : error?.toString() ??
+                'لقد انتهت صلاحية الرمز المميز الخاص بك. الرجاء تسجيل الدخول مرة أخرى.');
       } else {
         Get.snackbar('تنبيه', 'لم يتم تسجيل الخروج، يرجى اعادة المحاولة!');
       }

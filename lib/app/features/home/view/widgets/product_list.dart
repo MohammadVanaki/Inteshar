@@ -23,7 +23,7 @@ class ProductsList extends StatelessWidget {
     final HomeApiProvider homeApiProvider = Get.find<HomeApiProvider>();
     return AutoHeightGridView(
       itemCount: products.length,
-      crossAxisCount: 2,
+      crossAxisCount: 3,
       mainAxisSpacing: 10,
       crossAxisSpacing: 10,
       physics: const BouncingScrollPhysics(),
@@ -32,78 +32,88 @@ class ProductsList extends StatelessWidget {
       builder: (context, index) {
         CardPriceApi cardPriceApi =
             Get.put(CardPriceApi(), tag: index.toString());
-        return ZoomTapAnimation(
-          onTap: () {
-            print('object');
-            print('===============>${products[index].id}');
-            final filteredList = homeApiProvider
-                .homeDataList.first.cardCategories
-                ?.where((card) => card.companyId == products[index].id)
-                .toList();
+        print('===============>${products[index].logoUrl}');
+        return RepaintBoundary(
+          child: GestureDetector(
+            onTap: () {
+              print('object');
+              print('===============>${products[index].logoUrl}');
+              final filteredList = homeApiProvider
+                  .homeDataList.first.cardCategories
+                  ?.where((card) => card.companyId == products[index].id)
+                  .toList();
 
-            Get.toNamed(
-              Routes.companiesArchivePage,
-              arguments: CompaniesArchivePage(
-                companyList: filteredList ?? [],
-              ),
-            );
-          },
-          child: Stack(
-            children: [
-              Container(
-                clipBehavior: Clip.antiAlias,
-                decoration: Constants.intesharBoxDecoration(context)
-                    .copyWith(color: Theme.of(context).colorScheme.primary),
-                child: Column(
-                  children: [
-                    Center(
-                      child: CachedNetworkImage(
-                        fit: BoxFit.fill,
-                        height: 120,
-                        width: double.infinity,
-                        imageUrl: products[index].logoUrl ?? '',
-                        placeholder: (context, url) => const CustomLoading(),
-                        errorWidget: (context, url, error) => Image.asset(
-                          'assets/images/not.jpg',
-                          fit: BoxFit.fill,
-                          height: 120,
-                          width: double.infinity,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Text(
-                        products[index].title ?? '',
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onPrimary,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.fade,
-                      ),
-                    ),
-                  ],
+              Get.toNamed(
+                Routes.companiesArchivePage,
+                arguments: CompaniesArchivePage(
+                  companyList: filteredList ?? [],
                 ),
-              ),
-              Obx(
-                () => Visibility(
-                  visible: cardPriceApi.rxRequestStatus.value == Status.loading
-                      ? true
-                      : false,
-                  child: Container(
-                    width: double.infinity,
-                    height: 160,
-                    decoration: BoxDecoration(
-                      color: Colors.black26,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const CustomLoading(
-                      color: Colors.white,
+              );
+            },
+            child: Stack(
+              children: [
+                Container(
+                  clipBehavior: Clip.antiAlias,
+                  decoration: Constants.intesharBoxDecoration(context).copyWith(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onPrimary
+                          .withAlpha(10)),
+                  child: Column(
+                    children: [
+                      Center(
+                        child: CachedNetworkImage(
+                          fit: BoxFit.fill,
+                          height: 80,
+                          width: double.infinity,
+                          imageUrl: products[index]
+                                  .logoUrl
+                                  ?.replaceAll('source', 'thumbs') ??
+                              '',
+                          placeholder: (context, url) => const CustomLoading(),
+                          errorWidget: (context, url, error) => Image.asset(
+                            'assets/images/not.jpg',
+                            fit: BoxFit.fill,
+                            height: 80,
+                            width: double.infinity,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Text(
+                          products[index].title ?? '',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onPrimary,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.fade,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Obx(
+                  () => Visibility(
+                    visible:
+                        cardPriceApi.rxRequestStatus.value == Status.loading
+                            ? true
+                            : false,
+                    child: Container(
+                      width: double.infinity,
+                      height: 160,
+                      decoration: BoxDecoration(
+                        color: Colors.black26,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const CustomLoading(
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },

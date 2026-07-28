@@ -79,7 +79,93 @@ class SettingPage extends StatelessWidget {
                   ],
                 ),
               ),
-              const Gap(10),
+              const Gap(15),
+              ZoomTapAnimation(
+                onTap: () => shareApp(context),
+                child: Container(
+                  width: double.infinity,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Theme.of(context).colorScheme.secondary,
+                        Theme.of(context)
+                            .colorScheme
+                            .secondary
+                            .withValues(alpha: 0.8),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .secondary
+                            .withValues(alpha: 0.3),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.25),
+                          shape: BoxShape.circle,
+                        ),
+                        child: SvgPicture.asset(
+                          'assets/svgs/share-square.svg',
+                          colorFilter: const ColorFilter.mode(
+                            Colors.black87,
+                            BlendMode.srcIn,
+                          ),
+                          width: 22,
+                          height: 22,
+                        ),
+                      ),
+                      const Gap(15),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'مشاركة التطبيق',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            const Gap(2),
+                            Text(
+                              'شارك التطبيق مع أصدقائك وعائلتك',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.black.withValues(alpha: 0.65),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SvgPicture.asset(
+                        'assets/svgs/angle-left.svg',
+                        colorFilter: const ColorFilter.mode(
+                          Colors.black87,
+                          BlendMode.srcIn,
+                        ),
+                        width: 15,
+                        height: 15,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const Gap(15),
               const Divider(),
               const Gap(10),
               Row(
@@ -118,10 +204,14 @@ class SettingPage extends StatelessWidget {
                   padding: EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     border: Border.all(
-                        color: Theme.of(context).colorScheme.onPrimary),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onPrimary
+                            .withAlpha(50)),
                     borderRadius: BorderRadius.circular(10),
-                    color:
-                        Theme.of(context).colorScheme.onPrimary.withAlpha(100),
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF2C2C2C)
+                        : const Color(0xFFEEF2F6),
                   ),
                   child: Stack(
                     children: [
@@ -156,7 +246,9 @@ class SettingPage extends StatelessWidget {
                                     color:
                                         settingController.isPreviewEnabled.value
                                             ? Colors.black
-                                            : Colors.black38,
+                                            : Theme.of(context)
+                                                .colorScheme
+                                                .onPrimary,
                                   ),
                                 ),
                               ),
@@ -173,7 +265,9 @@ class SettingPage extends StatelessWidget {
                                   style: TextStyle(
                                     color:
                                         settingController.isPreviewEnabled.value
-                                            ? Colors.black38
+                                            ? Theme.of(context)
+                                                .colorScheme
+                                                .onPrimary
                                             : Colors.black,
                                   ),
                                 ),
@@ -388,18 +482,46 @@ class SettingPage extends StatelessWidget {
                                         margin:
                                             const EdgeInsets.only(bottom: 10),
                                         child: ListTile(
+                                          leading: Icon(
+                                            device.isPrinter
+                                                ? Icons.print_rounded
+                                                : Icons.bluetooth_rounded,
+                                            color: device.isPrinter
+                                                ? Theme.of(context)
+                                                    .colorScheme
+                                                    .primary
+                                                : Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurface
+                                                    .withAlpha(120),
+                                          ),
                                           title: Text(device.name),
                                           subtitle: Text(
                                               device.macAddress.toString()),
-                                          onTap: () {
-                                            bluetoothController
-                                                .deviceName.value = device.name;
-                                            bluetoothController.connectToDevice(
+                                          trailing: Obx(() {
+                                            final isThisConnected =
+                                                bluetoothController
+                                                        .isConnected.value &&
+                                                    bluetoothController
+                                                            .deviceName.value ==
+                                                        device.name;
+                                            return isThisConnected
+                                                ? const Icon(
+                                                    Icons.check_circle_rounded,
+                                                    color: Colors.green)
+                                                : const SizedBox.shrink();
+                                          }),
+                                          onTap: () async {
+                                            bool connected =
+                                                await bluetoothController
+                                                    .connectToDevice(
                                               device.macAddress,
                                               device.name,
                                             );
-                                            Navigator.pop(
-                                                context); // close modal
+                                            if (connected && context.mounted) {
+                                              Navigator.pop(
+                                                  context); // close modal on success
+                                            }
                                           },
                                         ),
                                       ),
@@ -438,10 +560,10 @@ class SettingPage extends StatelessWidget {
                 },
                 child: Obx(() {
                   // Show connected device name or fallback text
-                  String buttonText =
-                      bluetoothController.deviceName.value.isNotEmpty
-                          ? 'متصل بـ ${bluetoothController.deviceName.value}'
-                          : 'عرض الأجهزة';
+                  String buttonText = (bluetoothController.isConnected.value &&
+                          bluetoothController.deviceName.value.isNotEmpty)
+                      ? 'متصل بـ ${bluetoothController.deviceName.value}'
+                      : 'عرض الأجهزة';
                   return Container(
                     padding: EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -461,49 +583,7 @@ class SettingPage extends StatelessWidget {
                   );
                 }),
               ),
-
-              const Gap(10),
-              const Divider(),
-              const Gap(10),
-              ZoomTapAnimation(
-                onTap: () => shareApp(context),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    SvgPicture.asset(
-                      'assets/svgs/share-square.svg',
-                      colorFilter: ColorFilter.mode(
-                        Theme.of(context).colorScheme.onSurface,
-                        BlendMode.srcIn,
-                      ),
-                      width: 25,
-                      height: 25,
-                    ),
-                    const Gap(10),
-                    const Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.only(top: 6),
-                        child: Text(
-                          'مشاركة التطبيق',
-                          style: TextStyle(
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                    ),
-                    SvgPicture.asset(
-                      'assets/svgs/angle-left.svg',
-                      colorFilter: ColorFilter.mode(
-                        Theme.of(context).colorScheme.onSurface,
-                        BlendMode.srcIn,
-                      ),
-                      width: 15,
-                      height: 15,
-                    ),
-                  ],
-                ),
-              ),
+              const Gap(30),
             ],
           ),
         ),

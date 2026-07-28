@@ -38,7 +38,7 @@ class ReportingDate extends StatelessWidget {
                 width: 8,
               ),
             ),
-            color: Theme.of(context).colorScheme.primary,
+            color: Theme.of(context).colorScheme.onPrimary.withAlpha(20),
           ),
           child: Obx(
             () {
@@ -70,9 +70,13 @@ class ReportingDate extends StatelessWidget {
                   final startDate = await showBoardDateTimePicker(
                     context: context,
                     pickerType: DateTimePickerType.date,
-                    options: const BoardDateTimeOptions(
-                      activeColor: Colors.transparent,
-                      activeTextColor: Colors.black,
+                    options: BoardDateTimeOptions(
+                      activeColor: Theme.of(context).colorScheme.secondary,
+                      activeTextColor:
+                          Theme.of(context).colorScheme.onSecondary,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor:
+                          Theme.of(context).colorScheme.onPrimary.withAlpha(40),
                       showDateButton: false,
                       pickerFormat: PickerFormat.ymd,
                       boardTitle: 'حدد التاريخ المطلوب',
@@ -98,7 +102,7 @@ class ReportingDate extends StatelessWidget {
                     width: 8,
                   ),
                 ),
-                color: Theme.of(context).colorScheme.primary,
+                color: Theme.of(context).colorScheme.onPrimary.withAlpha(20),
               ),
               child: InkWell(
                 child: Row(
@@ -128,9 +132,13 @@ class ReportingDate extends StatelessWidget {
                   final endDate = await showBoardDateTimePicker(
                     context: context,
                     pickerType: DateTimePickerType.date,
-                    options: const BoardDateTimeOptions(
-                      activeColor: Colors.transparent,
-                      activeTextColor: Colors.black,
+                    options: BoardDateTimeOptions(
+                      activeColor: Theme.of(context).colorScheme.secondary,
+                      activeTextColor:
+                          Theme.of(context).colorScheme.onSecondary,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor:
+                          Theme.of(context).colorScheme.onPrimary.withAlpha(40),
                       showDateButton: false,
                       pickerFormat: PickerFormat.ymd,
                       boardTitle: 'حدد التاريخ المطلوب',

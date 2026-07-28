@@ -27,6 +27,7 @@ Future<void> manageMethods({
   required String footer,
   required String cardId,
   required bool isReported,
+  required String originalAgent,
 }) async {
   print('photoUrl =====>$photoUrl');
   print('cardTitle =====>$cardTitle');
@@ -116,6 +117,7 @@ Future<void> manageMethods({
         footer: footer,
         isReported: isReported,
         cardId: cardId,
+        originalAgent: originalAgent,
       );
       break;
 
@@ -312,6 +314,7 @@ Future<void> navigateToBluetoothPage({
   required String footer,
   required bool isReported,
   required String cardId,
+  required String originalAgent,
 }) async {
   Get.toNamed(
     Routes.bluetoothPage,
@@ -324,6 +327,7 @@ Future<void> navigateToBluetoothPage({
       footer: footer,
       isReported: isReported,
       cardId: cardId,
+      originalAgent: originalAgent,
     ),
   );
 }
@@ -337,7 +341,16 @@ Future<void> checkBluetoothBeforeNavigate({
   required String footer,
   required bool isReported,
   required String cardId,
+  required String originalAgent,
 }) async {
+  if (photoUrl.isNotEmpty) {
+    try {
+      precacheImage(CachedNetworkImageProvider(photoUrl), Get.context!);
+    } catch (e) {
+      debugPrint("Error pre-caching image: $e");
+    }
+  }
+
   final adapterState = await FlutterBluePlus.adapterState.first;
 
   final BluetoothController bluetoothController =
@@ -352,6 +365,7 @@ Future<void> checkBluetoothBeforeNavigate({
       footer: footer,
       isReported: isReported,
       cardId: cardId,
+      originalAgent: originalAgent,
     );
   } else {
     await bluetoothController.checkAndRequestBluetooth();
@@ -364,6 +378,7 @@ Future<void> checkBluetoothBeforeNavigate({
       footer: footer,
       isReported: isReported,
       cardId: cardId,
+      originalAgent: originalAgent,
     );
   }
 }

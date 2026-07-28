@@ -20,7 +20,7 @@ class AdSlider extends StatelessWidget {
     return CarouselSlider(
       options: CarouselOptions(
         height:
-            homeApiProvider.homeDataList.first.sliders.isNotEmpty ? 90.0 : 0,
+            homeApiProvider.homeDataList.first.sliders.isNotEmpty ? 120.0 : 0,
         autoPlay: true,
         autoPlayInterval: const Duration(seconds: 3),
       ),

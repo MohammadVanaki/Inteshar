@@ -13,17 +13,15 @@ class OfflineWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         showLogo ?? true
-            ? ColorFiltered(
-                colorFilter: ColorFilter.mode(
-                    Theme.of(context).colorScheme.onPrimary, BlendMode.srcIn),
-                child: Image.asset(
-                  'assets/images/logo-1.png',
-                  fit: BoxFit.fill,
-                  height: 80,
-                  width: 80,
-                ),
+            ? Image.asset(
+                'assets/images/logo_cn.png',
+                fit: BoxFit.fill,
+                height: 80,
+                width: 80,
               )
             : const SizedBox.shrink(),
         const Gap(10),

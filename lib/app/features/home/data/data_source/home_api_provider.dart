@@ -45,6 +45,7 @@ class HomeApiProvider extends GetxController {
       );
       print("response.statusCode =======?>>: ${response.statusCode}");
       if (response.statusCode == 200) {
+        print("HOME_API user object =======?>>: ${response.data?['user']}");
         rxRequestStatus.value = Status.completed;
         homeDataList.clear();
         homeDataList.add(HomeModel.fromJson(response.data));

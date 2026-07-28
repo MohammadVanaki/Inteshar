@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class CustomLoading extends StatelessWidget {
   const CustomLoading({
@@ -9,9 +8,17 @@ class CustomLoading extends StatelessWidget {
   final Color? color;
   @override
   Widget build(BuildContext context) {
-    return LoadingAnimationWidget.threeArchedCircle(
-      size: 20,
-      color: color ?? Theme.of(context).colorScheme.onPrimary,
+    return Center(
+      child: SizedBox(
+        width: 20,
+        height: 20,
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          valueColor: AlwaysStoppedAnimation<Color>(
+            color ?? Theme.of(context).colorScheme.onPrimary,
+          ),
+        ),
+      ),
     );
   }
 }

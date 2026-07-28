@@ -55,35 +55,40 @@ class ReportingPage extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            CategoryDropdown(
-                              itemList: [
-                                const DropdownMenuEntry(
-                                    value: '0', label: 'الکل'),
-                                ...companyArchiveController.filteredCompanies
-                                    .map((company) {
-                                  return DropdownMenuEntry(
-                                    value: company.id.toString(),
-                                    label: company.title ?? '',
-                                  );
-                                }),
-                              ],
-                              selectedValue:
-                                  reportValueController.selectedCompany.value ??
+                            Obx(() => CategoryDropdown(
+                                  itemList: [
+                                    const DropdownMenuEntry(
+                                        value: '0', label: 'الكل'),
+                                    ...companyArchiveController
+                                        .filteredCompanies
+                                        .map((company) {
+                                      return DropdownMenuEntry(
+                                        value: company.id.toString(),
+                                        label: company.title ?? '',
+                                      );
+                                    }),
+                                  ],
+                                  selectedValue: reportValueController
+                                          .selectedCompany.value ??
                                       '0',
-                              onSelected: (id) {
-                                // وقتی شرکت انتخاب شد، محصولات مربوطه رو fetch کن
-                                productsApiProvider.fetchProducts(
-                                    int.tryParse(id ?? '0') ?? 0);
+                                  onSelected: (id) {
+                                    if (id == '0') {
+                                      productsApiProvider.productsDataList
+                                          .clear();
+                                      productsApiProvider.rxRequestStatus
+                                          .value = Status.initial;
+                                    } else {
+                                      productsApiProvider.fetchProducts(
+                                          int.tryParse(id ?? '0') ?? 0);
+                                    }
 
-                                // مقدار انتخاب شده شرکت رو ذخیره کن
-                                reportValueController.selectedCompany.value =
-                                    id ?? '0';
+                                    reportValueController
+                                        .selectedCompany.value = id ?? '0';
 
-                                // مقدار محصول رو ریست کن به مقدار پیش‌فرض چون شرکت تغییر کرده
-                                reportValueController.selectedProduct.value =
-                                    '0';
-                              },
-                            ),
+                                    reportValueController
+                                        .selectedProduct.value = '0';
+                                  },
+                                )),
                             const Gap(10),
                             Obx(() {
                               switch (
@@ -97,7 +102,7 @@ class ReportingPage extends StatelessWidget {
                                   return CategoryDropdown(
                                     itemList: const [
                                       DropdownMenuEntry(
-                                          value: '0', label: 'الکل'),
+                                          value: '0', label: 'الكل'),
                                     ],
                                     selectedValue: reportValueController
                                             .selectedProduct.value ??
@@ -111,7 +116,7 @@ class ReportingPage extends StatelessWidget {
                                   return CategoryDropdown(
                                     itemList: [
                                       const DropdownMenuEntry(
-                                          value: '0', label: 'الکل'),
+                                          value: '0', label: 'الكل'),
                                       ...productsApiProvider.productsDataList
                                           .map((product) {
                                         return DropdownMenuEntry(

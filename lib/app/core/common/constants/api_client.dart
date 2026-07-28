@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inteshar/app/config/constants.dart';
 import 'package:inteshar/app/core/common/constants/api_interceptor.dart';
+import 'package:inteshar/app/core/security/ssl_pinning_adapter.dart';
 
 class ApiClient {
   static final ApiClient _instance = ApiClient._internal();
@@ -21,6 +22,10 @@ class ApiClient {
       validateStatus: (status) =>
           status != null && status != 301 && status != 302,
     ));
+
+    dio.httpClientAdapter = SslPinningAdapter(
+      allowedSha256Fingerprints: Constants.pinnedSha256Fingerprints,
+    );
 
     dio.interceptors.add(SecurityInterceptor());
 
