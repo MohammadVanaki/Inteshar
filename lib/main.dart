@@ -15,6 +15,8 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_api_availability/google_api_availability.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
+import 'package:inteshar/firebase_options.dart';
+
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
@@ -87,7 +89,9 @@ Future<void> checkGooglePlayServices() async {
   } else {
     debugPrint('Google Play Services is available.');
 
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
 
     // Enable Firebase Crashlytics error reporting
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;

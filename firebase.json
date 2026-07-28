@@ -1,0 +1,38 @@
+{
+  "auth": {
+    "providers": {
+      "emailPassword": true
+    }
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "1048912133961",
+          "appId": "1:1048912133961:android:com.dijlah.inteshar",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "1048912133961",
+          "appId": "1:1048912133961:ios:com.dijlah.inteshar",
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "1048912133961",
+          "configurations": {
+            "android": "1:1048912133961:android:com.dijlah.inteshar",
+            "ios": "1:1048912133961:ios:com.dijlah.inteshar"
+          }
+        }
+      }
+    }
+  }
+}

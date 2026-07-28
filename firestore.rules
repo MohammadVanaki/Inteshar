@@ -1,0 +1,14 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // User profile collection
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Default fallback rule for other collections (requires authentication)
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
