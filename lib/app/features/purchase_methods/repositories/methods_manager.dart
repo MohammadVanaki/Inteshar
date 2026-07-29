@@ -122,7 +122,13 @@ Future<void> manageMethods({
       break;
 
     case 1: // Share
-      Share.share(generatePinCodes(), subject: 'Check this out!');
+      final box1 = Get.context?.findRenderObject() as RenderBox?;
+      final origin1 = box1 != null ? (box1.localToGlobal(Offset.zero) & box1.size) : null;
+      Share.share(
+        generatePinCodes(),
+        subject: 'Check this out!',
+        sharePositionOrigin: origin1,
+      );
       break;
 
     case 2: // Screenshot
@@ -132,11 +138,14 @@ Future<void> manageMethods({
         final file =
             await File('${tempDir.path}/screenshot.png').writeAsBytes(image);
         final xFile = XFile(file.path);
+        final box2 = Get.context?.findRenderObject() as RenderBox?;
+        final origin2 = box2 != null ? (box2.localToGlobal(Offset.zero) & box2.size) : null;
         // Share the XFile
         await Share.shareXFiles(
           [xFile],
           text:
               'أرسل بواسطة: ${updateController.homeDataList.first.user?.name ?? ''}',
+          sharePositionOrigin: origin2,
         );
       }
       // Implement screenshot functionality
@@ -259,12 +268,11 @@ Future<void> manageMethods({
         actions: [
           ElevatedButton(
             onPressed: () async {
-              Get.back();
               final Uint8List? image = await screenshotController.capture();
+              Get.back();
               if (image != null) {
                 await saveAndShare(image);
               }
-              Get.back();
             },
             child: const Text(
               'مشاركة الصورة',
@@ -351,24 +359,44 @@ Future<void> checkBluetoothBeforeNavigate({
     }
   }
 
-  final adapterState = await FlutterBluePlus.adapterState.first;
+  try {
+    BluetoothAdapterState adapterState = BluetoothAdapterState.off;
+    try {
+      adapterState = await FlutterBluePlus.adapterState.first
+          .timeout(const Duration(seconds: 2), onTimeout: () => BluetoothAdapterState.unknown);
+    } catch (_) {}
 
-  final BluetoothController bluetoothController =
-      Get.put(BluetoothController(), permanent: true);
-  if (adapterState == BluetoothAdapterState.on) {
-    await navigateToBluetoothPage(
-      serials: serials,
-      ussdCodes: ussdCodes,
-      photoUrl: photoUrl,
-      printDate: printDate,
-      cardTitle: cardTitle,
-      footer: footer,
-      isReported: isReported,
-      cardId: cardId,
-      originalAgent: originalAgent,
-    );
-  } else {
-    await bluetoothController.checkAndRequestBluetooth();
+    final BluetoothController bluetoothController =
+        Get.put(BluetoothController(), permanent: true);
+
+    if (adapterState == BluetoothAdapterState.on) {
+      await navigateToBluetoothPage(
+        serials: serials,
+        ussdCodes: ussdCodes,
+        photoUrl: photoUrl,
+        printDate: printDate,
+        cardTitle: cardTitle,
+        footer: footer,
+        isReported: isReported,
+        cardId: cardId,
+        originalAgent: originalAgent,
+      );
+    } else {
+      await bluetoothController.checkAndRequestBluetooth();
+      await navigateToBluetoothPage(
+        serials: serials,
+        ussdCodes: ussdCodes,
+        photoUrl: photoUrl,
+        printDate: printDate,
+        cardTitle: cardTitle,
+        footer: footer,
+        isReported: isReported,
+        cardId: cardId,
+        originalAgent: originalAgent,
+      );
+    }
+  } catch (e) {
+    debugPrint("Error in checkBluetoothBeforeNavigate: $e");
     await navigateToBluetoothPage(
       serials: serials,
       ussdCodes: ussdCodes,

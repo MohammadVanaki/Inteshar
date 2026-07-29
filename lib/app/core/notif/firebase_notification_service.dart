@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:inteshar/app/config/constants.dart';
@@ -12,12 +13,13 @@ class FirebaseNotificationService {
     // Request user permission for notifications
     await _firebaseMessaging.requestPermission();
 
-    // FirebaseMessaging.instance.getToken().then((token) {
-    //   print("Device Token: $token");
-    // });
-    // Retrieve the FCM token
-    Constants.fcmToken = (await _firebaseMessaging.getToken())!;
-    print("FCM Token: ${Constants.fcmToken}");
+    // Retrieve the FCM token safely
+    try {
+      Constants.fcmToken = (await _firebaseMessaging.getToken()) ?? '';
+      print("FCM Token: ${Constants.fcmToken}");
+    } catch (e) {
+      print("Error getting FCM token: $e");
+    }
 
     // Configure local notifications
     await _configureLocalNotifications();
@@ -33,8 +35,12 @@ class FirebaseNotificationService {
       }
     });
 
-    // Subscribe to a topic
-    await subscribeToTopic("general");
+    // Subscribe to platform-specific topic
+    if (Platform.isAndroid) {
+      await subscribeToTopic("inteshar_android");
+    } else if (Platform.isIOS) {
+      await subscribeToTopic("inteshar_ios");
+    }
   }
 
   // Subscribe to a topic

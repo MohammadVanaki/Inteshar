@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:auto_height_grid_view/auto_height_grid_view.dart';
@@ -706,7 +707,12 @@ class CompaniesArchivePage extends StatelessWidget {
                                                                                           originalAgent: purchaseApiProvider.purchaseDataList.first.originalAgent ?? '',
                                                                                         );
                                                                                       } else {
-                                                                                        bool isConnected = await PrintBluetoothThermal.connectionStatus;
+                                                                                         bool isConnected = false;
+                                                                                         try {
+                                                                                           if (Platform.isAndroid) {
+                                                                                             isConnected = await PrintBluetoothThermal.connectionStatus;
+                                                                                           }
+                                                                                         } catch (_) {}
 
                                                                                         if (!isConnected) {
                                                                                           Get.dialog(
