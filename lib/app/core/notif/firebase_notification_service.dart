@@ -57,9 +57,12 @@ class FirebaseNotificationService {
   Future<void> _configureLocalNotifications() async {
     const AndroidInitializationSettings androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
+    const DarwinInitializationSettings iosSettings =
+        DarwinInitializationSettings();
 
     const InitializationSettings settings = InitializationSettings(
       android: androidSettings,
+      iOS: iosSettings,
     );
 
     await _localNotifications.initialize(settings);
