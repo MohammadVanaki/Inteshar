@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:get/get.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -28,10 +29,15 @@ class BluetoothController extends GetxController {
         await FlutterBluePlus.adapterState.first;
 
     if (adapterState != BluetoothAdapterState.on) {
-      await Permission.bluetoothConnect.request();
-      await Permission.bluetoothScan.request();
-
-      FlutterBluePlus.turnOn();
+      if (Platform.isAndroid) {
+        await Permission.bluetoothConnect.request();
+        await Permission.bluetoothScan.request();
+        try {
+          await FlutterBluePlus.turnOn();
+        } catch (_) {}
+      } else if (Platform.isIOS) {
+        await Permission.bluetooth.request();
+      }
 
       int retries = 0;
       while (adapterState != BluetoothAdapterState.on && retries < 10) {
@@ -49,6 +55,7 @@ class BluetoothController extends GetxController {
       startScan();
     }
   }
+
 
   // Start scanning for available Bluetooth devices
   void startScan() async {

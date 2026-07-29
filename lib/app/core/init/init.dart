@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:inteshar/app/features/home/data/data_source/home_api_provider.dart';
@@ -33,10 +34,17 @@ Future<void> init() async {
     Constants.isLoggedIn = true;
   }
 
-  await [
-    Permission.bluetooth,
-    Permission.bluetoothScan,
-    Permission.bluetoothAdvertise,
-    Permission.bluetoothConnect,
-  ].request();
+  if (Platform.isAndroid) {
+    await [
+      Permission.bluetooth,
+      Permission.bluetoothScan,
+      Permission.bluetoothAdvertise,
+      Permission.bluetoothConnect,
+    ].request();
+  } else if (Platform.isIOS) {
+    await [
+      Permission.bluetooth,
+    ].request();
+  }
 }
+
