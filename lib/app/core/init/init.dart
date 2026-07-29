@@ -41,10 +41,6 @@ Future<void> init() async {
       Permission.bluetoothAdvertise,
       Permission.bluetoothConnect,
     ].request();
-  } else if (Platform.isIOS) {
-    await [
-      Permission.bluetooth,
-    ].request();
   }
 }
 

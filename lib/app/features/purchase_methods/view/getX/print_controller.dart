@@ -38,8 +38,6 @@ class BluetoothController extends GetxController {
         try {
           await FlutterBluePlus.turnOn();
         } catch (_) {}
-      } else if (Platform.isIOS) {
-        await Permission.bluetooth.request();
       }
 
       int retries = 0;
