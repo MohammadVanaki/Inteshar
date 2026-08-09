@@ -817,9 +817,7 @@ class CompaniesArchivePage extends StatelessWidget {
                                                                                           } else {
                                                                                             bool isConnected = false;
                                                                                             try {
-                                                                                              if (Platform.isAndroid) {
-                                                                                                isConnected = await PrintBluetoothThermal.connectionStatus;
-                                                                                              }
+                                                                                              isConnected = await PrintBluetoothThermal.connectionStatus;
                                                                                             } catch (
                                                                                               _
                                                                                             ) {}

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 import 'package:flutter/foundation.dart';
@@ -639,12 +640,20 @@ class BluetoothPage extends StatelessWidget {
       // تبدیل تصویر به داده‌های باینری مناسب چاپگر
       final profile = await CapabilityProfile.load();
       final generator = Generator(PaperSize.mm58, profile);
-      final bytes = generator.imageRaster(
-        trimmedImage,
-        align: PosAlign.center,
-        highDensityHorizontal: true,
-        highDensityVertical: true,
-      );
+
+      List<int> bytes;
+      if (Platform.isIOS) {
+        // On iOS, imageRaster (GS v 0) often prints as garbage due to Bluetooth
+        // chunking limits. Using generator.image (ESC *) is safer.
+        bytes = generator.image(trimmedImage, align: PosAlign.center);
+      } else {
+        bytes = generator.imageRaster(
+          trimmedImage,
+          align: PosAlign.center,
+          highDensityHorizontal: true,
+          highDensityVertical: true,
+        );
+      }
 
       return bytes;
     } catch (e) {
