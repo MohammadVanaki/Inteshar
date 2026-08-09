@@ -617,39 +617,50 @@ class BluetoothPage extends StatelessWidget {
     );
   }
 
+  List<int> _imageToRasterBytes(img.Image image) {
+    final List<int> bytes = [];
+    final int width = image.width;
+    final int height = image.height;
+    final int widthBytes = (width + 7) ~/ 8;
+    final int xL = widthBytes % 256;
+    final int xH = widthBytes ~/ 256;
+    final int yL = height % 256;
+    final int yH = height ~/ 256;
+
+    bytes.addAll([29, 118, 48, 0, xL, xH, yL, yH]);
+
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < widthBytes * 8; x += 8) {
+        int byteVal = 0;
+        for (int bit = 0; bit < 8; bit++) {
+          final int px = x + bit;
+          if (px < width) {
+            final pixel = image.getPixel(px, y);
+            if (pixel.a > 127) {
+              final int luminance =
+                  (pixel.r * 0.299 + pixel.g * 0.587 + pixel.b * 0.114).round();
+              if (luminance < 128) {
+                byteVal |= (128 >> bit);
+              }
+            }
+          }
+        }
+        bytes.add(byteVal);
+      }
+    }
+    return bytes;
+  }
+
   Future<List<int>?> processImageForPrinter(Uint8List imageBytes) async {
     try {
-      // تبدیل بایت‌ها به تصویر
       final image = img.decodeImage(imageBytes);
-      if (image == null) {
-        print("Error: Failed to decode image.");
-        return null;
-      }
+      if (image == null) return null;
 
-      // تغییر اندازه تصویر
       final resizedImage = img.copyResize(image, width: 384);
       final processedImage = adjustContrastAndThreshold(resizedImage, 1.5);
       final trimmedImage = trimWhiteMargins(processedImage);
 
-      // تبدیل تصویر به داده‌های باینری مناسب چاپگر
-      final profile = await CapabilityProfile.load();
-      final generator = Generator(PaperSize.mm58, profile);
-
-      List<int> bytes;
-      if (Platform.isIOS) {
-        // On iOS, imageRaster (GS v 0) often prints as garbage due to Bluetooth
-        // chunking limits. Using generator.image (ESC *) is safer.
-        bytes = generator.image(trimmedImage, align: PosAlign.center);
-      } else {
-        bytes = generator.imageRaster(
-          trimmedImage,
-          align: PosAlign.center,
-          highDensityHorizontal: true,
-          highDensityVertical: true,
-        );
-      }
-
-      return bytes;
+      return _imageToRasterBytes(trimmedImage);
     } catch (e) {
       print("Error processing image: $e");
       return null;

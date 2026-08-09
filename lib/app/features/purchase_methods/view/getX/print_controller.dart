@@ -30,8 +30,29 @@ class BluetoothController extends GetxController {
     _statusTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
       try {
         final status = await PrintBluetoothThermal.connectionStatus;
-        if (isConnected.value != status) {
-          isConnected.value = status;
+        bool isRealConnected = status;
+
+        if (status && Platform.isIOS) {
+          // On iOS, connectionStatus might be cached. Verify with FlutterBluePlus.
+          final connectedDevices = FlutterBluePlus.connectedDevices;
+          bool found = false;
+          for (var device in connectedDevices) {
+            // We check by name or MAC if possible, but just checking if ANY device is connected is better than nothing.
+            // If the printer is turned off, it drops from connectedDevices quickly.
+            if (device.advName == deviceName.value ||
+                device.remoteId.str ==
+                    Constants.localStorage.read('printAddres')?['macAddress']) {
+              found = true;
+              break;
+            }
+          }
+          if (!found && connectedDevices.isEmpty) {
+            isRealConnected = false;
+          }
+        }
+
+        if (isConnected.value != isRealConnected) {
+          isConnected.value = isRealConnected;
         }
       } catch (_) {}
     });
@@ -47,8 +68,9 @@ class BluetoothController extends GetxController {
   Future<void> checkAndRequestBluetooth() async {
     BluetoothAdapterState adapterState = BluetoothAdapterState.off;
     try {
-      adapterState = await FlutterBluePlus.adapterState.first
-          .timeout(const Duration(seconds: 2), onTimeout: () => BluetoothAdapterState.unknown);
+      adapterState = await FlutterBluePlus.adapterState.first.timeout(
+          const Duration(seconds: 2),
+          onTimeout: () => BluetoothAdapterState.unknown);
     } catch (_) {}
 
     if (adapterState != BluetoothAdapterState.on) {
@@ -58,13 +80,14 @@ class BluetoothController extends GetxController {
         try {
           await FlutterBluePlus.turnOn();
         } catch (_) {}
-        
+
         int retries = 0;
         while (adapterState != BluetoothAdapterState.on && retries < 10) {
           await Future.delayed(const Duration(seconds: 1));
           try {
-            adapterState = await FlutterBluePlus.adapterState.first
-                .timeout(const Duration(seconds: 1), onTimeout: () => adapterState);
+            adapterState = await FlutterBluePlus.adapterState.first.timeout(
+                const Duration(seconds: 1),
+                onTimeout: () => adapterState);
           } catch (_) {}
           retries++;
         }
@@ -129,8 +152,9 @@ class BluetoothController extends GetxController {
 
       BluetoothAdapterState adapterState = BluetoothAdapterState.off;
       try {
-        adapterState = await FlutterBluePlus.adapterState.first
-            .timeout(const Duration(seconds: 2), onTimeout: () => BluetoothAdapterState.unknown);
+        adapterState = await FlutterBluePlus.adapterState.first.timeout(
+            const Duration(seconds: 2),
+            onTimeout: () => BluetoothAdapterState.unknown);
       } catch (_) {}
 
       if (adapterState != BluetoothAdapterState.on) {

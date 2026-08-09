@@ -1679,10 +1679,15 @@ class CompaniesArchivePage extends StatelessWidget {
       );
       final img.Image? image = img.decodeImage(pngBytes);
       if (image == null) return [];
+      
       final resized = img.copyResize(image, width: width);
-      final profile = await CapabilityProfile.load();
-      final generator = Generator(PaperSize.mm58, profile);
-      final result = generator.image(resized);
+      // We must use GS v 0 (raster) rather than ESC * (generator.image) to prevent weird characters on iOS
+      final List<int> result = _convertRgbaToRasterBytes(
+        resized.getBytes(order: img.ChannelOrder.rgba),
+        resized.width,
+        resized.height,
+      );
+      
       _cachedFooters[cacheKey] = result;
       return result;
     } catch (e) {
