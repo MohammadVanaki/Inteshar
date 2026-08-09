@@ -639,7 +639,7 @@ class BluetoothPage extends StatelessWidget {
             if (pixel.a > 127) {
               final int luminance =
                   (pixel.r * 0.299 + pixel.g * 0.587 + pixel.b * 0.114).round();
-              if (luminance < 128) {
+              if (luminance < 210) {
                 byteVal |= (128 >> bit);
               }
             }
@@ -657,8 +657,7 @@ class BluetoothPage extends StatelessWidget {
       if (image == null) return null;
 
       final resizedImage = img.copyResize(image, width: 384);
-      final processedImage = adjustContrastAndThreshold(resizedImage, 1.5);
-      final trimmedImage = trimWhiteMargins(processedImage);
+      final trimmedImage = trimWhiteMargins(resizedImage);
 
       return _imageToRasterBytes(trimmedImage);
     } catch (e) {

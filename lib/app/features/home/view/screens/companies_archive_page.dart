@@ -1450,7 +1450,7 @@ class CompaniesArchivePage extends StatelessWidget {
                 // محاسبه درخشندگی برای سیاه یا سفید کردن پیکسل
                 final int luminance =
                     (r * 0.299 + g * 0.587 + b * 0.114).round();
-                if (luminance < 128) {
+                if (luminance < 210) {
                   byteVal |= (128 >> bit);
                 }
               }

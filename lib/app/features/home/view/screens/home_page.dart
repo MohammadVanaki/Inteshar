@@ -178,6 +178,7 @@ class _HomePageState extends State<HomePage> {
     return Container(
       color: Theme.of(context).colorScheme.primary,
       width: Get.width,
+      padding: const EdgeInsets.only(top: 3.0),
       child: Obx(
         () {
           switch (homeApiProvider.rxRequestStatus.value) {
