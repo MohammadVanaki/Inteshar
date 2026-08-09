@@ -38,22 +38,25 @@ class BluetoothController extends GetxController {
         try {
           await FlutterBluePlus.turnOn();
         } catch (_) {}
-      }
+        
+        int retries = 0;
+        while (adapterState != BluetoothAdapterState.on && retries < 10) {
+          await Future.delayed(const Duration(seconds: 1));
+          try {
+            adapterState = await FlutterBluePlus.adapterState.first
+                .timeout(const Duration(seconds: 1), onTimeout: () => adapterState);
+          } catch (_) {}
+          retries++;
+        }
 
-      int retries = 0;
-      while (adapterState != BluetoothAdapterState.on && retries < 10) {
-        await Future.delayed(const Duration(seconds: 1));
-        try {
-          adapterState = await FlutterBluePlus.adapterState.first
-              .timeout(const Duration(seconds: 1), onTimeout: () => adapterState);
-        } catch (_) {}
-        retries++;
-      }
-
-      if (adapterState == BluetoothAdapterState.on) {
-        Get.closeAllSnackbars();
-        Get.snackbar("نجاح", "تم تشغيل البلوتوث بنجاح.");
-        await tryAutoConnectPrinter();
+        if (adapterState == BluetoothAdapterState.on) {
+          Get.closeAllSnackbars();
+          Get.snackbar("نجاح", "تم تشغيل البلوتوث بنجاح.");
+          await tryAutoConnectPrinter();
+        }
+      } else {
+        // On iOS, starting a scan usually triggers the system permission dialog
+        startScan();
       }
     } else {
       startScan();
@@ -65,16 +68,6 @@ class BluetoothController extends GetxController {
     try {
       isLoading.value = true;
       devicesList.clear();
-
-      if (Platform.isIOS) {
-        isLoading.value = false;
-        Get.closeAllSnackbars();
-        Get.snackbar(
-          "معلومات",
-          "طباعة البلوتوث المباشرة متوفرة عبر جهاز POS أو سیستم‌عامل اندرويد.",
-        );
-        return;
-      }
 
       final List<BluetoothInfo> listResult =
           await PrintBluetoothThermal.pairedBluetooths;
@@ -102,7 +95,7 @@ class BluetoothController extends GetxController {
   }
 
   Future<void> tryAutoConnectPrinter() async {
-    if (isLoading.value || isConnected.value || Platform.isIOS) {
+    if (isLoading.value || isConnected.value) {
       return;
     }
 
@@ -162,13 +155,6 @@ class BluetoothController extends GetxController {
   Future<bool> connectToDevice(String remoteId, String advName,
       {bool isAutoConnect = false}) async {
     if (isLoading.value) return false;
-    if (Platform.isIOS) {
-      if (!isAutoConnect) {
-        Get.closeAllSnackbars();
-        Get.snackbar("معلومات", "طباعة البلوتوث المباشرة متوفرة لأجهزة أندرويد فقط.");
-      }
-      return false;
-    }
     try {
       isLoading.value = true;
 
