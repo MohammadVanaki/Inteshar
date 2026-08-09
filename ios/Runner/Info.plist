@@ -17,6 +17,8 @@
 		<!-- Camera & Biometrics -->
 		<key>NSCameraUsageDescription</key>
 		<string>We need camera access to upload photos.</string>
+		<key>NSMicrophoneUsageDescription</key>
+		<string>We need microphone access for recording videos.</string>
 		<key>NSFaceIDUsageDescription</key>
 		<string>We use Face ID for secure authentication.</string>
 		<!-- location -->

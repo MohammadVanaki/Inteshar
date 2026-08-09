@@ -276,28 +276,31 @@ class SecurityBridge(private val context: Context) {
                 return mapOf("isValid" to false, "sha256" to "")
             }
 
-            val certBytes = signatures[0].toByteArray()
-            val md = MessageDigest.getInstance("SHA-256")
-            val digest = md.digest(certBytes)
-            val currentSha256 = digest.joinToString("") { "%02X".format(it) }.uppercase()
+            val currentSha256List = signatures.map { sig ->
+                val certBytes = sig.toByteArray()
+                val md = MessageDigest.getInstance("SHA-256")
+                val digest = md.digest(certBytes)
+                digest.joinToString("") { "%02X".format(it) }.uppercase()
+            }
+            val primarySha256 = currentSha256List.firstOrNull() ?: ""
 
-            Log.d(TAG, "🔑 Extracted Runtime APK Signature SHA-256: $currentSha256")
+            Log.d(TAG, "🔑 Extracted Runtime APK Signatures SHA-256: $currentSha256List")
 
             if (!expectedSignatureSha256.isNullOrBlank()) {
                 val allowedSignatures = expectedSignatureSha256.split(",", "|", ";")
                     .map { it.replace(":", "").replace(" ", "").trim().uppercase() }
                     .filter { it.isNotEmpty() }
 
-                val isValid = allowedSignatures.contains(currentSha256)
+                val isValid = currentSha256List.any { allowedSignatures.contains(it) }
                 if (!isValid) {
                     Log.e(TAG, "🚨 APK Signature Mismatch!")
-                    Log.e(TAG, "🚨 Current Runtime Signature: $currentSha256")
+                    Log.e(TAG, "🚨 Current Runtime Signatures: $currentSha256List")
                     Log.e(TAG, "🚨 Allowed Signatures List: $allowedSignatures")
                 }
-                return mapOf("isValid" to isValid, "sha256" to currentSha256)
+                return mapOf("isValid" to isValid, "sha256" to primarySha256)
             }
 
-            return mapOf("isValid" to true, "sha256" to currentSha256)
+            return mapOf("isValid" to true, "sha256" to primarySha256)
         } catch (e: Exception) {
             Log.e(TAG, "🚨 Error in checkApkSignature: ${e.message}", e)
             return mapOf("isValid" to false, "sha256" to "", "error" to (e.message ?: ""))
