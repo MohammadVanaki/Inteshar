@@ -158,9 +158,12 @@ class BluetoothController extends GetxController {
     try {
       isLoading.value = true;
 
-      // Disconnect any stale native socket first
-      await PrintBluetoothThermal.disconnect;
-      await Future.delayed(const Duration(milliseconds: 300));
+      // Only disconnect if we are already connected, because calling disconnect
+      // when not connected causes a native crash in the iOS plugin (v1.2.1)
+      if (isConnected.value) {
+        await PrintBluetoothThermal.disconnect;
+        await Future.delayed(const Duration(milliseconds: 300));
+      }
 
       bool connected =
           await PrintBluetoothThermal.connect(macPrinterAddress: remoteId);
@@ -212,7 +215,9 @@ class BluetoothController extends GetxController {
   // Disconnect from the current Bluetooth device (Native disconnect + State reset)
   Future<void> disconnectDevice() async {
     try {
-      await PrintBluetoothThermal.disconnect;
+      if (isConnected.value) {
+        await PrintBluetoothThermal.disconnect;
+      }
     } catch (e) {
       print("خطا در قطع اتصال: $e");
     }

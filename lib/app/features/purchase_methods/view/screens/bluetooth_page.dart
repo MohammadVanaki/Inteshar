@@ -55,21 +55,33 @@ class BluetoothPage extends StatelessWidget {
     final updateController = Get.find<HomeApiProvider>();
     // final String cleanFooter = removeHtmlTags(footer);
 
-    List<ScreenshotController> cardPhotoScreenshotControllers =
-        List.generate(serialList.length, (_) => ScreenshotController());
+    List<ScreenshotController> cardPhotoScreenshotControllers = List.generate(
+      serialList.length,
+      (_) => ScreenshotController(),
+    );
 
-    List<ScreenshotController> headerScreenshotControllers =
-        List.generate(serialList.length, (_) => ScreenshotController());
+    List<ScreenshotController> headerScreenshotControllers = List.generate(
+      serialList.length,
+      (_) => ScreenshotController(),
+    );
 
-    List<ScreenshotController> qrcodeScreenshotControllers =
-        List.generate(serialList.length, (_) => ScreenshotController());
+    List<ScreenshotController> qrcodeScreenshotControllers = List.generate(
+      serialList.length,
+      (_) => ScreenshotController(),
+    );
 
-    List<ScreenshotController> footerScreenshotControllers =
-        List.generate(serialList.length, (_) => ScreenshotController());
-    List<ScreenshotController> pinCodeScreenshotControllers =
-        List.generate(serialList.length, (_) => ScreenshotController());
-    List<ScreenshotController> barCodeScreenshotControllers =
-        List.generate(serialList.length, (_) => ScreenshotController());
+    List<ScreenshotController> footerScreenshotControllers = List.generate(
+      serialList.length,
+      (_) => ScreenshotController(),
+    );
+    List<ScreenshotController> pinCodeScreenshotControllers = List.generate(
+      serialList.length,
+      (_) => ScreenshotController(),
+    );
+    List<ScreenshotController> barCodeScreenshotControllers = List.generate(
+      serialList.length,
+      (_) => ScreenshotController(),
+    );
 
     Future<Uint8List?> waitUntilCaptured(
       ScreenshotController controller, {
@@ -125,26 +137,44 @@ class BluetoothPage extends StatelessWidget {
 
         // گرفتن همزمان عکس‌ها به صورت موازی (Parallel) برای حداکثر سرعت
         final results = await Future.wait([
-          waitUntilCaptured(headerScreenshotControllers[index],
-              tag: "Header", allowFailure: true),
+          waitUntilCaptured(
+            headerScreenshotControllers[index],
+            tag: "Header",
+            allowFailure: true,
+          ),
           showCardPhoto
-              ? waitUntilCaptured(cardPhotoScreenshotControllers[index],
-                  tag: "CardPhoto", allowFailure: true)
+              ? waitUntilCaptured(
+                  cardPhotoScreenshotControllers[index],
+                  tag: "CardPhoto",
+                  allowFailure: true,
+                )
               : Future.value(null),
           showQrCode
-              ? waitUntilCaptured(qrcodeScreenshotControllers[index],
-                  tag: "QRCode", allowFailure: true)
+              ? waitUntilCaptured(
+                  qrcodeScreenshotControllers[index],
+                  tag: "QRCode",
+                  allowFailure: true,
+                )
               : Future.value(null),
           showFooter
-              ? waitUntilCaptured(footerScreenshotControllers[index],
-                  tag: "Footer", allowFailure: true)
+              ? waitUntilCaptured(
+                  footerScreenshotControllers[index],
+                  tag: "Footer",
+                  allowFailure: true,
+                )
               : Future.value(null),
           showBarCode
-              ? waitUntilCaptured(barCodeScreenshotControllers[index],
-                  tag: "BarCode", allowFailure: true)
+              ? waitUntilCaptured(
+                  barCodeScreenshotControllers[index],
+                  tag: "BarCode",
+                  allowFailure: true,
+                )
               : Future.value(null),
-          waitUntilCaptured(pinCodeScreenshotControllers[index],
-              tag: "PinCode", allowFailure: true),
+          waitUntilCaptured(
+            pinCodeScreenshotControllers[index],
+            tag: "PinCode",
+            allowFailure: true,
+          ),
         ]);
 
         final headerImageBytes = results[0];
@@ -174,8 +204,11 @@ class BluetoothPage extends StatelessWidget {
             : null;
 
         // تابع چاپ متن با مدیریت خطا و await
-        Future<void> printText(String text,
-            {bool bold = false, int? size}) async {
+        Future<void> printText(
+          String text, {
+          bool bold = false,
+          int? size,
+        }) async {
           try {
             await PrintBluetoothThermal.writeString(
               printText: PrintTextSize(
@@ -245,15 +278,16 @@ class BluetoothPage extends StatelessWidget {
           await safeWriteBytes(footerBytes);
         }
 
-        await printText('\n --------------- \n\n');
+        await printText('\n --------------- \n');
         debugPrint("✅ چاپ کامل شد برای index $index");
       }
     }
 
     OptimizedPrinterService.preWarm(
-        photoUrl: photoUrl,
-        printCardImage:
-            settingController.settings["preview_printCardImage"] ?? false);
+      photoUrl: photoUrl,
+      printCardImage:
+          settingController.settings["preview_printCardImage"] ?? false,
+    );
     bluetoothController.tryAutoConnectPrinter();
 
     return InternalPage(
@@ -264,80 +298,69 @@ class BluetoothPage extends StatelessWidget {
         height: double.infinity,
         margin: const EdgeInsets.symmetric(horizontal: 20).copyWith(bottom: 20),
         padding: const EdgeInsets.all(20),
-        decoration: Constants.intesharBoxDecoration(context).copyWith(
-          color: Theme.of(context).colorScheme.primary,
-        ),
-        child: Obx(
-          () {
-            return SizedBox(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              child: bluetoothController.isConnected.value
-                  ? Column(
-                      children: [
-                        Expanded(
-                          child: SingleChildScrollView(
-                            child: Offstage(
-                              offstage: false,
-                              child: RepaintBoundary(
-                                // key: _globalKey,
-                                child: Container(
-                                  constraints: const BoxConstraints(
-                                    maxWidth: 360.0,
-                                  ),
-                                  child: Column(
-                                    children: List.generate(
-                                      serialList.length,
-                                      (index) => Container(
-                                        alignment: Alignment.center,
-                                        margin:
-                                            const EdgeInsets.only(bottom: 25),
-                                        child: PrintWidget(
-                                          printDate: printDate,
-                                          cardTitle: cardTitle,
-                                          photoUrl: photoUrl,
-                                          serialId: serialList[index]
-                                                  ?.id
-                                                  ?.toString() ??
-                                              '',
-                                          serial:
-                                              serialList[index]?.serial ?? '',
-                                          pinCode:
-                                              serialList[index]?.code ?? '',
-                                          ussd: (index < ussdCodes.length)
-                                              ? ussdCodes[index]?.code ?? ''
-                                              : '',
-                                          code1: serialList[index]?.code1 ?? '',
-                                          code2: serialList[index]?.code2 ?? '',
-                                          code3: serialList[index]?.code3 ?? '',
-                                          code4: serialList[index]?.code4 ?? '',
-                                          originalAgent: originalAgent,
-                                          footerText: footer,
-                                          cardPhotoScreenshotControllers:
-                                              cardPhotoScreenshotControllers[
-                                                  index],
-                                          headerScreenshotControllers:
-                                              headerScreenshotControllers[
-                                                  index],
-                                          qrcodeScreenshotControllers:
-                                              qrcodeScreenshotControllers[
-                                                  index],
-                                          footerScreenshotControllers:
-                                              footerScreenshotControllers[
-                                                  index],
-                                          pinCodeScreenshotControllers:
-                                              pinCodeScreenshotControllers[
-                                                  index],
-                                          isReported: isReported,
-                                          barCodeScreenshotControllers:
-                                              barCodeScreenshotControllers[
-                                                  index],
-                                          cardId: cardId,
-                                          expiryTime:
-                                              serialList[index]?.expiredDate ??
-                                                  serialList[index]?.code3 ??
-                                                  '',
-                                        ),
+        decoration: Constants.intesharBoxDecoration(
+          context,
+        ).copyWith(color: Theme.of(context).colorScheme.primary),
+        child: Obx(() {
+          return SizedBox(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            child: bluetoothController.isConnected.value
+                ? Column(
+                    children: [
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Offstage(
+                            offstage: false,
+                            child: RepaintBoundary(
+                              // key: _globalKey,
+                              child: Container(
+                                constraints: const BoxConstraints(
+                                  maxWidth: 360.0,
+                                ),
+                                child: Column(
+                                  children: List.generate(
+                                    serialList.length,
+                                    (index) => Container(
+                                      alignment: Alignment.center,
+                                      margin: const EdgeInsets.only(bottom: 25),
+                                      child: PrintWidget(
+                                        printDate: printDate,
+                                        cardTitle: cardTitle,
+                                        photoUrl: photoUrl,
+                                        serialId:
+                                            serialList[index]?.id?.toString() ??
+                                                '',
+                                        serial: serialList[index]?.serial ?? '',
+                                        pinCode: serialList[index]?.code ?? '',
+                                        ussd: (index < ussdCodes.length)
+                                            ? ussdCodes[index]?.code ?? ''
+                                            : '',
+                                        code1: serialList[index]?.code1 ?? '',
+                                        code2: serialList[index]?.code2 ?? '',
+                                        code3: serialList[index]?.code3 ?? '',
+                                        code4: serialList[index]?.code4 ?? '',
+                                        originalAgent: originalAgent,
+                                        footerText: footer,
+                                        cardPhotoScreenshotControllers:
+                                            cardPhotoScreenshotControllers[
+                                                index],
+                                        headerScreenshotControllers:
+                                            headerScreenshotControllers[index],
+                                        qrcodeScreenshotControllers:
+                                            qrcodeScreenshotControllers[index],
+                                        footerScreenshotControllers:
+                                            footerScreenshotControllers[index],
+                                        pinCodeScreenshotControllers:
+                                            pinCodeScreenshotControllers[index],
+                                        isReported: isReported,
+                                        barCodeScreenshotControllers:
+                                            barCodeScreenshotControllers[index],
+                                        cardId: cardId,
+                                        expiryTime:
+                                            serialList[index]?.expiredDate ??
+                                                serialList[index]?.code3 ??
+                                                '',
                                       ),
                                     ),
                                   ),
@@ -346,258 +369,255 @@ class BluetoothPage extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const Gap(5),
-                        Obx(() {
-                          switch (bluetoothController.rxRequestStatus.value) {
-                            case Status.loading:
-                              return const CustomLoading();
-                            default:
-                              return const SizedBox.shrink();
-                          }
-                        }),
-                        const Gap(5),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Obx(() {
-                              return ElevatedButton(
-                                onPressed: (!bluetoothController
-                                            .printed.value &&
-                                        !bluetoothController.isLoading.value)
-                                    ? () async {
-                                        bluetoothController.isLoading.value =
-                                            true;
+                      ),
+                      const Gap(5),
+                      Obx(() {
+                        switch (bluetoothController.rxRequestStatus.value) {
+                          case Status.loading:
+                            return const CustomLoading();
+                          default:
+                            return const SizedBox.shrink();
+                        }
+                      }),
+                      const Gap(5),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Obx(() {
+                            return ElevatedButton(
+                              onPressed: (!bluetoothController.printed.value &&
+                                      !bluetoothController.isLoading.value)
+                                  ? () async {
+                                      bluetoothController.isLoading.value =
+                                          true;
 
-                                        bool isConnected =
-                                            await PrintBluetoothThermal
-                                                .connectionStatus;
+                                      bool isConnected =
+                                          await PrintBluetoothThermal
+                                              .connectionStatus;
 
-                                        if (!isConnected) {
-                                          final savedPrinter = Constants
-                                              .localStorage
-                                              .read('printAddres');
+                                      if (!isConnected) {
+                                        final savedPrinter = Constants
+                                            .localStorage
+                                            .read('printAddres');
 
-                                          if (savedPrinter != null &&
-                                              savedPrinter['macAddress'] !=
-                                                  null &&
-                                              savedPrinter['name'] != null) {
-                                            try {
-                                              await bluetoothController
-                                                  .connectToDevice(
-                                                savedPrinter['macAddress'],
-                                                savedPrinter['name'],
-                                              );
-                                            } catch (e) {
-                                              bluetoothController
-                                                  .isLoading.value = false;
-                                              return;
-                                            }
-                                          } else {
+                                        if (savedPrinter != null &&
+                                            savedPrinter['macAddress'] !=
+                                                null &&
+                                            savedPrinter['name'] != null) {
+                                          try {
+                                            await bluetoothController
+                                                .connectToDevice(
+                                              savedPrinter['macAddress'],
+                                              savedPrinter['name'],
+                                            );
+                                          } catch (e) {
                                             bluetoothController
                                                 .isLoading.value = false;
                                             return;
                                           }
-                                        }
-
-                                        try {
-                                          await captureAndSavePng();
-                                          bluetoothController.printed.value =
-                                              true;
-                                        } catch (e) {
-                                          bluetoothController.printed.value =
-                                              false;
-                                        } finally {
+                                        } else {
                                           bluetoothController.isLoading.value =
                                               false;
-                                        }
-                                      }
-                                    : null,
-                                child: bluetoothController.isLoading.value
-                                    ? SizedBox(
-                                        width: 20,
-                                        height: 20,
-                                        child: CircularProgressIndicator(
-                                            color: Colors.white,
-                                            strokeWidth: 2),
-                                      )
-                                    : Row(
-                                        children: [
-                                          SvgPicture.asset(
-                                            'assets/svgs/print.svg',
-                                            colorFilter: ColorFilter.mode(
-                                              Theme.of(context)
-                                                  .colorScheme
-                                                  .onPrimary,
-                                              BlendMode.srcIn,
-                                            ),
-                                            width: 20,
-                                            height: 20,
-                                          ),
-                                          const Gap(5),
-                                          Text(bluetoothController.printed.value
-                                              ? "تمت الطباعة"
-                                              : "طباعة"),
-                                        ],
-                                      ),
-                              );
-                            }),
-                            const Gap(10),
-                            ZoomTapAnimation(
-                              child: ElevatedButton.icon(
-                                onPressed: () async {
-                                  if (bluetoothController.printCount.value <=
-                                      (updateController.homeDataList.first.user!
-                                              .agent!.maxReprints ??
-                                          1)) {
-                                    bool isConnected =
-                                        await PrintBluetoothThermal
-                                            .connectionStatus;
-
-                                    if (!isConnected) {
-                                      // Get.snackbar("جاري محاولة الاتصال",
-                                      //     "تم قطع الاتصال بالطابعة، جارٍ إعادة الاتصال...");
-
-                                      final savedPrinter = Constants
-                                          .localStorage
-                                          .read('printAddres');
-
-                                      if (savedPrinter != null &&
-                                          savedPrinter['macAddress'] != null &&
-                                          savedPrinter['name'] != null) {
-                                        try {
-                                          await bluetoothController
-                                              .connectToDevice(
-                                            savedPrinter['macAddress'],
-                                            savedPrinter['name'],
-                                          );
-                                          // Get.snackbar("تم الاتصال بنجاح",
-                                          //     "تم الاتصال بالطابعة بنجاح، جاري الطباعة...");
-                                        } catch (e) {
-                                          // Get.snackbar("خطأ في الاتصال",
-                                          //     "فشل الاتصال بالطابعة: $e");
                                           return;
                                         }
                                       }
-                                    }
 
-                                    buildPrintString();
-                                  } else {
-                                    // Get.closeAllSnackbars();
-                                    // Get.snackbar('تنبيه',
-                                    //     'تجاوزت الحد الاقصى لعدد مرات تكرار الخدمة!');
+                                      try {
+                                        await captureAndSavePng();
+                                        bluetoothController.printed.value =
+                                            true;
+                                      } catch (e) {
+                                        bluetoothController.printed.value =
+                                            false;
+                                      } finally {
+                                        bluetoothController.isLoading.value =
+                                            false;
+                                      }
+                                    }
+                                  : null,
+                              child: bluetoothController.isLoading.value
+                                  ? SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : Row(
+                                      children: [
+                                        SvgPicture.asset(
+                                          'assets/svgs/print.svg',
+                                          colorFilter: ColorFilter.mode(
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.onPrimary,
+                                            BlendMode.srcIn,
+                                          ),
+                                          width: 20,
+                                          height: 20,
+                                        ),
+                                        const Gap(5),
+                                        Text(
+                                          bluetoothController.printed.value
+                                              ? "تمت الطباعة"
+                                              : "طباعة",
+                                        ),
+                                      ],
+                                    ),
+                            );
+                          }),
+                          const Gap(10),
+                          ZoomTapAnimation(
+                            child: ElevatedButton.icon(
+                              onPressed: () async {
+                                if (bluetoothController.printCount.value <=
+                                    (updateController.homeDataList.first.user!
+                                            .agent!.maxReprints ??
+                                        1)) {
+                                  bool isConnected = await PrintBluetoothThermal
+                                      .connectionStatus;
+
+                                  if (!isConnected) {
+                                    // Get.snackbar("جاري محاولة الاتصال",
+                                    //     "تم قطع الاتصال بالطابعة، جارٍ إعادة الاتصال...");
+
+                                    final savedPrinter = Constants.localStorage
+                                        .read('printAddres');
+
+                                    if (savedPrinter != null &&
+                                        savedPrinter['macAddress'] != null &&
+                                        savedPrinter['name'] != null) {
+                                      try {
+                                        await bluetoothController
+                                            .connectToDevice(
+                                          savedPrinter['macAddress'],
+                                          savedPrinter['name'],
+                                        );
+                                        // Get.snackbar("تم الاتصال بنجاح",
+                                        //     "تم الاتصال بالطابعة بنجاح، جاري الطباعة...");
+                                      } catch (e) {
+                                        // Get.snackbar("خطأ في الاتصال",
+                                        //     "فشل الاتصال بالطابعة: $e");
+                                        return;
+                                      }
+                                    }
                                   }
-                                },
-                                label: const Text('طباعة مختصرة'),
-                                icon: SvgPicture.asset(
-                                  'assets/svgs/print.svg',
-                                  colorFilter: ColorFilter.mode(
-                                    Theme.of(context).colorScheme.onPrimary,
-                                    BlendMode.srcIn,
-                                  ),
-                                  width: 20,
-                                  height: 20,
+
+                                  buildPrintString();
+                                } else {
+                                  // Get.closeAllSnackbars();
+                                  // Get.snackbar('تنبيه',
+                                  //     'تجاوزت الحد الاقصى لعدد مرات تكرار الخدمة!');
+                                }
+                              },
+                              label: const Text('طباعة مختصرة'),
+                              icon: SvgPicture.asset(
+                                'assets/svgs/print.svg',
+                                colorFilter: ColorFilter.mode(
+                                  Theme.of(context).colorScheme.onPrimary,
+                                  BlendMode.srcIn,
                                 ),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: (bluetoothController
-                                              .printCount.value <=
-                                          (updateController.homeDataList.first
-                                                  .user!.agent!.maxReprints ??
-                                              1))
-                                      ? Theme.of(context).colorScheme.secondary
-                                      : Theme.of(context).colorScheme.surface,
-                                ),
+                                width: 20,
+                                height: 20,
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: (bluetoothController
+                                            .printCount.value <=
+                                        (updateController.homeDataList.first
+                                                .user!.agent!.maxReprints ??
+                                            1))
+                                    ? Theme.of(context).colorScheme.secondary
+                                    : Theme.of(context).colorScheme.surface,
                               ),
                             ),
-                          ],
-                        ),
-                        // const Gap(5),
-                        // ZoomTapAnimation(
+                          ),
+                        ],
+                      ),
 
-                        const Gap(5),
-                        Text(
-                            "تم الاتصال بـ : ${bluetoothController.deviceName.value}"),
-                      ],
-                    )
-                  : Column(
-                      children: [
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount: bluetoothController.devicesList.length,
-                            itemBuilder: (context, index) {
-                              final device =
-                                  bluetoothController.devicesList[index];
-                              return Directionality(
-                                textDirection: TextDirection.ltr,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onPrimary
-                                        .withAlpha(30),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  margin: const EdgeInsets.only(bottom: 10),
-                                  child: ListTile(
-                                    leading: Icon(
-                                      device.isPrinter
-                                          ? Icons.print_rounded
-                                          : Icons.bluetooth_rounded,
-                                      color: device.isPrinter
-                                          ? Theme.of(context)
-                                              .colorScheme
-                                              .primary
-                                          : Theme.of(context)
-                                              .colorScheme
-                                              .onSurface
-                                              .withAlpha(120),
-                                    ),
-                                    title: Text(device.name),
-                                    subtitle:
-                                        Text(device.macAddress.toString()),
-                                    trailing: Obx(() {
-                                      final isThisConnected =
-                                          bluetoothController
-                                                  .isConnected.value &&
-                                              bluetoothController
-                                                      .deviceName.value ==
-                                                  device.name;
-                                      return isThisConnected
-                                          ? const Icon(
-                                              Icons.check_circle_rounded,
-                                              color: Colors.green)
-                                          : const SizedBox.shrink();
-                                    }),
-                                    onTap: () async {
-                                      await bluetoothController.connectToDevice(
-                                        device.macAddress,
-                                        device.name,
-                                      );
-                                    },
-                                  ),
+                      // const Gap(5),
+                      // ZoomTapAnimation(
+                      const Gap(5),
+                      Text(
+                        "تم الاتصال بـ : ${bluetoothController.deviceName.value}",
+                      ),
+                    ],
+                  )
+                : Column(
+                    children: [
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: bluetoothController.devicesList.length,
+                          itemBuilder: (context, index) {
+                            final device =
+                                bluetoothController.devicesList[index];
+                            return Directionality(
+                              textDirection: TextDirection.ltr,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimary.withAlpha(30),
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                              );
-                            },
-                          ),
+                                margin: const EdgeInsets.only(bottom: 10),
+                                child: ListTile(
+                                  leading: Icon(
+                                    device.isPrinter
+                                        ? Icons.print_rounded
+                                        : Icons.bluetooth_rounded,
+                                    color: device.isPrinter
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Theme.of(context)
+                                            .colorScheme
+                                            .onSurface
+                                            .withAlpha(120),
+                                  ),
+                                  title: Text(device.name),
+                                  subtitle: Text(device.macAddress.toString()),
+                                  trailing: Obx(() {
+                                    final isThisConnected = bluetoothController
+                                            .isConnected.value &&
+                                        bluetoothController.deviceName.value ==
+                                            device.name;
+                                    return isThisConnected
+                                        ? const Icon(
+                                            Icons.check_circle_rounded,
+                                            color: Colors.green,
+                                          )
+                                        : const SizedBox.shrink();
+                                  }),
+                                  onTap: () async {
+                                    await bluetoothController.connectToDevice(
+                                      device.macAddress,
+                                      device.name,
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          },
                         ),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              bluetoothController.checkAndRequestBluetooth();
-                            },
-                            child: bluetoothController.isLoading.value
-                                ? CustomLoading(
-                                    color:
-                                        Theme.of(context).colorScheme.onPrimary,
-                                  )
-                                : const Text('البحث عن أجهزة'),
-                          ),
+                      ),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            bluetoothController.checkAndRequestBluetooth();
+                          },
+                          child: bluetoothController.isLoading.value
+                              ? CustomLoading(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimary,
+                                )
+                              : const Text('البحث عن أجهزة'),
                         ),
-                      ],
-                    ),
-            );
-          },
-        ),
+                      ),
+                    ],
+                  ),
+          );
+        }),
       ),
     );
   }
@@ -693,7 +713,9 @@ class BluetoothPage extends StatelessWidget {
   }
 
   img.Image adjustContrastAndThreshold(
-      img.Image originalImage, double contrast) {
+    img.Image originalImage,
+    double contrast,
+  ) {
     final contrastAdjusted = img.adjustColor(originalImage, contrast: contrast);
 
     const int threshold = 228;
@@ -707,7 +729,10 @@ class BluetoothPage extends StatelessWidget {
           contrastAdjusted.setPixel(x, y, img.ColorInt32.rgba(0, 0, 0, 255));
         } else {
           contrastAdjusted.setPixel(
-              x, y, img.ColorInt32.rgba(255, 255, 255, 255));
+            x,
+            y,
+            img.ColorInt32.rgba(255, 255, 255, 255),
+          );
         }
       }
     }
@@ -746,7 +771,6 @@ class BluetoothPage extends StatelessWidget {
                   "\x1B\x45\x00" // غیرفعال کردن بولد
                   "\x1D\x21\x00" // بازگشت به سایز فونت اصلی
                   "\x1B\x4D\x00\n\n\n" // بازگشت به فونت اصلی
-
             else
               '\nPin Code : \n'
                   "\x1B\x61\x00"
@@ -769,13 +793,13 @@ class BluetoothPage extends StatelessWidget {
                 "${serial.code3}"
                 "\n"
                 "${serial.code4}"
-                "\n\n\n"
+                "\n\n\n",
           ].where((code) => code.isNotEmpty).join("\n"),
       ].join('\n');
     }
 
     String combinedString =
-        serialList.map(formatSerial).join('\n --------------- \n');
+        '${serialList.map(formatSerial).join('\n --------------- \n')}\n';
 
     Uint8List byteArray = Uint8List.fromList(utf8.encode(combinedString));
 

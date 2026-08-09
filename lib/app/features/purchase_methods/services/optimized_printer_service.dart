@@ -30,8 +30,10 @@ class OptimizedPrinterService {
 
   /// Pre-load logo, card image and generator while the page is opening
   /// so by the time the user taps Print, everything is already cached.
-  static void preWarm(
-      {required String photoUrl, required bool printCardImage}) {
+  static void preWarm({
+    required String photoUrl,
+    required bool printCardImage,
+  }) {
     // Fire and forget — we don't need the results here
     _getGenerator();
     downloadAndDecodeImage('http://inteshar.net/logo-print.jpg');
@@ -136,8 +138,10 @@ class OptimizedPrinterService {
     final byteData = await imgUi.toByteData(format: ui.ImageByteFormat.rawRgba);
     if (byteData == null) return [];
 
-    final Uint8List rgbaBytes = byteData.buffer
-        .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes);
+    final Uint8List rgbaBytes = byteData.buffer.asUint8List(
+      byteData.offsetInBytes,
+      byteData.lengthInBytes,
+    );
 
     // Offload the CPU-heavy pixel loop to a background isolate
     return compute(
@@ -210,24 +214,34 @@ class OptimizedPrinterService {
     detailLines.add(_TextLayout(serialNum, bold: false, fontSize: 26.0));
 
     if (serial.code != null && serial.code != '') {
-      detailLines.add(_TextLayout("${serial.code}",
-          bold: true, fontSize: 40.0, border: true));
+      detailLines.add(
+        _TextLayout("${serial.code}", bold: true, fontSize: 40.0, border: true),
+      );
     } else {
       if (serial.code1 != null && serial.code1 != '') {
-        detailLines
-            .add(_TextLayout("${serial.code1}", bold: false, fontSize: 26.0));
+        detailLines.add(
+          _TextLayout("${serial.code1}", bold: false, fontSize: 26.0),
+        );
       }
       if (serial.code2 != null && serial.code2 != '') {
-        detailLines.add(_TextLayout("${serial.code2}",
-            bold: true, fontSize: 40.0, border: true));
+        detailLines.add(
+          _TextLayout(
+            "${serial.code2}",
+            bold: true,
+            fontSize: 40.0,
+            border: true,
+          ),
+        );
       }
       if (serial.code3 != null && serial.code3 != '') {
-        detailLines
-            .add(_TextLayout("${serial.code3}", bold: false, fontSize: 26.0));
+        detailLines.add(
+          _TextLayout("${serial.code3}", bold: false, fontSize: 26.0),
+        );
       }
       if (serial.code4 != null && serial.code4 != '') {
-        detailLines
-            .add(_TextLayout("${serial.code4}", bold: false, fontSize: 26.0));
+        detailLines.add(
+          _TextLayout("${serial.code4}", bold: false, fontSize: 26.0),
+        );
       }
     }
 
@@ -275,10 +289,15 @@ class OptimizedPrinterService {
       final cardIdString =
           '00964${purchaseData.cardCategory?.id?.toString() ?? ''}';
       final barcode = bc.Barcode.code93();
-      final svgString = barcode.toSvg(cardIdString,
-          width: barcodeWidth, height: barcodeHeight);
-      final pictureInfo =
-          await vg.loadPicture(SvgStringLoader(svgString), null);
+      final svgString = barcode.toSvg(
+        cardIdString,
+        width: barcodeWidth,
+        height: barcodeHeight,
+      );
+      final pictureInfo = await vg.loadPicture(
+        SvgStringLoader(svgString),
+        null,
+      );
       barcodePicture = pictureInfo.picture;
       ticketHeight += barcodeHeight + 10.0;
     }
@@ -299,7 +318,11 @@ class OptimizedPrinterService {
       canvas.drawImageRect(
         logoImage,
         Rect.fromLTWH(
-            0, 0, logoImage.width.toDouble(), logoImage.height.toDouble()),
+          0,
+          0,
+          logoImage.width.toDouble(),
+          logoImage.height.toDouble(),
+        ),
         Rect.fromLTWH(dx, currentY, logoWidth, logoHeight),
         Paint(),
       );
@@ -316,7 +339,11 @@ class OptimizedPrinterService {
       canvas.drawImageRect(
         cardImage,
         Rect.fromLTWH(
-            0, 0, cardImage.width.toDouble(), cardImage.height.toDouble()),
+          0,
+          0,
+          cardImage.width.toDouble(),
+          cardImage.height.toDouble(),
+        ),
         Rect.fromLTWH(0, currentY, ticketWidth, cardImgHeight),
         Paint(),
       );
@@ -351,8 +378,10 @@ class OptimizedPrinterService {
     }
 
     final picture = recorder.endRecording();
-    final imgUi =
-        await picture.toImage(ticketWidth.toInt(), ticketHeight.toInt());
+    final imgUi = await picture.toImage(
+      ticketWidth.toInt(),
+      ticketHeight.toInt(),
+    );
 
     // Call our highly optimized direct RGBA to ESC/POS Raster command encoder
     return await _imageToRasterBytes(imgUi);
@@ -423,24 +452,34 @@ class OptimizedPrinterService {
     detailLines.add(_TextLayout(serialNum, bold: false, fontSize: 26.0));
 
     if (serial.code != null && serial.code != '') {
-      detailLines.add(_TextLayout("${serial.code}",
-          bold: true, fontSize: 40.0, border: true));
+      detailLines.add(
+        _TextLayout("${serial.code}", bold: true, fontSize: 40.0, border: true),
+      );
     } else {
       if (serial.code1 != null && serial.code1 != '') {
-        detailLines
-            .add(_TextLayout("${serial.code1}", bold: false, fontSize: 26.0));
+        detailLines.add(
+          _TextLayout("${serial.code1}", bold: false, fontSize: 26.0),
+        );
       }
       if (serial.code2 != null && serial.code2 != '') {
-        detailLines.add(_TextLayout("${serial.code2}",
-            bold: true, fontSize: 40.0, border: true));
+        detailLines.add(
+          _TextLayout(
+            "${serial.code2}",
+            bold: true,
+            fontSize: 40.0,
+            border: true,
+          ),
+        );
       }
       if (serial.code3 != null && serial.code3 != '') {
-        detailLines
-            .add(_TextLayout("${serial.code3}", bold: false, fontSize: 26.0));
+        detailLines.add(
+          _TextLayout("${serial.code3}", bold: false, fontSize: 26.0),
+        );
       }
       if (serial.code4 != null && serial.code4 != '') {
-        detailLines
-            .add(_TextLayout("${serial.code4}", bold: false, fontSize: 26.0));
+        detailLines.add(
+          _TextLayout("${serial.code4}", bold: false, fontSize: 26.0),
+        );
       }
     }
 
@@ -484,10 +523,15 @@ class OptimizedPrinterService {
     if (printBarcode) {
       final cardIdString = '00964$cardId';
       final barcode = bc.Barcode.code93();
-      final svgString = barcode.toSvg(cardIdString,
-          width: barcodeWidth, height: barcodeHeight);
-      final pictureInfo =
-          await vg.loadPicture(SvgStringLoader(svgString), null);
+      final svgString = barcode.toSvg(
+        cardIdString,
+        width: barcodeWidth,
+        height: barcodeHeight,
+      );
+      final pictureInfo = await vg.loadPicture(
+        SvgStringLoader(svgString),
+        null,
+      );
       barcodePicture = pictureInfo.picture;
       ticketHeight += barcodeHeight + 10.0;
     }
@@ -508,7 +552,11 @@ class OptimizedPrinterService {
       canvas.drawImageRect(
         logoImage,
         Rect.fromLTWH(
-            0, 0, logoImage.width.toDouble(), logoImage.height.toDouble()),
+          0,
+          0,
+          logoImage.width.toDouble(),
+          logoImage.height.toDouble(),
+        ),
         Rect.fromLTWH(dx, currentY, logoWidth, logoHeight),
         Paint(),
       );
@@ -525,7 +573,11 @@ class OptimizedPrinterService {
       canvas.drawImageRect(
         cardImage,
         Rect.fromLTWH(
-            0, 0, cardImage.width.toDouble(), cardImage.height.toDouble()),
+          0,
+          0,
+          cardImage.width.toDouble(),
+          cardImage.height.toDouble(),
+        ),
         Rect.fromLTWH(0, currentY, ticketWidth, cardImgHeight),
         Paint(),
       );
@@ -560,8 +612,10 @@ class OptimizedPrinterService {
     }
 
     final picture = recorder.endRecording();
-    final imgUi =
-        await picture.toImage(ticketWidth.toInt(), ticketHeight.toInt());
+    final imgUi = await picture.toImage(
+      ticketWidth.toInt(),
+      ticketHeight.toInt(),
+    );
 
     return await _imageToRasterBytes(imgUi);
   }
@@ -578,8 +632,9 @@ class OptimizedPrinterService {
   }) async {
     try {
       // Parallel download/cache retrieval
-      final logoFuture =
-          downloadAndDecodeImage('http://inteshar.net/logo-print.jpg');
+      final logoFuture = downloadAndDecodeImage(
+        'http://inteshar.net/logo-print.jpg',
+      );
       final cardPhotoFuture = (printCardImage && photoUrl.isNotEmpty)
           ? downloadAndDecodeImage(photoUrl)
           : Future.value(null);
@@ -639,8 +694,9 @@ class OptimizedPrinterService {
     required bool isReported,
   }) async {
     try {
-      final logoFuture =
-          downloadAndDecodeImage('http://inteshar.net/logo-print.jpg');
+      final logoFuture = downloadAndDecodeImage(
+        'http://inteshar.net/logo-print.jpg',
+      );
       final cardPhotoFuture = (printCardImage && photoUrl.isNotEmpty)
           ? downloadAndDecodeImage(photoUrl)
           : Future.value(null);
@@ -697,8 +753,12 @@ class _TextLayout {
 
   late TextPainter _tp;
 
-  _TextLayout(this.text,
-      {required this.bold, required this.fontSize, this.border = false});
+  _TextLayout(
+    this.text, {
+    required this.bold,
+    required this.fontSize,
+    this.border = false,
+  });
 
   void layout(double maxWidth) {
     final textStyle = TextStyle(
@@ -769,10 +829,7 @@ Future<ui.Image?> htmlToImage(String htmlContent, double width) async {
     child: Html(
       data: processedHtml,
       style: {
-        "p": Style(
-          fontSize: FontSize(16),
-          color: Colors.black,
-        ),
+        "p": Style(fontSize: FontSize(16), color: Colors.black),
         "body": Style(
           margin: Margins.zero,
           padding: HtmlPaddings.zero,
