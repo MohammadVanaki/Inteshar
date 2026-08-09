@@ -144,9 +144,8 @@ class CompaniesArchivePage extends StatelessWidget {
     );
 
     final HomeApiProvider homeApiProvider = Get.find<HomeApiProvider>();
-    final int? companyId = companyList.isNotEmpty
-        ? companyList.first.companyId
-        : null;
+    final int? companyId =
+        companyList.isNotEmpty ? companyList.first.companyId : null;
 
     List<CardCategory> dynamicCategories() {
       if (companyId == null) return companyList;
@@ -159,9 +158,8 @@ class CompaniesArchivePage extends StatelessWidget {
     String cardPricestr = '';
     return InternalPage(
       disconnect: false,
-      title: companyList.isNotEmpty
-          ? (companyList.first.companyTitle ?? '')
-          : '',
+      title:
+          companyList.isNotEmpty ? (companyList.first.companyTitle ?? '') : '',
       child: Container(
         width: double.infinity,
         margin: const EdgeInsets.symmetric(horizontal: 20).copyWith(bottom: 20),
@@ -235,9 +233,7 @@ class CompaniesArchivePage extends StatelessWidget {
                           );
                           if (cardPriceApi.cardPriceData.isNotEmpty) {
                             cardPricestr = cardPriceApi
-                                .cardPriceData
-                                .first
-                                .cardPrice
+                                .cardPriceData.first.cardPrice
                                 .toString();
                             showModalBottomSheet(
                               isScrollControlled: true,
@@ -250,16 +246,14 @@ class CompaniesArchivePage extends StatelessWidget {
                                 PurchaseApiProvider purchaseApiProvider =
                                     Get.put(PurchaseApiProvider());
                                 PurchaseMethodsController
-                                purchaseMethodsController = Get.put(
+                                    purchaseMethodsController = Get.put(
                                   PurchaseMethodsController(),
                                   tag: 'single',
                                 );
                                 cardPriceApi.cardPriceData.first.cardType ==
                                         'charge'
                                     ? purchaseMethodsController
-                                              .hasGlobalCard
-                                              .value =
-                                          true
+                                        .hasGlobalCard.value = true
                                     : false;
                                 return Padding(
                                   padding: EdgeInsets.only(
@@ -280,8 +274,8 @@ class CompaniesArchivePage extends StatelessWidget {
                                             clipBehavior: Clip.antiAlias,
                                             decoration:
                                                 Constants.intesharBoxDecoration(
-                                                  context,
-                                                ),
+                                              context,
+                                            ),
                                             child: Center(
                                               child: CachedNetworkImage(
                                                 fit: BoxFit.fill,
@@ -291,22 +285,21 @@ class CompaniesArchivePage extends StatelessWidget {
                                                     company.photoUrl ?? '',
                                                 placeholder: (context, url) =>
                                                     SizedBox(
-                                                      height: 160,
-                                                      width: 160,
-                                                      child:
-                                                          const CustomLoading(),
-                                                    ),
-                                                errorWidget:
-                                                    (
-                                                      context,
-                                                      url,
-                                                      error,
-                                                    ) => Image.asset(
-                                                      'assets/images/not.jpg',
-                                                      fit: BoxFit.fill,
-                                                      height: 160,
-                                                      width: double.infinity,
-                                                    ),
+                                                  height: 160,
+                                                  width: 160,
+                                                  child: const CustomLoading(),
+                                                ),
+                                                errorWidget: (
+                                                  context,
+                                                  url,
+                                                  error,
+                                                ) =>
+                                                    Image.asset(
+                                                  'assets/images/not.jpg',
+                                                  fit: BoxFit.fill,
+                                                  height: 160,
+                                                  width: double.infinity,
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -326,12 +319,11 @@ class CompaniesArchivePage extends StatelessWidget {
                                                         TextSpan(
                                                           text: 'الشركة: ',
                                                           style: TextStyle(
-                                                            color:
-                                                                Theme.of(
-                                                                      context,
-                                                                    )
-                                                                    .colorScheme
-                                                                    .onPrimary,
+                                                            color: Theme.of(
+                                                              context,
+                                                            )
+                                                                .colorScheme
+                                                                .onPrimary,
                                                             fontSize: 15,
                                                           ),
                                                         ),
@@ -340,12 +332,11 @@ class CompaniesArchivePage extends StatelessWidget {
                                                           style: TextStyle(
                                                             fontWeight:
                                                                 FontWeight.w700,
-                                                            color:
-                                                                Theme.of(
-                                                                      context,
-                                                                    )
-                                                                    .colorScheme
-                                                                    .onPrimary,
+                                                            color: Theme.of(
+                                                              context,
+                                                            )
+                                                                .colorScheme
+                                                                .onPrimary,
                                                           ),
                                                         ),
                                                       ],
@@ -355,14 +346,14 @@ class CompaniesArchivePage extends StatelessWidget {
                                                     bool isFav =
                                                         favorityController
                                                             .isFavorite(
-                                                              company.id!,
-                                                            );
+                                                      company.id!,
+                                                    );
                                                     return ZoomTapAnimation(
                                                       onTap: () =>
                                                           favorityController
                                                               .toggleFavorite(
-                                                                companyList[index],
-                                                              ),
+                                                        companyList[index],
+                                                      ),
                                                       child: SvgPicture.asset(
                                                         isFav
                                                             ? 'assets/svgs/star_filled.svg'
@@ -371,11 +362,11 @@ class CompaniesArchivePage extends StatelessWidget {
                                                         height: 25,
                                                         colorFilter:
                                                             ColorFilter.mode(
-                                                              Theme.of(context)
-                                                                  .colorScheme
-                                                                  .onPrimary,
-                                                              BlendMode.srcIn,
-                                                            ),
+                                                          Theme.of(context)
+                                                              .colorScheme
+                                                              .onPrimary,
+                                                          BlendMode.srcIn,
+                                                        ),
                                                       ),
                                                     );
                                                   }),
@@ -439,9 +430,10 @@ class CompaniesArchivePage extends StatelessWidget {
                                                 builder: (context, setState) {
                                                   final int currentVal =
                                                       int.tryParse(
-                                                        countController.text,
-                                                      ) ??
-                                                      1;
+                                                            countController
+                                                                .text,
+                                                          ) ??
+                                                          1;
                                                   return Row(
                                                     children: [
                                                       Text(
@@ -471,38 +463,36 @@ class CompaniesArchivePage extends StatelessWidget {
                                                         child: Container(
                                                           width: 44,
                                                           height: 44,
-                                                          decoration: BoxDecoration(
-                                                            color:
-                                                                Theme.of(
-                                                                      context,
-                                                                    )
-                                                                    .colorScheme
-                                                                    .onPrimary
-                                                                    .withAlpha(
-                                                                      currentVal >
-                                                                              1
-                                                                          ? 40
-                                                                          : 15,
-                                                                    ),
-                                                            borderRadius:
-                                                                BorderRadius.circular(
-                                                                  12,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: Theme.of(
+                                                              context,
+                                                            )
+                                                                .colorScheme
+                                                                .onPrimary
+                                                                .withAlpha(
+                                                                  currentVal > 1
+                                                                      ? 40
+                                                                      : 15,
                                                                 ),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                              12,
+                                                            ),
                                                           ),
                                                           child: Icon(
                                                             Icons.remove,
-                                                            color:
-                                                                Theme.of(
-                                                                      context,
-                                                                    )
-                                                                    .colorScheme
-                                                                    .onPrimary
-                                                                    .withOpacity(
-                                                                      currentVal >
-                                                                              1
-                                                                          ? 1.0
-                                                                          : 0.4,
-                                                                    ),
+                                                            color: Theme.of(
+                                                              context,
+                                                            )
+                                                                .colorScheme
+                                                                .onPrimary
+                                                                .withOpacity(
+                                                                  currentVal > 1
+                                                                      ? 1.0
+                                                                      : 0.4,
+                                                                ),
                                                             size: 22,
                                                           ),
                                                         ),
@@ -515,12 +505,11 @@ class CompaniesArchivePage extends StatelessWidget {
                                                             currentVal
                                                                 .toString(),
                                                             style: TextStyle(
-                                                              color:
-                                                                  Theme.of(
-                                                                        context,
-                                                                      )
-                                                                      .colorScheme
-                                                                      .onPrimary,
+                                                              color: Theme.of(
+                                                                context,
+                                                              )
+                                                                  .colorScheme
+                                                                  .onPrimary,
                                                               fontSize: 22,
                                                               fontWeight:
                                                                   FontWeight
@@ -542,20 +531,21 @@ class CompaniesArchivePage extends StatelessWidget {
                                                         child: Container(
                                                           width: 44,
                                                           height: 44,
-                                                          decoration: BoxDecoration(
-                                                            color:
-                                                                Theme.of(
-                                                                      context,
-                                                                    )
-                                                                    .colorScheme
-                                                                    .onPrimary
-                                                                    .withAlpha(
-                                                                      40,
-                                                                    ),
-                                                            borderRadius:
-                                                                BorderRadius.circular(
-                                                                  12,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: Theme.of(
+                                                              context,
+                                                            )
+                                                                .colorScheme
+                                                                .onPrimary
+                                                                .withAlpha(
+                                                                  40,
                                                                 ),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                              12,
+                                                            ),
                                                             // boxShadow: [
                                                             //   BoxShadow(
                                                             //     color: Colors
@@ -571,12 +561,11 @@ class CompaniesArchivePage extends StatelessWidget {
                                                           ),
                                                           child: Icon(
                                                             Icons.add,
-                                                            color:
-                                                                Theme.of(
-                                                                      context,
-                                                                    )
-                                                                    .colorScheme
-                                                                    .onPrimary,
+                                                            color: Theme.of(
+                                                              context,
+                                                            )
+                                                                .colorScheme
+                                                                .onPrimary,
                                                             size: 22,
                                                           ),
                                                         ),
@@ -611,78 +600,79 @@ class CompaniesArchivePage extends StatelessWidget {
                                                           width:
                                                               double.infinity,
                                                           child: Obx(
-                                                            () =>
-                                                                purchaseApiProvider
+                                                            () => purchaseApiProvider
                                                                     .isProcessing
                                                                     .value
                                                                 ? (purchaseApiProvider
-                                                                              .totalPrintCount
-                                                                              .value >
-                                                                          0
-                                                                      ? Column(
-                                                                          mainAxisSize:
-                                                                              MainAxisSize.min,
-                                                                          children: [
-                                                                            CustomLoading(
+                                                                            .totalPrintCount
+                                                                            .value >
+                                                                        0
+                                                                    ? Column(
+                                                                        mainAxisSize:
+                                                                            MainAxisSize.min,
+                                                                        children: [
+                                                                          CustomLoading(
+                                                                            color:
+                                                                                Theme.of(
+                                                                              context,
+                                                                            ).colorScheme.secondary,
+                                                                          ),
+                                                                          const Gap(
+                                                                            8,
+                                                                          ),
+                                                                          Text(
+                                                                            "جاري طباعة الكارت ${purchaseApiProvider.currentPrintCount.value} من ${purchaseApiProvider.totalPrintCount.value} ...",
+                                                                            style:
+                                                                                TextStyle(
                                                                               color: Theme.of(
                                                                                 context,
-                                                                              ).colorScheme.secondary,
+                                                                              ).colorScheme.onPrimary,
+                                                                              fontWeight: FontWeight.bold,
                                                                             ),
-                                                                            const Gap(
-                                                                              8,
-                                                                            ),
-                                                                            Text(
-                                                                              "جاري طباعة الكارت ${purchaseApiProvider.currentPrintCount.value} من ${purchaseApiProvider.totalPrintCount.value} ...",
-                                                                              style: TextStyle(
-                                                                                color: Theme.of(
-                                                                                  context,
-                                                                                ).colorScheme.onPrimary,
-                                                                                fontWeight: FontWeight.bold,
-                                                                              ),
-                                                                            ),
-                                                                          ],
-                                                                        )
-                                                                      : Column(
-                                                                          mainAxisSize:
-                                                                              MainAxisSize.min,
-                                                                          children: [
-                                                                            CustomLoading(
+                                                                          ),
+                                                                        ],
+                                                                      )
+                                                                    : Column(
+                                                                        mainAxisSize:
+                                                                            MainAxisSize.min,
+                                                                        children: [
+                                                                          CustomLoading(
+                                                                            color:
+                                                                                Theme.of(
+                                                                              context,
+                                                                            ).colorScheme.secondary,
+                                                                          ),
+                                                                          const Gap(
+                                                                            8,
+                                                                          ),
+                                                                          Text(
+                                                                            "جاري معالجة الطلب وشراء الكروت...",
+                                                                            style:
+                                                                                TextStyle(
                                                                               color: Theme.of(
                                                                                 context,
-                                                                              ).colorScheme.secondary,
+                                                                              ).colorScheme.onPrimary,
+                                                                              fontWeight: FontWeight.bold,
                                                                             ),
-                                                                            const Gap(
-                                                                              8,
-                                                                            ),
-                                                                            Text(
-                                                                              "جاري معالجة الطلب وشراء الكروت...",
-                                                                              style: TextStyle(
-                                                                                color: Theme.of(
-                                                                                  context,
-                                                                                ).colorScheme.onPrimary,
-                                                                                fontWeight: FontWeight.bold,
-                                                                              ),
-                                                                            ),
-                                                                          ],
-                                                                        ))
+                                                                          ),
+                                                                        ],
+                                                                      ))
                                                                 : ElevatedButton(
-                                                                    style: ElevatedButton.styleFrom(
-                                                                      backgroundColor:
-                                                                          purchaseApiProvider
+                                                                    style: ElevatedButton
+                                                                        .styleFrom(
+                                                                      backgroundColor: purchaseApiProvider
                                                                               .isProcessing
                                                                               .value
-                                                                          ? Colors.grey
+                                                                          ? Colors
+                                                                              .grey
                                                                           : Theme.of(context)
-                                                                                .extension<
-                                                                                  SuccessColorTheme
-                                                                                >()
-                                                                                ?.successColor,
+                                                                              .extension<SuccessColorTheme>()
+                                                                              ?.successColor,
                                                                       disabledBackgroundColor:
                                                                           Colors
                                                                               .grey,
                                                                     ),
-                                                                    onPressed:
-                                                                        purchaseApiProvider
+                                                                    onPressed: purchaseApiProvider
                                                                             .isProcessing
                                                                             .value
                                                                         ? null
@@ -690,10 +680,8 @@ class CompaniesArchivePage extends StatelessWidget {
                                                                             if (purchaseApiProvider.isProcessing.value) {
                                                                               return;
                                                                             }
-                                                                            if (countController.text ==
-                                                                                    '' ||
-                                                                                countController.text ==
-                                                                                    '0') {
+                                                                            if (countController.text == '' ||
+                                                                                countController.text == '0') {
                                                                               if (!Get.isSnackbarOpen) {
                                                                                 Get.snackbar(
                                                                                   'تنبيه',
@@ -707,24 +695,16 @@ class CompaniesArchivePage extends StatelessWidget {
                                                                               purchaseApiProvider.isProcessing.value = true;
 
                                                                               // پیش-بارگذاری تصاویر در بکگراوند همزمان با درخواست API
-                                                                              final userProvider0 =
-                                                                                  Get.find<
-                                                                                    HomeApiProvider
-                                                                                  >();
+                                                                              final userProvider0 = Get.find<HomeApiProvider>();
                                                                               if (userProvider0.homeDataList.isNotEmpty) {
-                                                                                final logoUrl =
-                                                                                    userProvider0.homeDataList.first.user?.agent?.appPhotoUrl ??
-                                                                                    '';
-                                                                                final cardPhotoUrl =
-                                                                                    company.photoUrl ??
-                                                                                    '';
+                                                                                final logoUrl = userProvider0.homeDataList.first.user?.agent?.appPhotoUrl ?? '';
+                                                                                final cardPhotoUrl = company.photoUrl ?? '';
                                                                                 // fire-and-forget — بدون await
                                                                                 buildNetworkImage(
                                                                                   logoUrl,
                                                                                   220,
                                                                                 ).ignore();
-                                                                                if (settingController.settings["nonPreview_printCardImage"] ??
-                                                                                    false) {
+                                                                                if (settingController.settings["nonPreview_printCardImage"] ?? false) {
                                                                                   buildNetworkImage(
                                                                                     cardPhotoUrl,
                                                                                     200,
@@ -734,549 +714,421 @@ class CompaniesArchivePage extends StatelessWidget {
 
                                                                               purchaseApiProvider
                                                                                   .fetchPurchase(
-                                                                                    counter: countController.text,
-                                                                                    type: 'print',
-                                                                                    cardId: company.id.toString(),
-                                                                                  )
+                                                                                counter: countController.text,
+                                                                                type: 'print',
+                                                                                cardId: company.id.toString(),
+                                                                              )
                                                                                   .then(
-                                                                                    (
-                                                                                      isSuccessful,
-                                                                                    ) async {
-                                                                                      try {
-                                                                                        if (isSuccessful) {
-                                                                                          print(
-                                                                                            '____________________${settingController.isPreviewEnabled.value}',
-                                                                                          );
-                                                                                          print(
-                                                                                            '____________________${purchaseMethodsController.purchaseMethodsSelected.value}',
-                                                                                          );
+                                                                                (
+                                                                                  isSuccessful,
+                                                                                ) async {
+                                                                                  try {
+                                                                                    if (isSuccessful) {
+                                                                                      print(
+                                                                                        '____________________${settingController.isPreviewEnabled.value}',
+                                                                                      );
+                                                                                      print(
+                                                                                        '____________________${purchaseMethodsController.purchaseMethodsSelected.value}',
+                                                                                      );
 
-                                                                                          if (purchaseMethodsController.purchaseMethodsSelected.value !=
-                                                                                              0) {
-                                                                                            Navigator.pop(
-                                                                                              context,
-                                                                                            );
+                                                                                      if (purchaseMethodsController.purchaseMethodsSelected.value != 0) {
+                                                                                        Navigator.pop(
+                                                                                          context,
+                                                                                        );
 
-                                                                                            manageMethods(
-                                                                                              type: purchaseMethodsController.purchaseMethodsSelected.value,
-                                                                                              serials: purchaseApiProvider.purchaseDataList.first.serials,
-                                                                                              cardTitle:
-                                                                                                  purchaseApiProvider.purchaseDataList.first.cardTitle ??
-                                                                                                  '',
-                                                                                              photoUrl:
-                                                                                                  purchaseApiProvider.purchaseDataList.first.cardCategory?.photoUrl ??
-                                                                                                  '',
-                                                                                              ussdCodes:
-                                                                                                  purchaseApiProvider.purchaseDataList.first.ussdCodes ??
-                                                                                                  [],
-                                                                                              printDate: purchaseApiProvider.purchaseDataList.first.printDate.toString(),
-                                                                                              title:
-                                                                                                  purchaseApiProvider.purchaseDataList.first.companyTitle ??
-                                                                                                  '',
-                                                                                              footer:
-                                                                                                  purchaseApiProvider.purchaseDataList.first.cardDetails2?.cardFooter ??
-                                                                                                  '',
-                                                                                              isReported: false,
-                                                                                              cardId:
-                                                                                                  purchaseApiProvider.purchaseDataList.first.cardCategory?.id?.toString() ??
-                                                                                                  '',
-                                                                                              originalAgent:
-                                                                                                  purchaseApiProvider.purchaseDataList.first.originalAgent ??
-                                                                                                  '',
-                                                                                            );
-                                                                                          } else if (settingController.isPreviewEnabled.value &&
-                                                                                              purchaseMethodsController.purchaseMethodsSelected.value ==
-                                                                                                  0) {
-                                                                                            manageMethods(
-                                                                                              type: purchaseMethodsController.purchaseMethodsSelected.value,
-                                                                                              serials: purchaseApiProvider.purchaseDataList.first.serials,
-                                                                                              cardTitle:
-                                                                                                  purchaseApiProvider.purchaseDataList.first.cardTitle ??
-                                                                                                  '',
-                                                                                              photoUrl:
-                                                                                                  purchaseApiProvider.purchaseDataList.first.cardCategory?.photoUrl ??
-                                                                                                  '',
-                                                                                              ussdCodes:
-                                                                                                  purchaseApiProvider.purchaseDataList.first.ussdCodes ??
-                                                                                                  [],
-                                                                                              printDate: purchaseApiProvider.purchaseDataList.first.printDate.toString(),
-                                                                                              title:
-                                                                                                  purchaseApiProvider.purchaseDataList.first.companyTitle ??
-                                                                                                  '',
-                                                                                              footer:
-                                                                                                  purchaseApiProvider.purchaseDataList.first.cardDetails2?.cardFooter ??
-                                                                                                  '',
-                                                                                              isReported: false,
-                                                                                              cardId:
-                                                                                                  purchaseApiProvider.purchaseDataList.first.cardCategory?.id?.toString() ??
-                                                                                                  '',
-                                                                                              originalAgent:
-                                                                                                  purchaseApiProvider.purchaseDataList.first.originalAgent ??
-                                                                                                  '',
-                                                                                            );
-                                                                                          } else {
-                                                                                            bool isConnected = false;
-                                                                                            try {
-                                                                                              isConnected = await PrintBluetoothThermal.connectionStatus;
-                                                                                            } catch (
-                                                                                              _
-                                                                                            ) {}
+                                                                                        manageMethods(
+                                                                                          type: purchaseMethodsController.purchaseMethodsSelected.value,
+                                                                                          serials: purchaseApiProvider.purchaseDataList.first.serials,
+                                                                                          cardTitle: purchaseApiProvider.purchaseDataList.first.cardTitle ?? '',
+                                                                                          photoUrl: purchaseApiProvider.purchaseDataList.first.cardCategory?.photoUrl ?? '',
+                                                                                          ussdCodes: purchaseApiProvider.purchaseDataList.first.ussdCodes ?? [],
+                                                                                          printDate: purchaseApiProvider.purchaseDataList.first.printDate.toString(),
+                                                                                          title: purchaseApiProvider.purchaseDataList.first.companyTitle ?? '',
+                                                                                          footer: purchaseApiProvider.purchaseDataList.first.cardDetails2?.cardFooter ?? '',
+                                                                                          isReported: false,
+                                                                                          cardId: purchaseApiProvider.purchaseDataList.first.cardCategory?.id?.toString() ?? '',
+                                                                                          originalAgent: purchaseApiProvider.purchaseDataList.first.originalAgent ?? '',
+                                                                                        );
+                                                                                      } else if (settingController.isPreviewEnabled.value && purchaseMethodsController.purchaseMethodsSelected.value == 0) {
+                                                                                        manageMethods(
+                                                                                          type: purchaseMethodsController.purchaseMethodsSelected.value,
+                                                                                          serials: purchaseApiProvider.purchaseDataList.first.serials,
+                                                                                          cardTitle: purchaseApiProvider.purchaseDataList.first.cardTitle ?? '',
+                                                                                          photoUrl: purchaseApiProvider.purchaseDataList.first.cardCategory?.photoUrl ?? '',
+                                                                                          ussdCodes: purchaseApiProvider.purchaseDataList.first.ussdCodes ?? [],
+                                                                                          printDate: purchaseApiProvider.purchaseDataList.first.printDate.toString(),
+                                                                                          title: purchaseApiProvider.purchaseDataList.first.companyTitle ?? '',
+                                                                                          footer: purchaseApiProvider.purchaseDataList.first.cardDetails2?.cardFooter ?? '',
+                                                                                          isReported: false,
+                                                                                          cardId: purchaseApiProvider.purchaseDataList.first.cardCategory?.id?.toString() ?? '',
+                                                                                          originalAgent: purchaseApiProvider.purchaseDataList.first.originalAgent ?? '',
+                                                                                        );
+                                                                                      } else {
+                                                                                        bool isConnected = false;
+                                                                                        try {
+                                                                                          isConnected = await PrintBluetoothThermal.connectionStatus;
+                                                                                        } catch (_) {}
 
-                                                                                            if (!isConnected) {
-                                                                                              Get.dialog(
-                                                                                                AlertDialog(
-                                                                                                  shape: RoundedRectangleBorder(
-                                                                                                    borderRadius: BorderRadius.circular(
-                                                                                                      16,
-                                                                                                    ),
-                                                                                                  ),
-                                                                                                  backgroundColor: Theme.of(
-                                                                                                    context,
-                                                                                                  ).colorScheme.surface,
-                                                                                                  title: const Text(
-                                                                                                    "خطأ في الاتصال",
-                                                                                                    style: TextStyle(
-                                                                                                      fontWeight: FontWeight.bold,
-                                                                                                    ),
-                                                                                                  ),
-                                                                                                  content: const Text(
-                                                                                                    "لم يتم الاتصال بالطابعة، هل تريد الانتقال إلى صفحة الاعدادات؟",
-                                                                                                  ),
-                                                                                                  actions: [
-                                                                                                    TextButton(
-                                                                                                      onPressed: () => Get.back(),
-                                                                                                      child: const Text(
-                                                                                                        "إلغاء",
-                                                                                                      ),
-                                                                                                    ),
-                                                                                                    ElevatedButton(
-                                                                                                      onPressed: () {
-                                                                                                        Get.back();
-                                                                                                        Get.toNamed(
-                                                                                                          "/printerSettings",
-                                                                                                        );
-                                                                                                        navigationController.goToPage(
-                                                                                                          2,
-                                                                                                        );
-                                                                                                      },
-                                                                                                      child: const Text(
-                                                                                                        "إعدادات",
-                                                                                                      ),
-                                                                                                    ),
-                                                                                                  ],
+                                                                                        if (!isConnected) {
+                                                                                          Get.dialog(
+                                                                                            AlertDialog(
+                                                                                              shape: RoundedRectangleBorder(
+                                                                                                borderRadius: BorderRadius.circular(
+                                                                                                  16,
                                                                                                 ),
+                                                                                              ),
+                                                                                              backgroundColor: Theme.of(
+                                                                                                context,
+                                                                                              ).colorScheme.surface,
+                                                                                              title: const Text(
+                                                                                                "خطأ في الاتصال",
+                                                                                                style: TextStyle(
+                                                                                                  fontWeight: FontWeight.bold,
+                                                                                                ),
+                                                                                              ),
+                                                                                              content: const Text(
+                                                                                                "لم يتم الاتصال بالطابعة، هل تريد الانتقال إلى صفحة الاعدادات؟",
+                                                                                              ),
+                                                                                              actions: [
+                                                                                                TextButton(
+                                                                                                  onPressed: () => Get.back(),
+                                                                                                  child: const Text(
+                                                                                                    "إلغاء",
+                                                                                                  ),
+                                                                                                ),
+                                                                                                ElevatedButton(
+                                                                                                  onPressed: () {
+                                                                                                    Get.back();
+                                                                                                    Get.toNamed(
+                                                                                                      "/printerSettings",
+                                                                                                    );
+                                                                                                    navigationController.goToPage(
+                                                                                                      2,
+                                                                                                    );
+                                                                                                  },
+                                                                                                  child: const Text(
+                                                                                                    "إعدادات",
+                                                                                                  ),
+                                                                                                ),
+                                                                                              ],
+                                                                                            ),
+                                                                                          );
+                                                                                          return;
+                                                                                        }
+
+                                                                                        final userProvider = Get.find<HomeApiProvider>();
+                                                                                        final user = userProvider.homeDataList.first;
+                                                                                        final purchaseData = purchaseApiProvider.purchaseDataList.first;
+                                                                                        final serials = purchaseData.serials;
+
+                                                                                        if (serials != null && serials.isNotEmpty) {
+                                                                                          const CustomLoading();
+
+                                                                                          try {
+                                                                                            final sw = Stopwatch()..start();
+
+                                                                                            // ساخت بایت‌های مربوط به عکس‌ها به صورت موازی (GPU-bound و تنها یک‌بار)
+                                                                                            final results = await Future.wait(
+                                                                                              [
+                                                                                                _buildAssetImageBytes(
+                                                                                                  'assets/images/logo-print.jpg',
+                                                                                                  80,
+                                                                                                ),
+                                                                                                buildNetworkImage(
+                                                                                                  user.user?.agent?.appPhotoUrl ?? '',
+                                                                                                  220,
+                                                                                                ),
+                                                                                                (settingController.settings["nonPreview_printCardImage"] ?? false)
+                                                                                                    ? buildNetworkImage(
+                                                                                                        purchaseData.cardCategory?.photoUrl ?? '',
+                                                                                                        200,
+                                                                                                      )
+                                                                                                    : Future.value(
+                                                                                                        <int>[],
+                                                                                                      ),
+                                                                                              ],
+                                                                                            );
+                                                                                            print(
+                                                                                              '[PRINT-TIMING] images: ${sw.elapsedMilliseconds}ms',
+                                                                                            );
+
+                                                                                            final List<int> appLogoBytes = results[0];
+                                                                                            final List<int> logoBytes = results[1];
+                                                                                            final List<int> cardImageBytes = results[2];
+
+                                                                                            // بارکد (GPU-bound، یک‌بار)
+                                                                                            final List<int> barcodeBytes = (settingController.settings["nonPreview_printBarCode"] ?? false)
+                                                                                                ? await buildBarcode93(
+                                                                                                    '00964${purchaseData.cardCategory?.id?.toString() ?? ''}',
+                                                                                                  )
+                                                                                                : const <int>[];
+
+                                                                                            print(
+                                                                                              '[PRINT-TIMING] barcode: ${sw.elapsedMilliseconds}ms',
+                                                                                            );
+
+                                                                                            // بخش‌های استاتیک متنی — با ESC/POS خام، بدون GPU، فوری
+                                                                                            final userName = user.user?.name ?? '';
+                                                                                            final bool hasNonAscii = userName.codeUnits.any(
+                                                                                              (
+                                                                                                unit,
+                                                                                              ) =>
+                                                                                                  unit > 127,
+                                                                                            );
+
+                                                                                            // اگر اسم فارسی/عربی است به صورت تصویر رندر می‌شود تا علامت سوال نشود
+                                                                                            final List<int> userNameBytes;
+                                                                                            if (hasNonAscii) {
+                                                                                              if (_cachedUserNames.containsKey(
+                                                                                                userName,
+                                                                                              )) {
+                                                                                                userNameBytes = _cachedUserNames[userName]!;
+                                                                                              } else {
+                                                                                                userNameBytes = await _buildCodeImageWithBorder(
+                                                                                                  userName,
+                                                                                                  width: 220,
+                                                                                                  drawBorder: false,
+                                                                                                  isBold: true,
+                                                                                                );
+                                                                                                _cachedUserNames[userName] = userNameBytes;
+                                                                                              }
+                                                                                            } else {
+                                                                                              userNameBytes = _buildRawTextBytes(
+                                                                                                '====[ $userName ]====',
+                                                                                                bold: true,
                                                                                               );
-                                                                                              return;
                                                                                             }
 
-                                                                                            final userProvider =
-                                                                                                Get.find<
-                                                                                                  HomeApiProvider
-                                                                                                >();
-                                                                                            final user = userProvider.homeDataList.first;
-                                                                                            final purchaseData = purchaseApiProvider.purchaseDataList.first;
-                                                                                            final serials = purchaseData.serials;
-
-                                                                                            if (serials !=
-                                                                                                    null &&
-                                                                                                serials.isNotEmpty) {
-                                                                                              const CustomLoading();
-
-                                                                                              try {
-                                                                                                final sw = Stopwatch()..start();
-
-                                                                                                // ساخت بایت‌های مربوط به عکس‌ها به صورت موازی (GPU-bound و تنها یک‌بار)
-                                                                                                final results = await Future.wait(
-                                                                                                  [
-                                                                                                    _buildAssetImageBytes(
-                                                                                                      'assets/images/logo-print.jpg',
-                                                                                                      80,
-                                                                                                    ),
-                                                                                                    buildNetworkImage(
-                                                                                                      user.user?.agent?.appPhotoUrl ??
-                                                                                                          '',
-                                                                                                      220,
-                                                                                                    ),
-                                                                                                    (settingController.settings["nonPreview_printCardImage"] ??
-                                                                                                            false)
-                                                                                                        ? buildNetworkImage(
-                                                                                                            purchaseData.cardCategory?.photoUrl ??
-                                                                                                                '',
-                                                                                                            200,
-                                                                                                          )
-                                                                                                        : Future.value(
-                                                                                                            <
-                                                                                                              int
-                                                                                                            >[],
-                                                                                                          ),
-                                                                                                  ],
+                                                                                            // تبدیل نام نماینده (فروشگاه) به عکس در صورت عربی/فارسی بودن
+                                                                                            final agentName = user.parentAgent ?? '';
+                                                                                            final List<int> agentNameBytes;
+                                                                                            if (agentName.isNotEmpty) {
+                                                                                              final bool hasNonAsciiAgent = agentName.codeUnits.any(
+                                                                                                (
+                                                                                                  unit,
+                                                                                                ) =>
+                                                                                                    unit > 127,
+                                                                                              );
+                                                                                              if (hasNonAsciiAgent) {
+                                                                                                agentNameBytes = await _buildCodeImageWithBorder(
+                                                                                                  agentName,
+                                                                                                  width: 220,
+                                                                                                  drawBorder: false,
+                                                                                                  isBold: true,
                                                                                                 );
-                                                                                                print(
-                                                                                                  '[PRINT-TIMING] images: ${sw.elapsedMilliseconds}ms',
+                                                                                              } else {
+                                                                                                agentNameBytes = _buildRawTextBytes(
+                                                                                                  agentName,
+                                                                                                  bold: true,
                                                                                                 );
+                                                                                              }
+                                                                                            } else {
+                                                                                              agentNameBytes = [];
+                                                                                            }
 
-                                                                                                final List<
-                                                                                                  int
-                                                                                                >
-                                                                                                appLogoBytes = results[0];
-                                                                                                final List<
-                                                                                                  int
-                                                                                                >
-                                                                                                logoBytes = results[1];
-                                                                                                final List<
-                                                                                                  int
-                                                                                                >
-                                                                                                cardImageBytes = results[2];
+                                                                                            final List<int> headerStaticBytes = [
+                                                                                              ...appLogoBytes,
+                                                                                              ...agentNameBytes,
+                                                                                              ...userNameBytes,
+                                                                                              ..._buildRawTextBytes(
+                                                                                                '========================',
+                                                                                              ),
+                                                                                              ..._buildRawTextBytes(
+                                                                                                'Terminal ID: ${user.user?.id ?? ''}',
+                                                                                                align: 0,
+                                                                                              ),
+                                                                                              ..._buildRawTextBytes(
+                                                                                                'Time: ${purchaseData.printDate}',
+                                                                                                align: 0,
+                                                                                              ),
+                                                                                            ];
 
-                                                                                                // بارکد (GPU-bound، یک‌بار)
-                                                                                                final List<
-                                                                                                  int
-                                                                                                >
-                                                                                                barcodeBytes =
-                                                                                                    (settingController.settings["nonPreview_printBarCode"] ??
-                                                                                                        false)
-                                                                                                    ? await buildBarcode93(
-                                                                                                        '00964${purchaseData.cardCategory?.id?.toString() ?? ''}',
-                                                                                                      )
-                                                                                                    : const <
-                                                                                                        int
-                                                                                                      >[];
+                                                                                            final List<int> cardTitleBytes = _buildRawTextBytes(
+                                                                                              purchaseData.cardTitle ?? '',
+                                                                                              bold: true,
+                                                                                              align: 1,
+                                                                                            );
 
-                                                                                                print(
-                                                                                                  '[PRINT-TIMING] barcode: ${sw.elapsedMilliseconds}ms',
+                                                                                            final String htmlFooter = purchaseData.cardDetails2?.cardFooter ?? '';
+                                                                                            final List<int> cardFooterBytes = (settingController.settings["nonPreview_printInformation"] ?? false)
+                                                                                                ? await buildHtmlImage(
+                                                                                                    htmlFooter,
+                                                                                                    384,
+                                                                                                  )
+                                                                                                : const <int>[];
+
+                                                                                            purchaseApiProvider.totalPrintCount.value = serials.length;
+
+                                                                                            // حلقه کاملاً ترتیبی: ساخت→چاپ فوری برای هر کارت، بدون انتظار برای کارت‌های بعدی
+                                                                                            for (int i = 0; i < serials.length; i++) {
+                                                                                              purchaseApiProvider.currentPrintCount.value = i + 1;
+                                                                                              final serial = serials[i];
+
+                                                                                              // ساخت تصویر کد با بوردر (Canvas-based، یک خط، دارای کادر)
+                                                                                              final List<int> codeBytes;
+                                                                                              if (serial.code != null && serial.code != '') {
+                                                                                                codeBytes = await _buildCodeImageWithBorder(
+                                                                                                  serial.code ?? '',
+                                                                                                  drawBorder: true,
+                                                                                                  isBold: true,
                                                                                                 );
-
-                                                                                                // بخش‌های استاتیک متنی — با ESC/POS خام، بدون GPU، فوری
-                                                                                                final userName =
-                                                                                                    user.user?.name ??
-                                                                                                    '';
-                                                                                                final bool hasNonAscii = userName.codeUnits.any(
-                                                                                                  (
-                                                                                                    unit,
-                                                                                                  ) =>
-                                                                                                      unit >
-                                                                                                      127,
-                                                                                                );
-
-                                                                                                // اگر اسم فارسی/عربی است به صورت تصویر رندر می‌شود تا علامت سوال نشود
-                                                                                                final List<
-                                                                                                  int
-                                                                                                >
-                                                                                                userNameBytes;
-                                                                                                if (hasNonAscii) {
-                                                                                                  if (_cachedUserNames.containsKey(
-                                                                                                    userName,
-                                                                                                  )) {
-                                                                                                    userNameBytes = _cachedUserNames[userName]!;
-                                                                                                  } else {
-                                                                                                    userNameBytes = await _buildCodeImageWithBorder(
-                                                                                                      userName,
-                                                                                                      width: 220,
-                                                                                                      drawBorder: false,
-                                                                                                      isBold: true,
-                                                                                                    );
-                                                                                                    _cachedUserNames[userName] = userNameBytes;
-                                                                                                  }
-                                                                                                } else {
-                                                                                                  userNameBytes = _buildRawTextBytes(
-                                                                                                    '====[ $userName ]====',
-                                                                                                    bold: true,
-                                                                                                  );
-                                                                                                }
-
-                                                                                                // تبدیل نام نماینده (فروشگاه) به عکس در صورت عربی/فارسی بودن
-                                                                                                final agentName =
-                                                                                                    user.parentAgent ??
-                                                                                                    '';
-                                                                                                final List<
-                                                                                                  int
-                                                                                                >
-                                                                                                agentNameBytes;
-                                                                                                if (agentName.isNotEmpty) {
-                                                                                                  final bool hasNonAsciiAgent = agentName.codeUnits.any(
-                                                                                                    (
-                                                                                                      unit,
-                                                                                                    ) =>
-                                                                                                        unit >
-                                                                                                        127,
-                                                                                                  );
-                                                                                                  if (hasNonAsciiAgent) {
-                                                                                                    agentNameBytes = await _buildCodeImageWithBorder(
-                                                                                                      agentName,
-                                                                                                      width: 220,
-                                                                                                      drawBorder: false,
-                                                                                                      isBold: true,
-                                                                                                    );
-                                                                                                  } else {
-                                                                                                    agentNameBytes = _buildRawTextBytes(
-                                                                                                      agentName,
-                                                                                                      bold: true,
-                                                                                                    );
-                                                                                                  }
-                                                                                                } else {
-                                                                                                  agentNameBytes = [];
-                                                                                                }
-
-                                                                                                final List<
-                                                                                                  int
-                                                                                                >
-                                                                                                headerStaticBytes = [
-                                                                                                  ...appLogoBytes,
-                                                                                                  ...agentNameBytes,
-                                                                                                  ...userNameBytes,
+                                                                                              } else {
+                                                                                                codeBytes = [
                                                                                                   ..._buildRawTextBytes(
-                                                                                                    '========================',
+                                                                                                    serial.code1 ?? '',
                                                                                                   ),
-                                                                                                  ..._buildRawTextBytes(
-                                                                                                    'Terminal ID: ${user.user?.id ?? ''}',
-                                                                                                    align: 0,
+                                                                                                  ...await _buildCodeImageWithBorder(
+                                                                                                    serial.code2 ?? '',
+                                                                                                    drawBorder: true,
+                                                                                                    isBold: true,
                                                                                                   ),
+                                                                                                  if (serial.code3 != null && serial.code3!.isNotEmpty)
+                                                                                                    ..._buildRawTextBytes(
+                                                                                                      serial.code3 ?? '',
+                                                                                                    ),
                                                                                                   ..._buildRawTextBytes(
-                                                                                                    'Time: ${purchaseData.printDate}',
-                                                                                                    align: 0,
+                                                                                                    serial.code4 ?? '',
                                                                                                   ),
                                                                                                 ];
+                                                                                              }
+                                                                                              print(
+                                                                                                'serial.code: ${serial.code}',
+                                                                                              );
+                                                                                              print(
+                                                                                                'serial.code1: ${serial.code1}',
+                                                                                              );
+                                                                                              print(
+                                                                                                'serial.code2: ${serial.code2}',
+                                                                                              );
+                                                                                              print(
+                                                                                                'serial.code3: ${serial.code3}',
+                                                                                              );
+                                                                                              print(
+                                                                                                'serial.code4: ${serial.code4}',
+                                                                                              );
 
-                                                                                                final List<
-                                                                                                  int
-                                                                                                >
-                                                                                                cardTitleBytes = _buildRawTextBytes(
-                                                                                                  purchaseData.cardTitle ??
-                                                                                                      '',
-                                                                                                  bold: true,
-                                                                                                  align: 1,
+                                                                                              // ساخت بایت‌های کارت جاری
+                                                                                              final List<int> ticketBytes = [
+                                                                                                ...logoBytes,
+                                                                                                ...headerStaticBytes,
+                                                                                                ..._buildRawTextBytes(
+                                                                                                  'Order Number: ${serial.id ?? ''}',
+                                                                                                  align: 0,
+                                                                                                ),
+                                                                                                ..._buildRawTextBytes(
+                                                                                                  'Expiry: ${serial.expiredDate ?? serial.code3 ?? ''}',
+                                                                                                  align: 0,
+                                                                                                ),
+                                                                                                ...cardImageBytes,
+                                                                                                ...cardTitleBytes,
+                                                                                                ..._buildRawTextBytes(
+                                                                                                  'Serial: ${serial.serial ?? ''}',
+                                                                                                  align: 0,
+                                                                                                ),
+                                                                                                ...codeBytes,
+                                                                                                10,
+                                                                                                //  10,
+                                                                                                ...barcodeBytes,
+                                                                                                // 10,
+                                                                                              ];
+
+                                                                                              // ساخت بایت‌های نهایی شامل QR کد و فوتر
+                                                                                              final List<int> finalBytes = [
+                                                                                                ...ticketBytes,
+                                                                                              ];
+                                                                                              if ((settingController.settings["nonPreview_printQrcode"] ?? false) && serial.code != null && serial.code != '' && (purchaseData.ussdCodes != null) && (i < purchaseData.ussdCodes!.length) && (purchaseData.ussdCodes![i].code != null)) {
+                                                                                                final qrBytes = await buildQRCode(
+                                                                                                  "tel:${purchaseData.ussdCodes![i].code}",
+                                                                                                  size: 100,
                                                                                                 );
+                                                                                                finalBytes.addAll(
+                                                                                                  [
+                                                                                                    0x1B,
+                                                                                                    0x61,
+                                                                                                    0x01,
+                                                                                                    ...qrBytes,
+                                                                                                  ],
+                                                                                                );
+                                                                                              }
 
-                                                                                                final String htmlFooter =
-                                                                                                    purchaseData.cardDetails2?.cardFooter ??
-                                                                                                    '';
-                                                                                                final List<
-                                                                                                  int
-                                                                                                >
-                                                                                                cardFooterBytes =
-                                                                                                    (settingController.settings["nonPreview_printInformation"] ??
-                                                                                                        false)
-                                                                                                    ? await buildHtmlImage(
-                                                                                                        htmlFooter,
-                                                                                                        256,
-                                                                                                      )
-                                                                                                    : const <
-                                                                                                        int
-                                                                                                      >[];
-
-                                                                                                purchaseApiProvider.totalPrintCount.value = serials.length;
-
-                                                                                                // حلقه کاملاً ترتیبی: ساخت→چاپ فوری برای هر کارت، بدون انتظار برای کارت‌های بعدی
-                                                                                                for (
-                                                                                                  int i = 0;
-                                                                                                  i <
-                                                                                                      serials.length;
-                                                                                                  i++
-                                                                                                ) {
-                                                                                                  purchaseApiProvider.currentPrintCount.value =
-                                                                                                      i +
-                                                                                                      1;
-                                                                                                  final serial = serials[i];
-
-                                                                                                  // ساخت تصویر کد با بوردر (Canvas-based، یک خط، دارای کادر)
-                                                                                                  final List<
-                                                                                                    int
-                                                                                                  >
-                                                                                                  codeBytes;
-                                                                                                  if (serial.code !=
-                                                                                                          null &&
-                                                                                                      serial.code !=
-                                                                                                          '') {
-                                                                                                    codeBytes = await _buildCodeImageWithBorder(
-                                                                                                      serial.code ??
-                                                                                                          '',
-                                                                                                      drawBorder: true,
-                                                                                                      isBold: true,
-                                                                                                    );
-                                                                                                  } else {
-                                                                                                    codeBytes = [
-                                                                                                      ..._buildRawTextBytes(
-                                                                                                        serial.code1 ??
-                                                                                                            '',
-                                                                                                      ),
-                                                                                                      ...await _buildCodeImageWithBorder(
-                                                                                                        serial.code2 ??
-                                                                                                            '',
-                                                                                                        drawBorder: true,
-                                                                                                        isBold: true,
-                                                                                                      ),
-                                                                                                      if (serial.code3 !=
-                                                                                                              null &&
-                                                                                                          serial.code3!.isNotEmpty)
-                                                                                                        ..._buildRawTextBytes(
-                                                                                                          serial.code3 ??
-                                                                                                              '',
-                                                                                                        ),
-                                                                                                      ..._buildRawTextBytes(
-                                                                                                        serial.code4 ??
-                                                                                                            '',
-                                                                                                      ),
-                                                                                                    ];
-                                                                                                  }
-                                                                                                  print(
-                                                                                                    'serial.code: ${serial.code}',
-                                                                                                  );
-                                                                                                  print(
-                                                                                                    'serial.code1: ${serial.code1}',
-                                                                                                  );
-                                                                                                  print(
-                                                                                                    'serial.code2: ${serial.code2}',
-                                                                                                  );
-                                                                                                  print(
-                                                                                                    'serial.code3: ${serial.code3}',
-                                                                                                  );
-                                                                                                  print(
-                                                                                                    'serial.code4: ${serial.code4}',
-                                                                                                  );
-
-                                                                                                  // ساخت بایت‌های کارت جاری
-                                                                                                  final List<
-                                                                                                    int
-                                                                                                  >
-                                                                                                  ticketBytes = [
-                                                                                                    ...logoBytes,
-                                                                                                    ...headerStaticBytes,
-                                                                                                    ..._buildRawTextBytes(
-                                                                                                      'Order Number: ${serial.id ?? ''}',
-                                                                                                      align: 0,
-                                                                                                    ),
-                                                                                                    ..._buildRawTextBytes(
-                                                                                                      'Expiry: ${serial.expiredDate ?? serial.code3 ?? ''}',
-                                                                                                      align: 0,
-                                                                                                    ),
-                                                                                                    ...cardImageBytes,
-                                                                                                    ...cardTitleBytes,
-                                                                                                    ..._buildRawTextBytes(
-                                                                                                      'Serial: ${serial.serial ?? ''}',
-                                                                                                      align: 0,
-                                                                                                    ),
-                                                                                                    ...codeBytes,
-                                                                                                    10,
-                                                                                                    //  10,
-                                                                                                    ...barcodeBytes,
+                                                                                              // اضافه کردن فوتر در انتهای کارت
+                                                                                              if (cardFooterBytes.isNotEmpty) {
+                                                                                                finalBytes.addAll(
+                                                                                                  [
                                                                                                     // 10,
-                                                                                                  ];
-
-                                                                                                  // ساخت بایت‌های نهایی شامل QR کد و فوتر
-                                                                                                  final List<
-                                                                                                    int
-                                                                                                  >
-                                                                                                  finalBytes = [
-                                                                                                    ...ticketBytes,
-                                                                                                  ];
-                                                                                                  if ((settingController.settings["nonPreview_printQrcode"] ??
-                                                                                                          false) &&
-                                                                                                      serial.code !=
-                                                                                                          null &&
-                                                                                                      serial.code !=
-                                                                                                          '' &&
-                                                                                                      (purchaseData.ussdCodes !=
-                                                                                                          null) &&
-                                                                                                      (i <
-                                                                                                          purchaseData.ussdCodes!.length) &&
-                                                                                                      (purchaseData.ussdCodes![i].code !=
-                                                                                                          null)) {
-                                                                                                    final qrBytes = await buildQRCode(
-                                                                                                      "tel:${purchaseData.ussdCodes![i].code}",
-                                                                                                      size: 100,
-                                                                                                    );
-                                                                                                    finalBytes.addAll(
-                                                                                                      [
-                                                                                                        0x1B,
-                                                                                                        0x61,
-                                                                                                        0x01,
-                                                                                                        ...qrBytes,
-                                                                                                      ],
-                                                                                                    );
-                                                                                                  }
-
-                                                                                                  // اضافه کردن فوتر در انتهای کارت
-                                                                                                  if (cardFooterBytes.isNotEmpty) {
-                                                                                                    finalBytes.addAll(
-                                                                                                      [
-                                                                                                        // 10,
-                                                                                                        ...cardFooterBytes,
-                                                                                                      ],
-                                                                                                    );
-                                                                                                  }
-
-                                                                                                  // خط پایان و برش فیزیکی
-                                                                                                  finalBytes.addAll(
-                                                                                                    [
-                                                                                                      ..._buildRawTextBytes(
-                                                                                                        '\n----------------------------\n',
-                                                                                                      ),
-                                                                                                      27,
-                                                                                                      100,
-                                                                                                      5, // Print and feed 5 lines
-                                                                                                    ],
-                                                                                                  );
-
-                                                                                                  // چاپ بلافاصله — بدون انتظار برای کارت‌های بعدی
-                                                                                                  print(
-                                                                                                    '[PRINT-TIMING] sending card ${i + 1} bytes=${finalBytes.length} at ${sw.elapsedMilliseconds}ms',
-                                                                                                  );
-                                                                                                  await PrintBluetoothThermal.writeBytes(
-                                                                                                    finalBytes,
-                                                                                                  );
-                                                                                                  print(
-                                                                                                    '[PRINT-TIMING] writeBytes done for card ${i + 1} at ${sw.elapsedMilliseconds}ms',
-                                                                                                  );
-
-                                                                                                  // تأخیر کوتاه بین کارت‌ها فقط برای فاصله فیزیکی کاغذ
-                                                                                                  if (i <
-                                                                                                      serials.length -
-                                                                                                          1) {
-                                                                                                    await Future.delayed(
-                                                                                                      const Duration(
-                                                                                                        milliseconds: 500,
-                                                                                                      ),
-                                                                                                    );
-                                                                                                  }
-                                                                                                }
-                                                                                              } catch (
-                                                                                                e
-                                                                                              ) {
-                                                                                                print(
-                                                                                                  "Error in printing: $e",
+                                                                                                    ...cardFooterBytes,
+                                                                                                  ],
                                                                                                 );
-                                                                                              } finally {
-                                                                                                purchaseApiProvider.totalPrintCount.value = 0;
-                                                                                                purchaseApiProvider.currentPrintCount.value = 0;
+                                                                                              }
+
+                                                                                              // خط پایان و برش فیزیکی
+                                                                                              finalBytes.addAll(
+                                                                                                [
+                                                                                                  ..._buildRawTextBytes(
+                                                                                                    '\n----------------------------\n',
+                                                                                                  ),
+                                                                                                  27,
+                                                                                                  100,
+                                                                                                  5, // Print and feed 5 lines
+                                                                                                ],
+                                                                                              );
+
+                                                                                              // چاپ بلافاصله — بدون انتظار برای کارت‌های بعدی
+                                                                                              print(
+                                                                                                '[PRINT-TIMING] sending card ${i + 1} bytes=${finalBytes.length} at ${sw.elapsedMilliseconds}ms',
+                                                                                              );
+                                                                                              await PrintBluetoothThermal.writeBytes(
+                                                                                                finalBytes,
+                                                                                              );
+                                                                                              print(
+                                                                                                '[PRINT-TIMING] writeBytes done for card ${i + 1} at ${sw.elapsedMilliseconds}ms',
+                                                                                              );
+
+                                                                                              // تأخیر کوتاه بین کارت‌ها فقط برای فاصله فیزیکی کاغذ
+                                                                                              if (i < serials.length - 1) {
+                                                                                                await Future.delayed(
+                                                                                                  const Duration(
+                                                                                                    milliseconds: 500,
+                                                                                                  ),
+                                                                                                );
                                                                                               }
                                                                                             }
-                                                                                            Get.back();
+                                                                                          } catch (e) {
+                                                                                            print(
+                                                                                              "Error in printing: $e",
+                                                                                            );
+                                                                                          } finally {
+                                                                                            purchaseApiProvider.totalPrintCount.value = 0;
+                                                                                            purchaseApiProvider.currentPrintCount.value = 0;
                                                                                           }
                                                                                         }
-                                                                                      } finally {
-                                                                                        purchaseApiProvider.isProcessing.value = false;
+                                                                                        Get.back();
                                                                                       }
-                                                                                    },
-                                                                                  )
-                                                                                  .catchError(
-                                                                                    (
-                                                                                      error,
-                                                                                    ) {
-                                                                                      purchaseApiProvider.isProcessing.value = false;
-                                                                                    },
-                                                                                  );
+                                                                                    }
+                                                                                  } finally {
+                                                                                    purchaseApiProvider.isProcessing.value = false;
+                                                                                  }
+                                                                                },
+                                                                              ).catchError(
+                                                                                (
+                                                                                  error,
+                                                                                ) {
+                                                                                  purchaseApiProvider.isProcessing.value = false;
+                                                                                },
+                                                                              );
                                                                             }
                                                                           },
-                                                                    child:
-                                                                        purchaseApiProvider
+                                                                    child: purchaseApiProvider
                                                                             .isProcessing
                                                                             .value
                                                                         ? CustomLoading(
-                                                                            color: Theme.of(
+                                                                            color:
+                                                                                Theme.of(
                                                                               context,
                                                                             ).colorScheme.onPrimary,
                                                                           )
-                                                                        : Obx(() {
+                                                                        : Obx(
+                                                                            () {
                                                                             switch (purchaseApiProvider.rxRequestStatus.value) {
                                                                               case Status.completed:
                                                                                 return const Text(
@@ -1301,14 +1153,9 @@ class CompaniesArchivePage extends StatelessWidget {
                                                                                 return Text(
                                                                                   'تأكيد',
                                                                                   style: TextStyle(
-                                                                                    color:
-                                                                                        Theme.of(
-                                                                                              context,
-                                                                                            )
-                                                                                            .extension<
-                                                                                              SuccessColorTheme
-                                                                                            >()
-                                                                                            ?.onSuccessColor,
+                                                                                    color: Theme.of(
+                                                                                      context,
+                                                                                    ).extension<SuccessColorTheme>()?.onSuccessColor,
                                                                                   ),
                                                                                 );
                                                                             }
@@ -1351,14 +1198,13 @@ class CompaniesArchivePage extends StatelessWidget {
                           children: [
                             Container(
                               clipBehavior: Clip.antiAlias,
-                              decoration:
-                                  Constants.intesharBoxDecoration(
-                                    context,
-                                  ).copyWith(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onPrimary.withAlpha(10),
-                                  ),
+                              decoration: Constants.intesharBoxDecoration(
+                                context,
+                              ).copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onPrimary.withAlpha(10),
+                              ),
                               child: Column(
                                 children: [
                                   Container(
@@ -1387,11 +1233,11 @@ class CompaniesArchivePage extends StatelessWidget {
                                       ),
                                       errorWidget: (context, url, error) =>
                                           Image.asset(
-                                            'assets/images/not.jpg',
-                                            fit: BoxFit.fill,
-                                            height: 160,
-                                            width: 160,
-                                          ),
+                                        'assets/images/not.jpg',
+                                        fit: BoxFit.fill,
+                                        height: 160,
+                                        width: 160,
+                                      ),
                                     ),
                                   ),
                                   const Gap(10),
@@ -1409,8 +1255,7 @@ class CompaniesArchivePage extends StatelessWidget {
                             ),
                             Obx(
                               () => Visibility(
-                                visible:
-                                    cardPriceApi.rxRequestStatus.value ==
+                                visible: cardPriceApi.rxRequestStatus.value ==
                                         Status.loading
                                     ? true
                                     : false,
@@ -1603,8 +1448,8 @@ class CompaniesArchivePage extends StatelessWidget {
               // اگر پیکسل شفاف باشد، آن را سفید فرض می‌کنیم
               if (a > 127) {
                 // محاسبه درخشندگی برای سیاه یا سفید کردن پیکسل
-                final int luminance = (r * 0.299 + g * 0.587 + b * 0.114)
-                    .round();
+                final int luminance =
+                    (r * 0.299 + g * 0.587 + b * 0.114).round();
                 if (luminance < 128) {
                   byteVal |= (128 >> bit);
                 }
@@ -1621,7 +1466,7 @@ class CompaniesArchivePage extends StatelessWidget {
   /// ✅ ساخت بایت بارکد Code93
   Future<List<int>> buildBarcode93(
     String cardId, {
-    int width = 300,
+    int width = 384,
     int height = 80,
   }) async {
     final barcode = bc.Barcode.code93();
@@ -1677,9 +1522,8 @@ class CompaniesArchivePage extends StatelessWidget {
     String cacheKey,
   ) async {
     try {
-      final response = await http
-          .get(Uri.parse(url))
-          .timeout(const Duration(seconds: 5));
+      final response =
+          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 5));
       final Uint8List bytes = response.bodyBytes;
 
       img.Image? image = img.decodeImage(bytes);
@@ -1810,6 +1654,7 @@ class CompaniesArchivePage extends StatelessWidget {
               color: Colors.black,
               textAlign: TextAlign.right,
               direction: TextDirection.rtl,
+              fontFamily: 'dijlah',
             ),
             "body": Style(
               margin: Margins.zero,
@@ -1817,8 +1662,9 @@ class CompaniesArchivePage extends StatelessWidget {
               color: Colors.black,
               textAlign: TextAlign.right,
               direction: TextDirection.rtl,
+              fontFamily: 'dijlah',
             ),
-            "span": Style(direction: TextDirection.rtl),
+            "span": Style(direction: TextDirection.rtl, fontFamily: 'dijlah'),
           },
         ),
       ),

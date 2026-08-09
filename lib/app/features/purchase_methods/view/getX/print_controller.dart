@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:get/get.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
@@ -16,11 +17,30 @@ class BluetoothController extends GetxController {
   RxInt printCount = 1.obs;
   RxString deviceName = ''.obs;
   var rxRequestStatus = Status.initial.obs;
+  Timer? _statusTimer;
 
   @override
   void onInit() {
     super.onInit();
     tryAutoConnectPrinter();
+    _startStatusPolling();
+  }
+
+  void _startStatusPolling() {
+    _statusTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
+      try {
+        final status = await PrintBluetoothThermal.connectionStatus;
+        if (isConnected.value != status) {
+          isConnected.value = status;
+        }
+      } catch (_) {}
+    });
+  }
+
+  @override
+  void onClose() {
+    _statusTimer?.cancel();
+    super.onClose();
   }
 
   // Check and request Bluetooth permissions, then turn it on if needed (with timeout)

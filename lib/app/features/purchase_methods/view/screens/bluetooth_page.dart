@@ -204,83 +204,77 @@ class BluetoothPage extends StatelessWidget {
             ? await processImageForPrinter(pinCodeImageBytes)
             : null;
 
-        // تابع چاپ متن با مدیریت خطا و await
-        Future<void> printText(
-          String text, {
-          bool bold = false,
-          int? size,
-        }) async {
-          try {
-            await PrintBluetoothThermal.writeString(
-              printText: PrintTextSize(
-                size: size ?? 8,
-                text: bold ? "\x1B\x45\x01$text\x1B\x45\x00" : text,
-              ),
-            );
-          } catch (e) {
-            debugPrint("⚠️ خطا در ارسال متن به پرینتر: $e");
-          }
-        }
+        List<int> allBytes = [];
 
-        Future<void> safeWriteBytes(List<int> bytes) async {
-          try {
-            await PrintBluetoothThermal.writeBytes(bytes);
-          } catch (e) {
-            debugPrint("⚠️ خطا در ارسال بایت‌ها به پرینتر: $e");
-          }
+        void addText(String text, {bool bold = false}) {
+          if (text.isEmpty) return;
+          if (bold) allBytes.addAll(const [0x1B, 0x45, 0x01]);
+          allBytes.addAll(utf8.encode(text));
+          if (bold) allBytes.addAll(const [0x1B, 0x45, 0x00]);
         }
 
         // شروع چاپ
-        debugPrint("🖨️ شروع ارسال به پرینتر برای index $index");
+        debugPrint("🖨️ شروع جمع‌آوری بایت‌ها برای index $index");
         bluetoothController.printed.value = true;
+        
         if (headerBytes != null) {
-          await safeWriteBytes(headerBytes);
+          allBytes.addAll(headerBytes);
         }
-        await printText(isReported ? '--------- 2 ---------\n' : '');
+        
+        addText(isReported ? '--------- 2 ---------\n' : '');
+        
         // Set alignment to Left (0)
-        await safeWriteBytes(const [0x1B, 0x61, 0x00]);
-        await printText('Terminal ID : ${user.user?.id ?? ''}\n');
-        await printText('Time : $printDate\n');
-        await printText('Order Number : ${serial.id}\n');
-        await printText('Expiry Time : ${serial.expiredDate ?? serial.code3}');
+        allBytes.addAll(const [0x1B, 0x61, 0x00]);
+        addText('Terminal ID : ${user.user?.id ?? ''}\n');
+        addText('Time : $printDate\n');
+        addText('Order Number : ${serial.id}\n');
+        addText('Expiry Time : ${serial.expiredDate ?? serial.code3}');
 
         if (cardPhotoBytes != null) {
-          await safeWriteBytes(cardPhotoBytes);
+          allBytes.addAll(cardPhotoBytes);
         }
 
         // Set alignment to Center (1)
-        await safeWriteBytes(const [0x1B, 0x61, 0x01]);
-        await printText("\n$cardTitle", bold: true);
+        allBytes.addAll(const [0x1B, 0x61, 0x01]);
+        
+        // Arabic text might not print well as UTF-8, but we keep it as it was
+        addText("\n$cardTitle", bold: true);
 
         // Reset alignment to Left (0)
-        await safeWriteBytes(const [0x1B, 0x61, 0x00]);
+        allBytes.addAll(const [0x1B, 0x61, 0x00]);
         if (serial.serial?.isNotEmpty ?? false) {
-          await printText("\nSerial : ${serial.serial}");
+          addText("\nSerial : ${serial.serial}");
         }
 
         if (serial.code1 != null &&
             serial.code1 is String &&
             (serial.code1 as String).isNotEmpty) {
-          await printText('\nPin Code :');
+          addText('\nPin Code :');
         }
         if (pinCodeBytes != null) {
-          await safeWriteBytes(pinCodeBytes);
+          allBytes.addAll(pinCodeBytes);
         }
 
         if (qrCodeBytes != null) {
-          await safeWriteBytes(qrCodeBytes);
+          allBytes.addAll(qrCodeBytes);
         }
 
         if (barCodeBytes != null) {
-          await safeWriteBytes(barCodeBytes);
+          allBytes.addAll(barCodeBytes);
         }
 
         if (footerBytes != null) {
-          await safeWriteBytes(footerBytes);
+          allBytes.addAll(footerBytes);
         }
 
-        await printText('\n --------------- \n');
-        debugPrint("✅ چاپ کامل شد برای index $index");
+        addText('\n --------------- \n');
+        
+        debugPrint("✅ ارسال یکپارچه بایت‌ها به پرینتر برای index $index");
+        try {
+          await PrintBluetoothThermal.writeBytes(allBytes);
+        } catch (e) {
+          debugPrint("⚠️ خطا در ارسال بایت‌ها به پرینتر: $e");
+        }
       }
     }
 

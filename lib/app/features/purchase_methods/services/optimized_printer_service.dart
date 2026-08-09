@@ -283,6 +283,7 @@ class OptimizedPrinterService {
     }
 
     ui.Picture? barcodePicture;
+    double actualBarcodeWidth = 300.0;
     const double barcodeHeight = 80.0;
     const double barcodeWidth = 300.0;
     if (printBarcode) {
@@ -299,6 +300,7 @@ class OptimizedPrinterService {
         null,
       );
       barcodePicture = pictureInfo.picture;
+      actualBarcodeWidth = pictureInfo.size.width;
       ticketHeight += barcodeHeight + 10.0;
     }
 
@@ -371,7 +373,7 @@ class OptimizedPrinterService {
 
     if (barcodePicture != null) {
       canvas.save();
-      canvas.translate((ticketWidth - barcodeWidth) / 2, currentY);
+      canvas.translate((ticketWidth - actualBarcodeWidth) / 2, currentY);
       canvas.drawPicture(barcodePicture);
       canvas.restore();
       currentY += barcodeHeight + 10.0;
@@ -829,11 +831,13 @@ Future<ui.Image?> htmlToImage(String htmlContent, double width) async {
     child: Html(
       data: processedHtml,
       style: {
-        "p": Style(fontSize: FontSize(16), color: Colors.black),
+        "p": Style(
+            fontSize: FontSize(16), color: Colors.black, fontFamily: 'dijlah'),
         "body": Style(
           margin: Margins.zero,
           padding: HtmlPaddings.zero,
           color: Colors.black,
+          fontFamily: 'dijlah',
         ),
       },
     ),
