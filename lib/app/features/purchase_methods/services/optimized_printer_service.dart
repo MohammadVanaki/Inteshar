@@ -824,22 +824,33 @@ Future<ui.Image?> htmlToImage(String htmlContent, double width) async {
   );
 
   final screenshotController = ScreenshotController();
-  final widget = Container(
-    color: Colors.white,
-    width: width,
-    padding: const EdgeInsets.all(5),
-    child: Html(
-      data: processedHtml,
-      style: {
-        "p": Style(
-            fontSize: FontSize(16), color: Colors.black, fontFamily: 'dijlah'),
-        "body": Style(
-          margin: Margins.zero,
-          padding: HtmlPaddings.zero,
-          color: Colors.black,
-          fontFamily: 'dijlah',
+  final widget = MediaQuery(
+    data: const MediaQueryData(
+      textScaler: TextScaler.linear(1.0),
+      devicePixelRatio: 1.0,
+    ),
+    child: Directionality(
+      textDirection: TextDirection.rtl,
+      child: Container(
+        color: Colors.white,
+        width: width,
+        padding: const EdgeInsets.all(5),
+        child: Html(
+          data: processedHtml,
+          style: {
+            "p": Style(
+                fontSize: FontSize(16),
+                color: Colors.black,
+                fontFamily: 'dijlah'),
+            "body": Style(
+              margin: Margins.zero,
+              padding: HtmlPaddings.zero,
+              color: Colors.black,
+              fontFamily: 'dijlah',
+            ),
+          },
         ),
-      },
+      ),
     ),
   );
 

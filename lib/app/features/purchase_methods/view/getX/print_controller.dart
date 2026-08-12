@@ -30,29 +30,9 @@ class BluetoothController extends GetxController {
     _statusTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
       try {
         final status = await PrintBluetoothThermal.connectionStatus;
-        bool isRealConnected = status;
 
-        if (status && Platform.isIOS) {
-          // On iOS, connectionStatus might be cached. Verify with FlutterBluePlus.
-          final connectedDevices = FlutterBluePlus.connectedDevices;
-          bool found = false;
-          for (var device in connectedDevices) {
-            // We check by name or MAC if possible, but just checking if ANY device is connected is better than nothing.
-            // If the printer is turned off, it drops from connectedDevices quickly.
-            if (device.advName == deviceName.value ||
-                device.remoteId.str ==
-                    Constants.localStorage.read('printAddres')?['macAddress']) {
-              found = true;
-              break;
-            }
-          }
-          if (!found && connectedDevices.isEmpty) {
-            isRealConnected = false;
-          }
-        }
-
-        if (isConnected.value != isRealConnected) {
-          isConnected.value = isRealConnected;
+        if (isConnected.value != status) {
+          isConnected.value = status;
         }
       } catch (_) {}
     });
